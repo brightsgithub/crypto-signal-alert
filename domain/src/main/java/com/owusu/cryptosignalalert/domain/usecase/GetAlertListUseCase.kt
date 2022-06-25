@@ -1,4 +1,13 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
-class GetAlertListUseCase {
+import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
+import com.owusu.cryptosignalalert.domain.repository.AlertListRepository
+
+class GetAlertListUseCase(
+    private val alertListRepository: AlertListRepository):
+    SuspendedUseCaseUnit<AlertListDomainWrapper> {
+
+    override suspend fun invoke(): AlertListDomainWrapper {
+        return alertListRepository.getAlertList()
+    }
 }

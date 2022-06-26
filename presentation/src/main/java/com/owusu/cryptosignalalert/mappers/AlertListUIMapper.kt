@@ -1,7 +1,9 @@
 package com.owusu.cryptosignalalert.mappers
 
+import com.owusu.cryptosignalalert.domain.models.AlertFrequency
 import com.owusu.cryptosignalalert.domain.models.AlertItemDomain
 import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
+import com.owusu.cryptosignalalert.models.AlertFrequencyUI
 import com.owusu.cryptosignalalert.models.AlertItemUI
 import com.owusu.cryptosignalalert.models.AlertListUIWrapper
 
@@ -16,7 +18,7 @@ class AlertListUIMapper: UIMapper<AlertListDomainWrapper, AlertListUIWrapper> {
                     AlertItemUI(
                         symbol,
                         cryptoName,
-                        frequency,
+                        mapFrequencyToUI(frequency),
                         currentPrice,
                         alertPrice,
                         progress,
@@ -37,7 +39,7 @@ class AlertListUIMapper: UIMapper<AlertListDomainWrapper, AlertListUIWrapper> {
                     AlertItemDomain(
                         symbol,
                         cryptoName,
-                        frequency,
+                        mapFrequencyToDomain(frequency),
                         currentPrice,
                         alertPrice,
                         progress,
@@ -47,5 +49,19 @@ class AlertListUIMapper: UIMapper<AlertListDomainWrapper, AlertListUIWrapper> {
             }
         }
         return AlertListDomainWrapper(list)
+    }
+
+    private fun mapFrequencyToUI(domainFrequency: AlertFrequency): AlertFrequencyUI {
+        return when(domainFrequency) {
+            is AlertFrequency.EveryTime -> AlertFrequencyUI.EveryTime
+            is AlertFrequency.Once -> AlertFrequencyUI.Once
+        }
+    }
+
+    private fun mapFrequencyToDomain(uiFrequency: AlertFrequencyUI): AlertFrequency {
+        return when(uiFrequency) {
+            is AlertFrequencyUI.EveryTime -> AlertFrequency.EveryTime
+            is AlertFrequencyUI.Once -> AlertFrequency.Once
+        }
     }
 }

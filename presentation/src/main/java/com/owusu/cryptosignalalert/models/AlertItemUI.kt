@@ -12,5 +12,5 @@ data class AlertItemUI (
     val currentPrice: String,
     val alertPrice: String,
     val progress: Int,
-    val hasAlertBeenTriggered: Int
+    val hasAlertBeenTriggered: Boolean
 ) : Parcelable

@@ -9,11 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CryptoSignalAlert"
-        android:name="com.owusu.cryptosignalalert.CryptoSignalAlertApp"
-        >
+        android:name="com.owusu.cryptosignalalert.CryptoSignalAlertApp">
         <activity
             android:name=".views.activities.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.CryptoSignalAlert.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

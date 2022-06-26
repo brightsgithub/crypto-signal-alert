@@ -1,12 +1,14 @@
 package com.owusu.cryptosignalalert.views.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.models.AlertListUIWrapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import kotlinx.coroutines.Job
@@ -64,11 +66,18 @@ class FragmentAlertList: Fragment() {
             viewModel.viewState.collect { state ->
                 when(state) {
                     is AlertListViewState.AlertListDataFailure -> {}
-                    is AlertListViewState.AlertListDataSuccess -> {}
+                    is AlertListViewState.AlertListDataSuccess -> { displayData(state.alertListUIWrapper) }
                     is AlertListViewState.HideLoadingState -> {}
                     is AlertListViewState.ShowLoadingState -> {}
                 }
             }
         }
+    }
+
+    private fun displayData(alertListUIWrapper: AlertListUIWrapper) {
+        for (item in alertListUIWrapper.alertList) {
+            Log.v("FragmentAlertList", item.toString())
+        }
+
     }
 }

@@ -10,4 +10,8 @@ val dataModule = module(override = true) {
     single<AlertListRepository> {
         AlertListRepositoryImpl()
     }
+
+
+
+
 }

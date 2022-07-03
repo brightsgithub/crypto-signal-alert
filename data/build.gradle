@@ -44,20 +44,22 @@ dependencies {
     // Ktor - https://ktor.io/docs/getting-started-ktor-client.html#add-dependencies
 
     // ktor-client-core contains core Ktor client functionality.
-    implementation("io.ktor:ktor-client-core:$ktor_version")
+    api("io.ktor:ktor-client-core:$ktor_version") // api so Presentation module can see this
     // CIO is a fully asynchronous coroutine-based engine that can be used for both JVM and Android platforms.
     //implementation("io.ktor:ktor-client-cio:2.0.3")
     // Engine dependency
     // Engines are used to process network requests. Note that a specific platform may require a
     // specific engine that processes network requests.-
     // Here I'm using the Android Engine
-    implementation("io.ktor:ktor-client-android:$ktor_version")
+    api("io.ktor:ktor-client-android:$ktor_version") // api so Presentation module can see this
     // Many applications require common functionality that is out of scope of the application logic.
     // This could be things like logging, serialization, or authorization.
     // All of these are provided in Ktor by means of what we call Plugins.
     // Here Im using the Logging plug in
-    implementation("io.ktor:ktor-client-logging-jvm:$ktor_version")
+    api("io.ktor:ktor-client-logging-jvm:$ktor_version")
     // Here im using the Serialization Plugin to serialize/deserialize JSON data
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    api("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+
+    api("io.ktor:ktor-client-content-negotiation:$ktor_version")
 
 }

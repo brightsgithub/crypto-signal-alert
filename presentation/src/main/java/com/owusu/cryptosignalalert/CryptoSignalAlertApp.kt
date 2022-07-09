@@ -2,8 +2,8 @@ package com.owusu.cryptosignalalert
 
 import android.support.multidex.MultiDexApplication
 import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
+import com.owusu.cryptosignalalert.data.di.dataModule
 import com.owusu.cryptosignalalert.di.appModule
-import com.owusu.cryptosignalalert.di.dataModule
 import com.owusu.cryptosignalalert.di.domainModule
 import com.owusu.cryptosignalalert.di.uiModule
 import org.koin.android.ext.koin.androidContext

@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.test.InstrumentationRegistry
 import androidx.test.InstrumentationRegistry.getInstrumentation
-import com.incrowdsports.mockserver.FakeServer
+import com.owusu.testutils.FakeServer
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.mockwebserver.MockResponse
 

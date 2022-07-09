@@ -1,4 +1,4 @@
-package com.incrowdsports.mockserver
+package com.owusu.testutils
 
 import android.content.Context
 import okhttp3.mockwebserver.Dispatcher

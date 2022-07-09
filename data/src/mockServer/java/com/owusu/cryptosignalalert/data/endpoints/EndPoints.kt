@@ -6,6 +6,6 @@ import com.owusu.cryptosignalalert.data.enpoints.EndPointsParent
 // Keep in mind EndPoints is deleted from the main folder so that it can exist in each build variant
 class EndPoints: EndPointsParent() {
     override fun getHostName(): String {
-        return "http://localhost:8080/api/v3/"
+        return "http://localhost:8080"
     }
 }

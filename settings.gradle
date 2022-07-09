@@ -16,3 +16,4 @@ rootProject.name = "CryptoSignalAlert"
 include ':presentation'
 include ':domain'
 include ':data'
+include ':testutils'

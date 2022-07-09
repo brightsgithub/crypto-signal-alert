@@ -3,7 +3,6 @@ package com.owusu.cryptosignalalert.di
 import android.util.Log
 import com.owusu.cryptosignalalert.data.datasource.CoinsDataSource
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoDataSourceImpl
-import com.owusu.cryptosignalalert.data.endpoints.EndPointProd
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.mappers.CoinsAPIMapper
 import com.owusu.cryptosignalalert.data.mappers.DataAPIListMapper
@@ -38,11 +37,11 @@ val dataModule = module(override = true) {
     factory<DataAPIListMapper<CoinAPI, Coin>>{ CoinsAPIMapper() }
 
     single<CoinsDataSource> {
-        CoinGeckoDataSourceImpl(get())
+        CoinGeckoDataSourceImpl(get(), get())
     }
 
-    single<EndPoints> {
-        EndPointProd()
+    single {
+        EndPoints()
     }
 
     single {
@@ -50,7 +49,7 @@ val dataModule = module(override = true) {
 
             // https://ktor.io/docs/default-request.html
             defaultRequest {
-                url("https://api.coingecko.com/api/v3/")
+                url(get<EndPoints>().getHostName())
             }
 
             engine {

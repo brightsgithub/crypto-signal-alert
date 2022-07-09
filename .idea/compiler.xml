@@ -4,6 +4,7 @@
     <bytecodeTargetLevel target="1.7">
       <module name="CryptoSignalAlert.data" target="11" />
       <module name="CryptoSignalAlert.presentation" target="11" />
+      <module name="CryptoSignalAlert.testutils" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

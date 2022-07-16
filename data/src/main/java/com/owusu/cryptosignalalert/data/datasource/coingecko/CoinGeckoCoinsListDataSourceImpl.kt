@@ -1,6 +1,6 @@
 package com.owusu.cryptosignalalert.data.datasource.coingecko
 
-import com.owusu.cryptosignalalert.data.datasource.CoinsDataSource
+import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.models.CoinAPI
 import io.ktor.client.*
@@ -8,10 +8,10 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 
-class CoinGeckoDataSourceImpl(
+class CoinGeckoCoinsListDataSourceImpl(
     private val httpClient: HttpClient,
     private val endPoints: EndPoints
-    ): CoinsDataSource {
+    ): CoinsListDataSource {
 
     override suspend fun getCoinsList(
         page: Int,

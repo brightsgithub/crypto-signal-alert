@@ -38,7 +38,9 @@ class FakeServer(private val context: Context) {
 
         override fun dispatch(recordedRequest: RecordedRequest): MockResponse {
             val url = recordedRequest.requestUrl.url().toString()
-            return responseMap.getOrElse(url) { getMockedResponse(500, "some error") }
+            return responseMap.getOrElse(url) {
+                getMockedResponse(500, "some error")
+            }
         }
     }
 

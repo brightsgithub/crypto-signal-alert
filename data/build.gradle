@@ -4,6 +4,8 @@ plugins {
     id 'kotlinx-serialization' // be sure to include in root gradle: id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.20' apply false
 }
 
+// ./gradlew data:connectedMockServerDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=com.owusu.cryptosignalalert.data
+
 android {
     compileSdk 32
 
@@ -84,4 +86,12 @@ dependencies {
     // Here im using the Serialization Plugin to serialize/deserialize JSON data
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+
+    // needed if we are using:
+    // val coinApiList = Json{ ignoreUnknownKeys = true }.decodeFromString<List<CoinAPI>>(coinApiListStr)
+    api ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+
+    // Using Gson for my own custom serializer since the ktor one is difficult to use.
+    // Need this for dynamic json responses
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
 }

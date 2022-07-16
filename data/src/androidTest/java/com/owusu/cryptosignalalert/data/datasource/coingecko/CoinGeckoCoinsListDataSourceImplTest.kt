@@ -2,7 +2,7 @@ package com.owusu.cryptosignalalert.data.datasource.coingecko
 
 import com.owusu.cryptosignalalert.data.BaseCoreTest
 import com.owusu.cryptosignalalert.data.test.R
-import com.owusu.cryptosignalalert.data.datasource.CoinsDataSource
+import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -13,9 +13,9 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.lang.StringBuilder
 
-class CoinGeckoDataSourceImplTest : BaseCoreTest(), KoinComponent {
+class CoinGeckoCoinsListDataSourceImplTest : BaseCoreTest(), KoinComponent {
 
-    val coinsDataSource : CoinsDataSource by inject()
+    val coinsDataSource : CoinsListDataSource by inject()
     val endPoints : EndPoints by inject()
 
     @Before

@@ -7,4 +7,8 @@ abstract class EndPointsParent {
     fun getCoinsListWithMarketDataPath(): String {
         return "/api/v3/coins/markets"
     }
+
+    fun getPriceDataPath(): String {
+        return "/api/v3/simple/price"
+    }
 }

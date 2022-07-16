@@ -1,14 +1,13 @@
 package com.owusu.cryptosignalalert.data.models
 
 
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import java.math.BigDecimal
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
-data class CoinAPI(
+data class CoinApiNew(
     @SerialName("ath")
-    val ath: Double? = null,
+    val ath: Int? = null,
     @SerialName("ath_change_percentage")
     val athChangePercentage: Double? = null,
     @SerialName("ath_date")
@@ -20,13 +19,13 @@ data class CoinAPI(
     @SerialName("atl_date")
     val atlDate: String? = null,
     @SerialName("circulating_supply")
-    val circulatingSupply: Double? = null,
+    val circulatingSupply: Int? = null,
     @SerialName("current_price")
-    val currentPrice: Double? = null,
+    val currentPrice: Int? = null,
     @SerialName("fully_diluted_valuation")
     val fullyDilutedValuation: Long? = null,
     @SerialName("high_24h")
-    val high24h: Double? = null,
+    val high24h: Int? = null,
     @SerialName("id")
     val id: String? = null,
     @SerialName("image")
@@ -34,17 +33,17 @@ data class CoinAPI(
     @SerialName("last_updated")
     val lastUpdated: String? = null,
     @SerialName("low_24h")
-    val low24h: Double? = null,
+    val low24h: Int? = null,
     @SerialName("market_cap")
-    val marketCap: Double? = null,
+    val marketCap: Long? = null,
     @SerialName("market_cap_change_24h")
-    val marketCapChange24h: Double? = null,
+    val marketCapChange24h: Long? = null,
     @SerialName("market_cap_change_percentage_24h")
     val marketCapChangePercentage24h: Double? = null,
     @SerialName("market_cap_rank")
-    val marketCapRank: Double? = null,
+    val marketCapRank: Int? = null,
     @SerialName("max_supply")
-    val maxSupply: Double? = null,
+    val maxSupply: Int? = null,
     @SerialName("name")
     val name: String? = null,
     @SerialName("price_change_24h")
@@ -54,7 +53,7 @@ data class CoinAPI(
     @SerialName("symbol")
     val symbol: String? = null,
     @SerialName("total_supply")
-    val totalSupply: Double? = null,
+    val totalSupply: Int? = null,
     @SerialName("total_volume")
-    val totalVolume: Double? = null
+    val totalVolume: Long? = null
 )

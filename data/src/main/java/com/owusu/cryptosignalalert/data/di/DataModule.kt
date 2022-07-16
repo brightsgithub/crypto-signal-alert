@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.data.di
 
+import android.system.Os.accept
 import android.util.Log
 import com.owusu.cryptosignalalert.data.datasource.CoinsDataSource
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoDataSourceImpl
@@ -18,6 +19,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.observer.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
@@ -48,10 +50,6 @@ val dataModule = module(override = true) {
         HttpClient(Android) {
 
             // https://ktor.io/docs/default-request.html
-
-            // http://localhost:8080/api/v3/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false
-
-
             defaultRequest {
                 url(get<EndPoints>().getHostName())
             }

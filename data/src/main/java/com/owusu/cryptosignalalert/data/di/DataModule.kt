@@ -12,10 +12,12 @@ import com.owusu.cryptosignalalert.data.models.CoinAPI
 import com.owusu.cryptosignalalert.data.models.PriceAPIWrapper
 import com.owusu.cryptosignalalert.data.repository.AlertListRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.CoinsRepositoryImpl
+import com.owusu.cryptosignalalert.data.repository.PriceInfoRepositoryImpl
 import com.owusu.cryptosignalalert.domain.models.Coin
 import com.owusu.cryptosignalalert.domain.models.PriceWrapper
 import com.owusu.cryptosignalalert.domain.repository.AlertListRepository
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
+import com.owusu.cryptosignalalert.domain.repository.PriceInfoRepository
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.*
@@ -37,7 +39,11 @@ val dataModule = module(override = true) {
     }
 
     single<CoinsRepository> {
-        CoinsRepositoryImpl(get(), get(), get(), get())
+        CoinsRepositoryImpl(get(), get())
+    }
+
+    single<PriceInfoRepository> {
+        PriceInfoRepositoryImpl(get(), get())
     }
 
     factory<DataAPIListMapper<CoinAPI, Coin>>{ CoinsAPIMapper() }

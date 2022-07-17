@@ -7,6 +7,8 @@ plugins {
 android {
     compileSdk 32
 
+    //testBuildType "release"
+
     defaultConfig {
         applicationId "com.owusu.cryptosignalalert"
         minSdk 21
@@ -32,15 +34,10 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            // debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
-
-//        releaseDebug {
-//            minifyEnabled false
-//            debuggable true
-//            signingConfig signingConfigs.release
-//        }
 
         debug {
             signingConfig signingConfigs.debug

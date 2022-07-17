@@ -38,6 +38,7 @@ class PriceInfoRepositoryImplTest: BaseCoreTest(), KoinComponent {
         val priceWrapper = priceInfoRepository.getPrices(ids, currencies)
         val bitcoinPrice = priceWrapper.prices[0]
 
+        assert(bitcoinPrice.id == ids)
         assert(bitcoinPrice.usd > 0)
         assert(bitcoinPrice.lastUpdatedAt > 0)
         assert(bitcoinPrice.usd24hChange > 0)
@@ -47,20 +48,25 @@ class PriceInfoRepositoryImplTest: BaseCoreTest(), KoinComponent {
 
     @Test
     fun getMultiPriceData() = runBlocking {
-        val ids = "bitcoin,ethereum"
+        val bitcoinId = "bitcoin"
+        val ethereumId = "ethereum"
+        val ids = "$bitcoinId,$ethereumId"
         val currencies = "usd"
+
         initDispatcher(getResponseMapForPriceData(R.raw.get_multi_price_data, ids, currencies))
 
         val priceWrapper = priceInfoRepository.getPrices(ids, currencies)
         val bitcoinPrice = priceWrapper.prices[0]
         val ethereumPrice = priceWrapper.prices[1]
 
+        assert(bitcoinPrice.id == bitcoinId)
         assert(bitcoinPrice.usd > 0)
         assert(bitcoinPrice.lastUpdatedAt > 0)
         assert(bitcoinPrice.usd24hChange > 0)
         assert(bitcoinPrice.usd24hVol > 0)
         assert(bitcoinPrice.usdMarketCap > 0)
 
+        assert(ethereumPrice.id == ethereumId)
         assert(ethereumPrice.usd > 0)
         assert(ethereumPrice.lastUpdatedAt > 0)
         assert(ethereumPrice.usd24hChange > 0)

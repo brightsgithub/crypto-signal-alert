@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.domain.models
 
 data class Price(
+    val id: String,
     val lastUpdatedAt: Double,
     val usd: Double,
     val usd24hChange: Double,

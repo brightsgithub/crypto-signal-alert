@@ -12,6 +12,7 @@ class PriceAPIMapper: DataAPIMapper<PriceAPIWrapper, PriceWrapper> {
             priceApi.apply {
                 prices.add(
                     Price(
+                        id = id!!,
                         lastUpdatedAt = lastUpdatedAt,
                         usd = usd,
                         usd24hChange = usd24hChange,
@@ -30,6 +31,7 @@ class PriceAPIMapper: DataAPIMapper<PriceAPIWrapper, PriceWrapper> {
             price.apply {
                 pricesApi.add(
                     PriceAPI(
+                        id = id,
                         lastUpdatedAt = lastUpdatedAt,
                         usd = usd,
                         usd24hChange = usd24hChange,

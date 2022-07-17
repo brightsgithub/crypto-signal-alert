@@ -7,6 +7,8 @@ plugins {
 // ./gradlew data:connectedMockServerDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=com.owusu.cryptosignalalert.data
 
 android {
+    //testBuildType "release"
+
     compileSdk 32
 
     defaultConfig {

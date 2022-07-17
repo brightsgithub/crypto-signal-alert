@@ -22,7 +22,7 @@ class SimpleCoinConverter : ContentConverter {
 //        val xmlmapper = XmlMapper()
 //        val objectoreturn = xmlmapper.readValue(reader, type.javaObjectType)
 
-        return arrayListOf<PriceAPI>(PriceAPI(1.0, 1.0, 1.0, 1.1, 2.1))
+        return arrayListOf<PriceAPI>()
     }
 
     override suspend fun serialize(

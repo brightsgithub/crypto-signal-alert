@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PriceAPI(
+    var id: String? = null, // Mapped manually
     @SerialName("last_updated_at")
     val lastUpdatedAt: Double,
     @SerialName("usd")

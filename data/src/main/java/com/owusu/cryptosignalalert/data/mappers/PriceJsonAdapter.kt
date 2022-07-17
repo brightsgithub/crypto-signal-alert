@@ -25,7 +25,12 @@ class PriceJsonAdapter: JsonDeserializer<PriceAPIWrapper> {
         for (coinId in keySet) {
             val priceJsonAsString = jsonObject.get(coinId).asJsonObject.toString()
             // Lets lean on the framework to map our object
-            val priceApi = Json{ ignoreUnknownKeys = true }.decodeFromString<PriceAPI>(priceJsonAsString)
+            val priceApi = Json{
+                //explicitNulls = false
+                ignoreUnknownKeys = true
+            }.decodeFromString<PriceAPI>(priceJsonAsString)
+            priceApi.id = coinId
+
             listOfPrices.add(priceApi)
         }
         val wrapper = PriceAPIWrapper(listOfPrices)

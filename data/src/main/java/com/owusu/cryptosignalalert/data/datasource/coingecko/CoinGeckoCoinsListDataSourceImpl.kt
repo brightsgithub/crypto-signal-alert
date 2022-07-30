@@ -16,7 +16,8 @@ class CoinGeckoCoinsListDataSourceImpl(
     override suspend fun getCoinsList(
         page: Int,
         recordsPerPage: Int,
-        currencies: String
+        currencies: String,
+        ids: String?
     ) : List<CoinAPI> {
 
         val coinApiListStr: List<CoinAPI> = httpClient.get(endPoints.getCoinsListWithMarketDataPath()) {
@@ -28,6 +29,9 @@ class CoinGeckoCoinsListDataSourceImpl(
                 parameters.append("per_page", recordsPerPage.toString())
                 parameters.append("page", page.toString())
                 parameters.append("sparkline", false.toString())
+                ids?.let {
+                    parameters.append("ids", it)
+                }
             }
 
         }.body()

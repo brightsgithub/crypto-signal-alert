@@ -6,5 +6,6 @@ interface CoinsListDataSource {
 
     suspend fun getCoinsList(page: Int,
                              recordsPerPage: Int,
-                             currencies: String) : List<CoinAPI>
+                             currencies: String,
+                             ids: String? =  null) : List<CoinAPI>
 }

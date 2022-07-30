@@ -12,6 +12,7 @@ import org.junit.Test
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.lang.StringBuilder
+import java.net.URL
 
 class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
 

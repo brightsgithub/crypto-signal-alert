@@ -17,6 +17,7 @@ android {
 
         testInstrumentationRunner "com.owusu.cryptosignalalert.data.MyTestRunner"
         consumerProguardFiles "consumer-rules.pro"
+        multiDexEnabled true
     }
 
     buildTypes {

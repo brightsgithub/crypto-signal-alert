@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.data
 
-import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.annotation.CallSuper
@@ -9,8 +8,6 @@ import androidx.test.InstrumentationRegistry.getInstrumentation
 import com.owusu.testutils.FakeServer
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.mockwebserver.MockResponse
-
-//import okhttp3.mockwebserver.MockResponse
 
 abstract class BaseCoreTest {
 

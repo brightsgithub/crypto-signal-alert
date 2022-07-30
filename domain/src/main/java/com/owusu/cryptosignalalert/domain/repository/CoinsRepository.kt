@@ -6,5 +6,6 @@ interface CoinsRepository {
 
     suspend fun getCoinsList(page: Int,
                              recordsPerPage: Int,
-                             currencies: String) : List<Coin>
+                             currencies: String,
+                             ids: String? = null) : List<Coin>
 }

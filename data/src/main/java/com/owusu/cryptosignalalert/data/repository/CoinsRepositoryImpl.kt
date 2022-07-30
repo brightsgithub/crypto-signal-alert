@@ -19,9 +19,10 @@ class CoinsRepositoryImpl(
     override suspend fun getCoinsList(
         page: Int,
         recordsPerPage: Int,
-        currencies: String
+        currencies: String,
+        ids: String?
     ): List<Coin> {
-        val coinsApiList = coinsDataSource.getCoinsList(page, recordsPerPage, currencies)
+        val coinsApiList = coinsDataSource.getCoinsList(page, recordsPerPage, currencies, ids)
         return dataAPIListMapper.mapAPIToDomain(coinsApiList)
     }
 }

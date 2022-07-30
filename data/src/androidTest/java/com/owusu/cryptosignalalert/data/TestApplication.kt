@@ -1,7 +1,6 @@
 package com.owusu.cryptosignalalert.data
 
-
-import androidx.multidex.MultiDexApplication
+import android.support.multidex.MultiDexApplication
 import com.owusu.cryptosignalalert.data.di.dataModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

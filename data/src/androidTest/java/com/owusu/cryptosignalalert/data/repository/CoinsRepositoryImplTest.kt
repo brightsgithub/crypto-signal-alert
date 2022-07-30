@@ -13,6 +13,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.lang.StringBuilder
 import java.net.URL
+import java.net.URLEncoder
 
 class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
 
@@ -75,11 +76,50 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         assert(coinsList[0].symbol != null)
     }
 
+    @Test
+    fun getCoinsListByIdTest() = runBlocking {
+
+        val page = 1
+        val recordsPerPage = 4
+        val currencies = "usd"
+        val ids = "bitcoin,ethereum,ripple,solana"
+
+        initDispatcher(getResponseMapForCoinsListWithMarketData(page, recordsPerPage, currencies, R.raw.get_coins_list_by_ids, ids))
+        val coinsAPIList = coinsRepository.getCoinsList(page, recordsPerPage, currencies, ids)
+
+        assert(coinsAPIList.isNotEmpty())
+        assert(coinsAPIList.size == 4)
+
+        val bitcoin = coinsAPIList[0]
+        assert(bitcoin.id.equals("bitcoin"))
+        assert(bitcoin.name.equals("Bitcoin"))
+        assert(bitcoin.symbol.equals("btc"))
+        assert(bitcoin.currentPrice != null)
+
+        val ethereum = coinsAPIList[1]
+        assert(ethereum.id.equals("ethereum"))
+        assert(ethereum.name.equals("Ethereum"))
+        assert(ethereum.symbol.equals("eth"))
+        assert(ethereum.currentPrice != null)
+
+        val ripple = coinsAPIList[2]
+        assert(ripple.id.equals("ripple"))
+        assert(ripple.name.equals("XRP"))
+        assert(ripple.symbol.equals("xrp"))
+        assert(ripple.currentPrice != null)
+
+        val solana = coinsAPIList[3]
+        assert(solana.id.equals("solana"))
+        assert(solana.name.equals("Solana"))
+        assert(solana.symbol.equals("sol"))
+        assert(solana.currentPrice != null)
+    }
 
     private fun getResponseMapForCoinsListWithMarketData(page: Int,
                                                          recordsPerPage: Int,
                                                          currencies: String,
-                                                         mockResIdFile: Int): Map<String, MockResponse> {
+                                                         mockResIdFile: Int,
+                                                         ids: String? = null): Map<String, MockResponse> {
 
         val hostName = endPoints.getHostName()
 
@@ -92,11 +132,16 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         request.append("&", "per_page", "=", recordsPerPage.toString())
         request.append("&", "page", "=", page.toString())
         request.append("&", "sparkline", "=", false.toString())
+        ids?.let {
+            request.append("&", "ids", "=", URLEncoder.encode(ids, "utf-8"))
+        }
 
+
+        val requestUrl = request.toString()
         val response = getMockedResponse(OK, mockResIdFile)
         // also mock critical RESPONSE headers!
         response.addHeader("content-type", "application/json; charset=utf-8") // critical!
         response.addHeader("cache-control", "public,max-age=300") // optional
-        return mapOf(request.toString() to response)
+        return mapOf(requestUrl to response)
     }
 }

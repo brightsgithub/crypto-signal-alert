@@ -29,8 +29,6 @@ abstract class BaseCoreTest {
             Log.v("OKHTTP_TEST_LOGS", message)
         })
         logging.level = HttpLoggingInterceptor.Level.BASIC
-
-        // ICNetwork.init(context as Application, interceptors = listOf(logging))
     }
 
     @CallSuper

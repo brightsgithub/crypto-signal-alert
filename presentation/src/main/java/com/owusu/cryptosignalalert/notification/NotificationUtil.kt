@@ -10,22 +10,48 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
+import com.owusu.cryptosignalalert.CryptoSignalAlertApp
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.service.CryptoSignalAlertService
 import com.owusu.cryptosignalalert.views.activities.MainActivity
+import kotlin.random.Random
 
 class NotificationUtil {
     companion object {
 
-        val NOTIFICATION_ID = 12
+        val SERVICE_NOTIFICATION_ID = 12
         val CHANNEL_ID = "cryptoSignalAlertIdNew"
+    }
+        fun sendNewStandAloneNotification(newMsg: String) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val manager = CryptoSignalAlertApp.instance.getSystemService(NotificationManager::class.java)
+                val notificationId = rand(1, Int.MAX_VALUE) as Int
+                manager.notify(notificationId, getNewNotification(notificationId ,newMsg, CryptoSignalAlertApp.instance))
+            }
+        }
 
-        fun getNotification(input: String, context: Context): Notification {
+        private fun rand(start: Int, end: Int): Int {
+            require(start <= end) { "Illegal Argument" }
+            val rand = Random(System.nanoTime())
+            return (start..end).random(rand)
+        }
 
+        fun updateServiceNotification(newMsg: String) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val manager = CryptoSignalAlertApp.instance.getSystemService(NotificationManager::class.java)
+                manager.notify(SERVICE_NOTIFICATION_ID, getNotification(SERVICE_NOTIFICATION_ID ,newMsg, CryptoSignalAlertApp.instance))
+            }
+        }
+
+        fun getNotification(notificationId: Int, input: String, context: Context): Notification {
             val actionStopIntent = Intent(CryptoSignalAlertService.ACTION_STOP)
-            val updatePendingIntent =
-                PendingIntent.getBroadcast(context, NOTIFICATION_ID, actionStopIntent, PendingIntent.FLAG_ONE_SHOT)
+
+            var updatePendingIntent: PendingIntent? = null
+            updatePendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.getBroadcast(context, notificationId, actionStopIntent, PendingIntent.FLAG_IMMUTABLE)
+            } else {
+                PendingIntent.getBroadcast(context, notificationId, actionStopIntent, PendingIntent.FLAG_ONE_SHOT)
+            }
 
             val notification = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.app_name))
@@ -37,15 +63,30 @@ class NotificationUtil {
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setContentIntent(getPendingIntent(context))
                 .addAction(R.drawable.ic_launcher_foreground, "Stop", updatePendingIntent)
+                .setOnlyAlertOnce(true)
                 .build()
             return notification
         }
 
-        fun getPendingIntent(context: Context): PendingIntent {
+        private fun getNewNotification(notificationId: Int, input: String, context: Context): Notification {
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(input)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setLargeIcon(
+                    BitmapFactory.decodeResource(context.getResources(),
+                        R.drawable.ic_launcher_foreground))
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                .setContentIntent(getPendingIntent(context))
+                .build()
+            return notification
+        }
+
+        private fun getPendingIntent(context: Context): PendingIntent {
             val notificationIntent = Intent(context, MainActivity::class.java)
             val pendingIntent = PendingIntent.getActivity(
                 context,
-                0, notificationIntent, 0
+                0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
             )
             return pendingIntent
         }
@@ -63,5 +104,4 @@ class NotificationUtil {
                 manager?.createNotificationChannel(serviceChannel)
             }
         }
-    }
 }

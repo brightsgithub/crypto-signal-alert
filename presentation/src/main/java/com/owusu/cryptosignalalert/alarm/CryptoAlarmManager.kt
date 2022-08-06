@@ -4,10 +4,14 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import com.owusu.cryptosignalalert.CryptoSignalAlertApp
+import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.receivers.AlarmReceiver
+import com.owusu.cryptosignalalert.utils.DateUtils
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 
 /**
@@ -17,6 +21,8 @@ object CryptoAlarmManager : KoinComponent {
 
     private lateinit var alarmIntent: PendingIntent
     private lateinit var context: CryptoSignalAlertApp
+    private val dateUtils: DateUtils by inject()
+    private val notificationUtil: NotificationUtil by inject()
 
     val INTENT_ACTION_START_ALARM_LISTENER = "INTENT_ACTION_START_ALARM_LISTENER"
     val INTENT_ACTION_STOP_ALARM_LISTENER = "INTENT_ACTION_STOP_ALARM_LISTENER"
@@ -25,7 +31,7 @@ object CryptoAlarmManager : KoinComponent {
     private val thirtySeconds = 30000L
     private val oneMin = 60000L
     private val twoMin = 120000L
-    private val ALARM_INTERVAL = twoMin
+    private val ALARM_INTERVAL = 10000
     private var hasInitBeenCalled: Boolean = false
 
     fun startAlarmFirstTime() {
@@ -49,9 +55,12 @@ object CryptoAlarmManager : KoinComponent {
             Log.v("CryptoSignalService", "CryptoAlertAlarm.starting alarm.....")
             val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            val pendingIntent =
-                PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(),
-                    PendingIntent.FLAG_CANCEL_CURRENT)
+            var pendingIntent: PendingIntent? = null
+            pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT)
+            } else {
+                PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(), PendingIntent.FLAG_CANCEL_CURRENT)
+            }
 
             alarmMgr.set(
                 AlarmManager.RTC_WAKEUP,
@@ -62,6 +71,7 @@ object CryptoAlarmManager : KoinComponent {
             t.printStackTrace()
         }
 
+        notificationUtil.updateServiceNotification("Last updated at "+ dateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis))
         Log.v("CryptoSignalService","Next alarm scheduled at " + Date(Calendar.getInstance().timeInMillis + ALARM_INTERVAL).toString())
     }
 
@@ -71,12 +81,13 @@ object CryptoAlarmManager : KoinComponent {
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
-        val pendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                START_ALARM_REQUEST_CODE,
-                getAlarmIntent(),
-                PendingIntent.FLAG_NO_CREATE)
+        var pendingIntent: PendingIntent? = null
+        pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(), PendingIntent.FLAG_IMMUTABLE)
+        } else {
+            PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(), PendingIntent.FLAG_NO_CREATE)
+        }
+
 
         if (pendingIntent != null && alarmManager != null) {
             Log.v("CryptoSignalService", "CryptoAlertAlarm.stopAlarmListenerEvent CANCEL ALARM")

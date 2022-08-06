@@ -18,12 +18,9 @@ class AlarmReceiver : BroadcastReceiver() , KoinComponent {
         context: Context,
         intent: Intent
     ) {
-        Log.v("CryptoSignalService", "CryptoAlertAlarm.AlarmReceiver called")
         intent.let { intent ->
             intent.action?.let { action ->
-
                 Log.v("CryptoSignalService", "CryptoAlertAlarm.AlarmReceiver called with " + action)
-
                 if (action == INTENT_ACTION_START_ALARM_LISTENER) {
                     startAlarmAgain()
                 } else if (action == INTENT_ACTION_STOP_ALARM_LISTENER) {

@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.owusu.cryptosignalalert">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,6 +25,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name="com.owusu.cryptosignalalert.receivers.BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.owusu.cryptosignalalert.service.CryptoSignalAlertService"
+            android:enabled="true"
+            android:exported="true"
+            />
+
+        <receiver android:name="com.owusu.cryptosignalalert.receivers.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.owusu.cryptosignalalert.alarm.CryptoAlarmManager.INTENT_ACTION_START_ALARM_LISTENER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

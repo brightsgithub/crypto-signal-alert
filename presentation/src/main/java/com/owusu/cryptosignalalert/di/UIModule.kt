@@ -1,9 +1,12 @@
 package com.owusu.cryptosignalalert.di
 
+import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
 import com.owusu.cryptosignalalert.mappers.AlertListUIMapper
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.AlertListUIWrapper
+import com.owusu.cryptosignalalert.notification.NotificationUtil
+import com.owusu.cryptosignalalert.utils.DateUtils
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -19,5 +22,13 @@ val uiModule = module(override = true) {
 
     viewModel {
         AlertListViewModel(get(), get(), get(named(IO)), get(named(MAIN)))
+    }
+
+    single {
+        DateUtils.getInstance()
+    }
+
+    single {
+        NotificationUtil()
     }
 }

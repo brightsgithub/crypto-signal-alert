@@ -11,11 +11,13 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.notification.NotificationUtil
-import com.owusu.cryptosignalalert.notification.NotificationUtil.Companion.NOTIFICATION_ID
-import com.owusu.cryptosignalalert.notification.NotificationUtil.Companion.createNotificationChannel
+import com.owusu.cryptosignalalert.notification.NotificationUtil.Companion.SERVICE_NOTIFICATION_ID
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 class CryptoSignalAlertService : Service(), KoinComponent {
+
+    val notificationUtil: NotificationUtil by inject()
 
     companion object {
         val ACTION_STOP = "com.owusu.cryptosignalalert.service.ACTION_STOP"
@@ -40,8 +42,8 @@ class CryptoSignalAlertService : Service(), KoinComponent {
             return false
         }
 
-        fun stopService(context: Context, serviceClass : Class<*>) {
-            val serviceIntent = Intent(context,serviceClass)
+        fun stopAlertService(context: Context) {
+            val serviceIntent = Intent(context, CryptoSignalAlertService::class.java)
             context?.stopService(serviceIntent)
         }
     }
@@ -58,8 +60,8 @@ class CryptoSignalAlertService : Service(), KoinComponent {
 
             val input = it.getStringExtra("inputExtra")
             input?.let {
-                createNotificationChannel(this@CryptoSignalAlertService)
-                startForeground(NOTIFICATION_ID, NotificationUtil.getNotification(input, this))
+                notificationUtil.createNotificationChannel(this@CryptoSignalAlertService)
+                startForeground(SERVICE_NOTIFICATION_ID, notificationUtil.getNotification(SERVICE_NOTIFICATION_ID, input, this))
             }
 
             startAlarmFirstTime()
@@ -90,7 +92,7 @@ class CryptoSignalAlertService : Service(), KoinComponent {
                     if (action == ACTION_STOP) {
                         context?.let {
                             stopAlarmLooping()
-                            stopService(it, CryptoSignalAlertService::class.java)
+                            stopAlertService(it)
                         }
                     }
                 }

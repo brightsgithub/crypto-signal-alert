@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.di
 
+import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
 import com.owusu.cryptosignalalert.mappers.AlertListUIMapper
@@ -30,5 +31,9 @@ val uiModule = module(override = true) {
 
     single {
         NotificationUtil()
+    }
+
+    single {
+       CryptoAlarmManager(get(named(IO)), get(named(MAIN)))
     }
 }

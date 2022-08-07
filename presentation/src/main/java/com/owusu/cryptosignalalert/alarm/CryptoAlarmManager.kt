@@ -10,6 +10,7 @@ import com.owusu.cryptosignalalert.CryptoSignalAlertApp
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.receivers.AlarmReceiver
 import com.owusu.cryptosignalalert.utils.DateUtils
+import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
@@ -17,26 +18,32 @@ import java.util.*
 /**
  * Created by Bright Owusu-Amankwaa on 24/01/21.
  */
-object CryptoAlarmManager : KoinComponent {
+class CryptoAlarmManager(
+    private val dispatcherBackground: CoroutineDispatcher,
+    private val dispatcherMain: CoroutineDispatcher
+) : KoinComponent {
 
-    private lateinit var alarmIntent: PendingIntent
+    companion object {
+        val INTENT_ACTION_START_ALARM_LISTENER = "INTENT_ACTION_START_ALARM_LISTENER"
+    }
+
     private lateinit var context: CryptoSignalAlertApp
     private val dateUtils: DateUtils by inject()
     private val notificationUtil: NotificationUtil by inject()
-
-    val INTENT_ACTION_START_ALARM_LISTENER = "INTENT_ACTION_START_ALARM_LISTENER"
-    val INTENT_ACTION_STOP_ALARM_LISTENER = "INTENT_ACTION_STOP_ALARM_LISTENER"
     private val START_ALARM_REQUEST_CODE = 412232
     private val fiveMins = 300000L
     private val thirtySeconds = 30000L
     private val oneMin = 60000L
     private val twoMin = 120000L
-    private val ALARM_INTERVAL = 10000
+    private val thirtyMins = oneMin * 30
+    private val fifteenMins = oneMin * 15
+    private val ALARM_INTERVAL = thirtySeconds
     private var hasInitBeenCalled: Boolean = false
+    private var backgroundJob: Job? = null
 
     fun startAlarmFirstTime() {
         init()
-        startAlarm()
+        startAlarm(1000)
     }
 
     private fun init() {
@@ -49,8 +56,9 @@ object CryptoAlarmManager : KoinComponent {
         }
     }
 
-    fun startAlarm() {
+    fun startAlarm(interval: Long = ALARM_INTERVAL) {
         try {
+            cancelOngoingJob()
             // just in case we get an network error or something
             Log.v("CryptoSignalService", "CryptoAlertAlarm.starting alarm.....")
             val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -64,7 +72,7 @@ object CryptoAlarmManager : KoinComponent {
 
             alarmMgr.set(
                 AlarmManager.RTC_WAKEUP,
-                Calendar.getInstance().timeInMillis + ALARM_INTERVAL,
+                Calendar.getInstance().timeInMillis + interval,
                 pendingIntent
             )
         } catch (t: Throwable) {
@@ -72,11 +80,11 @@ object CryptoAlarmManager : KoinComponent {
         }
 
         notificationUtil.updateServiceNotification("Last updated at "+ dateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis))
-        Log.v("CryptoSignalService","Next alarm scheduled at " + Date(Calendar.getInstance().timeInMillis + ALARM_INTERVAL).toString())
+        Log.v("CryptoSignalService","Next alarm scheduled at " + Date(Calendar.getInstance().timeInMillis + interval).toString())
     }
 
     fun stopAlarm() {
-
+        cancelOngoingJob()
         Log.v("CryptoSignalService", "CryptoAlertAlarm.stopAlarmListenerEvent called")
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
@@ -105,5 +113,29 @@ object CryptoAlarmManager : KoinComponent {
         val intent = Intent(context, AlarmReceiver::class.java)
         intent.action = INTENT_ACTION_START_ALARM_LISTENER
         return intent
+    }
+
+    fun onReadyToStartBackgroundWork() {
+        cancelOngoingJob()
+        backgroundJob = GlobalScope.launch(dispatcherBackground) {
+
+//            Log.v("CryptoSignalService", "start sleep")
+//            Thread.sleep(60000)
+//            Log.v("CryptoSignalService", "end sleep")
+
+            // using isActive functionality to check whether the
+            // coroutine is active or not
+            // https://www.geeksforgeeks.org/jobs-waiting-cancellation-in-kotlin-coroutines/
+            if(isActive) {
+                // do some work and then start the alarm again
+                startAlarm()
+            } else {
+                Log.v("CryptoSignalService", "****** No Longer active ********")
+            }
+        }
+    }
+
+    private fun cancelOngoingJob() {
+        backgroundJob?.cancel()
     }
 }

@@ -17,7 +17,8 @@ import org.koin.core.inject
 
 class CryptoSignalAlertService : Service(), KoinComponent {
 
-    val notificationUtil: NotificationUtil by inject()
+    private val notificationUtil: NotificationUtil by inject()
+    private val cryptoAlarmManager: CryptoAlarmManager by inject()
 
     companion object {
         val ACTION_STOP = "com.owusu.cryptosignalalert.service.ACTION_STOP"
@@ -75,14 +76,14 @@ class CryptoSignalAlertService : Service(), KoinComponent {
      * This service represents that there is some kind of work occurring in the background.
      */
     private fun startAlarmFirstTime() {
-        CryptoAlarmManager.startAlarmFirstTime()
+        cryptoAlarmManager.startAlarmFirstTime()
     }
 
     /**
      * When the service has been stopped, stop all work.
      */
     private fun stopAlarmLooping() {
-        CryptoAlarmManager.stopAlarm()
+        cryptoAlarmManager.stopAlarm()
     }
 
     private inner class StopReceiver : BroadcastReceiver() {

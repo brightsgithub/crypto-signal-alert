@@ -93,7 +93,7 @@ public class DateUtils {
     public String convertDateToFormattedStringWithTime(final long date) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(date);
-        SimpleDateFormat calendarDateFormatWithTime = new SimpleDateFormat("EEE MMM d (HH:mm)", Locale.getDefault());
+        SimpleDateFormat calendarDateFormatWithTime = new SimpleDateFormat("EEE MMM d (HH:mm:ss)", Locale.getDefault());
         final String formattedDate = calendarDateFormatWithTime.format(c.getTime());
         return formattedDate;
     }

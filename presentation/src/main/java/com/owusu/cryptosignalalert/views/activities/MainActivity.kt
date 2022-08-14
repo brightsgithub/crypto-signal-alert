@@ -2,13 +2,11 @@ package com.owusu.cryptosignalalert.views.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MenuItem
 import com.owusu.cryptosignalalert.R
-import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.service.CryptoSignalAlertService
 import com.owusu.cryptosignalalert.util.AppNavigationUtil
-import com.owusu.cryptosignalalert.utils.DateUtils
+import com.owusu.cryptosignalalert.domain.utils.DateUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject

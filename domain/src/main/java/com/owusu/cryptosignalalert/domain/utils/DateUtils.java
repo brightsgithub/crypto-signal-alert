@@ -1,4 +1,4 @@
-package com.owusu.cryptosignalalert.utils;
+package com.owusu.cryptosignalalert.domain.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

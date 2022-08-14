@@ -1,11 +1,21 @@
 package com.owusu.cryptosignalalert.di
 
-import com.owusu.cryptosignalalert.domain.usecase.GetAlertListUseCase
+import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
+import com.owusu.cryptosignalalert.domain.usecase.GetCoinsListUseCase
+import com.owusu.cryptosignalalert.domain.usecase.SyncForPriceTargetsUseCase
 import org.koin.dsl.module
 
 val domainModule = module(override = true) {
 
     factory {
-        GetAlertListUseCase(get())
+        GetPriceTargetsUseCase(get())
+    }
+
+    factory {
+        GetCoinsListUseCase(get())
+    }
+
+    single {
+        SyncForPriceTargetsUseCase(get())
     }
 }

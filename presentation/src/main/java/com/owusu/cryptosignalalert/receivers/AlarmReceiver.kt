@@ -36,7 +36,7 @@ class AlarmReceiver : BroadcastReceiver() , KoinComponent {
                     //    that is a singleton that holds and keeps a reference to a JOB.
                     //    This receiver each time it is called, creates a new instance, so do not try to keep
                     //    a job reference here and manage it. This is a fire and forget class
-                    cryptoAlarmManager.onReadyToStartBackgroundWork()
+                    cryptoAlarmManager.onReadyToStartBackgroundWork(context)
                 }
             }
         }

@@ -28,12 +28,13 @@ class CryptoSignalAlertService : Service(), KoinComponent {
             val clazz = CryptoSignalAlertService::class.java
             val serviceIntent = Intent(context, clazz)
             serviceIntent.putExtra("inputExtra", msg)
-            if(!isMyServiceRunning(context, clazz)) {
+            if(!isMyServiceRunning(context)) {
                 ContextCompat.startForegroundService(context, serviceIntent)
             }
         }
 
-        private fun isMyServiceRunning(context: Context, serviceClass : Class<*> ) : Boolean{
+        fun isMyServiceRunning(context: Context) : Boolean {
+            val serviceClass = CryptoSignalAlertService::class.java
             var manager = context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
                 if (serviceClass.name.equals(service.service.className)) {
@@ -76,14 +77,14 @@ class CryptoSignalAlertService : Service(), KoinComponent {
      * This service represents that there is some kind of work occurring in the background.
      */
     private fun startAlarmFirstTime() {
-        cryptoAlarmManager.startAlarmFirstTime()
+        cryptoAlarmManager.startAlarmFirstTime(this)
     }
 
     /**
      * When the service has been stopped, stop all work.
      */
     private fun stopAlarmLooping() {
-        cryptoAlarmManager.stopAlarm()
+        cryptoAlarmManager.stopAlarm(this)
     }
 
     private inner class StopReceiver : BroadcastReceiver() {

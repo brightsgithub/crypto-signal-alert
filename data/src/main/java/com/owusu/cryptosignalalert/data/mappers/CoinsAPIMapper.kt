@@ -5,7 +5,7 @@ import com.owusu.cryptosignalalert.domain.models.CoinDomain
 
 class CoinsAPIMapper: DataAPIListMapper<CoinAPI, CoinDomain> {
 
-    override fun mapAPIToDomain(apiList: List<CoinAPI>): List<CoinDomain> {
+    override fun transform(apiList: List<CoinAPI>): List<CoinDomain> {
         val coins = arrayListOf<CoinDomain>()
         for (coinApi in apiList) {
             coinApi.apply {
@@ -43,7 +43,7 @@ class CoinsAPIMapper: DataAPIListMapper<CoinAPI, CoinDomain> {
         return coins
     }
 
-    override fun mapToDomainApi(domainList: List<CoinDomain>): List<CoinAPI> {
+    override fun reverseTransformation(domainList: List<CoinDomain>): List<CoinAPI> {
 
         val coinsApi = arrayListOf<CoinAPI>()
         for (coin in domainList) {

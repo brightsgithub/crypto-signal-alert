@@ -18,6 +18,6 @@ class CoinsRepositoryImpl(
         ids: String?
     ): List<CoinDomain> {
         val coinsApiList = coinsDataSource.getCoinsList(page, recordsPerPage, currencies, ids)
-        return dataAPIListMapper.mapAPIToDomain(coinsApiList)
+        return dataAPIListMapper.transform(coinsApiList)
     }
 }

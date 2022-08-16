@@ -1,7 +1,7 @@
 package com.owusu.cryptosignalalert.di
 
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
-import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
+import com.owusu.cryptosignalalert.domain.models.PriceTargetsWrapper
 import com.owusu.cryptosignalalert.mappers.AlertListUIMapper
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.AlertListUIWrapper
@@ -14,7 +14,7 @@ import org.koin.dsl.module
 
 val uiModule = module(override = true) {
 
-    factory<UIMapper<AlertListDomainWrapper, AlertListUIWrapper>> {
+    factory<UIMapper<PriceTargetsWrapper, AlertListUIWrapper>> {
         AlertListUIMapper()
     }
 

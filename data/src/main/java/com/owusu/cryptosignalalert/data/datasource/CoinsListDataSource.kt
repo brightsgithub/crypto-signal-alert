@@ -1,6 +1,6 @@
 package com.owusu.cryptosignalalert.data.datasource
 
-import com.owusu.cryptosignalalert.data.models.CoinAPI
+import com.owusu.cryptosignalalert.data.models.api.CoinAPI
 
 interface CoinsListDataSource {
 

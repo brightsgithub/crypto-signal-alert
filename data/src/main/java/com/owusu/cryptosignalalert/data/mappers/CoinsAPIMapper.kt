@@ -1,16 +1,16 @@
 package com.owusu.cryptosignalalert.data.mappers
 
-import com.owusu.cryptosignalalert.data.models.CoinAPI
-import com.owusu.cryptosignalalert.domain.models.Coin
+import com.owusu.cryptosignalalert.data.models.api.CoinAPI
+import com.owusu.cryptosignalalert.domain.models.CoinDomain
 
-class CoinsAPIMapper: DataAPIListMapper<CoinAPI, Coin> {
+class CoinsAPIMapper: DataAPIListMapper<CoinAPI, CoinDomain> {
 
-    override fun mapAPIToDomain(apiList: List<CoinAPI>): List<Coin> {
-        val coins = arrayListOf<Coin>()
+    override fun mapAPIToDomain(apiList: List<CoinAPI>): List<CoinDomain> {
+        val coins = arrayListOf<CoinDomain>()
         for (coinApi in apiList) {
             coinApi.apply {
                 coins.add(
-                    Coin(
+                    CoinDomain(
                         ath,
                         athChangePercentage,
                         athDate,
@@ -43,7 +43,7 @@ class CoinsAPIMapper: DataAPIListMapper<CoinAPI, Coin> {
         return coins
     }
 
-    override fun mapToDomainApi(domainList: List<Coin>): List<CoinAPI> {
+    override fun mapToDomainApi(domainList: List<CoinDomain>): List<CoinAPI> {
 
         val coinsApi = arrayListOf<CoinAPI>()
         for (coin in domainList) {

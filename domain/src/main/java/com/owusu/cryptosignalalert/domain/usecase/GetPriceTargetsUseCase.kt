@@ -1,13 +1,15 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
-import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
-import com.owusu.cryptosignalalert.domain.repository.AlertListRepository
+import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.models.PriceTargetsWrapper
+import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
 
 class GetPriceTargetsUseCase(
-    private val alertListRepository: AlertListRepository):
-    SuspendedUseCaseUnit<AlertListDomainWrapper> {
+    private val priceTargetsRepository: PriceTargetsRepository):
+    SuspendedUseCaseUnit<List<PriceTargetDomain>> {
 
-    override suspend fun invoke(): AlertListDomainWrapper {
-        return alertListRepository.getAlertList()
+    // needs to return a flow since we will receiving constant updates
+    override suspend fun invoke(): List<PriceTargetDomain> {
+        return priceTargetsRepository.getPriceTargets()
     }
 }

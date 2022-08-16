@@ -2,14 +2,14 @@ package com.owusu.cryptosignalalert.mappers
 
 import com.owusu.cryptosignalalert.domain.models.AlertFrequency
 import com.owusu.cryptosignalalert.domain.models.AlertItemDomain
-import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
+import com.owusu.cryptosignalalert.domain.models.PriceTargetsWrapper
 import com.owusu.cryptosignalalert.models.AlertFrequencyUI
 import com.owusu.cryptosignalalert.models.AlertItemUI
 import com.owusu.cryptosignalalert.models.AlertListUIWrapper
 
-class AlertListUIMapper: UIMapper<AlertListDomainWrapper, AlertListUIWrapper> {
+class AlertListUIMapper: UIMapper<PriceTargetsWrapper, AlertListUIWrapper> {
 
-    override fun mapDomainToUI(domainObj: AlertListDomainWrapper): AlertListUIWrapper {
+    override fun mapDomainToUI(domainObj: PriceTargetsWrapper): AlertListUIWrapper {
         val alertListDomain = domainObj.alertList
         val list = arrayListOf<AlertItemUI>()
         for(alertItemDomain in alertListDomain) {
@@ -30,7 +30,7 @@ class AlertListUIMapper: UIMapper<AlertListDomainWrapper, AlertListUIWrapper> {
         return AlertListUIWrapper(list)
     }
 
-    override fun mapUIToDomain(uiObj: AlertListUIWrapper): AlertListDomainWrapper {
+    override fun mapUIToDomain(uiObj: AlertListUIWrapper): PriceTargetsWrapper {
         val alertListUI = uiObj.alertList
         val list = arrayListOf<AlertItemDomain>()
         for (alertItemUI in alertListUI) {
@@ -48,7 +48,7 @@ class AlertListUIMapper: UIMapper<AlertListDomainWrapper, AlertListUIWrapper> {
                 )
             }
         }
-        return AlertListDomainWrapper(list)
+        return PriceTargetsWrapper(list)
     }
 
     private fun mapFrequencyToUI(domainFrequency: AlertFrequency): AlertFrequencyUI {

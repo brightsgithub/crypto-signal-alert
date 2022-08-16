@@ -4,8 +4,8 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.owusu.cryptosignalalert.data.models.PriceAPI
-import com.owusu.cryptosignalalert.data.models.PriceAPIWrapper
+import com.owusu.cryptosignalalert.data.models.api.PriceAPI
+import com.owusu.cryptosignalalert.data.models.api.PriceAPIWrapper
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.lang.reflect.Type

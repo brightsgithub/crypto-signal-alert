@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.domain.models
 
-data class Coin(
+data class PriceTargetDomain(
+    val id: String? = null,
     val ath: Double? = null,
     val athChangePercentage: Double? = null,
     val athDate: String? = null,
@@ -11,7 +12,6 @@ data class Coin(
     val currentPrice: Double? = null,
     val fullyDilutedValuation: Long? = null,
     val high24h: Double? = null,
-    val id: String? = null,
     val image: String? = null,
     val lastUpdated: String? = null,
     val low24h: Double? = null,
@@ -25,5 +25,8 @@ data class Coin(
     val priceChangePercentage24h: Double? = null,
     val symbol: String? = null,
     val totalSupply: Double? = null,
-    val totalVolume: Double? = null
+    val totalVolume: Double? = null,
+    val userPriceTarget: Double? = null,
+    val hasPriceTargetBeenHit: Boolean = false,
+    val hasUserBeenAlerted: Boolean = false
 )

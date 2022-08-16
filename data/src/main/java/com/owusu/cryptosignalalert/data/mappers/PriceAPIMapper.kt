@@ -1,17 +1,17 @@
 package com.owusu.cryptosignalalert.data.mappers
 
-import com.owusu.cryptosignalalert.data.models.PriceAPI
-import com.owusu.cryptosignalalert.data.models.PriceAPIWrapper
-import com.owusu.cryptosignalalert.domain.models.Price
-import com.owusu.cryptosignalalert.domain.models.PriceWrapper
+import com.owusu.cryptosignalalert.data.models.api.PriceAPI
+import com.owusu.cryptosignalalert.data.models.api.PriceAPIWrapper
+import com.owusu.cryptosignalalert.domain.models.PriceDomain
+import com.owusu.cryptosignalalert.domain.models.PriceWrapperDomain
 
-class PriceAPIMapper: DataAPIMapper<PriceAPIWrapper, PriceWrapper> {
-    override fun mapAPIToDomain(api: PriceAPIWrapper): PriceWrapper {
-        val prices = arrayListOf<Price>()
-        for (priceApi in api.pricesAPI) {
+class PriceAPIMapper: DataMapper<PriceAPIWrapper, PriceWrapperDomain> {
+    override fun transform(objA: PriceAPIWrapper): PriceWrapperDomain {
+        val prices = arrayListOf<PriceDomain>()
+        for (priceApi in objA.pricesAPI) {
             priceApi.apply {
                 prices.add(
-                    Price(
+                    PriceDomain(
                         id = id!!,
                         lastUpdatedAt = lastUpdatedAt,
                         usd = usd,
@@ -22,12 +22,12 @@ class PriceAPIMapper: DataAPIMapper<PriceAPIWrapper, PriceWrapper> {
                 )
             }
         }
-        return PriceWrapper(prices)
+        return PriceWrapperDomain(prices)
     }
 
-    override fun mapToDomainApi(domain: PriceWrapper): PriceAPIWrapper {
+    override fun reverseTransformation(objB: PriceWrapperDomain): PriceAPIWrapper {
         val pricesApi = arrayListOf<PriceAPI>()
-        for (price in domain.prices) {
+        for (price in objB.domainPrices) {
             price.apply {
                 pricesApi.add(
                     PriceAPI(

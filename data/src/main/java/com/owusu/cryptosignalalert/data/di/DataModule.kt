@@ -8,14 +8,14 @@ import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoCoinsListD
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoPricesDataSourceImpl
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.mappers.*
-import com.owusu.cryptosignalalert.data.models.CoinAPI
-import com.owusu.cryptosignalalert.data.models.PriceAPIWrapper
-import com.owusu.cryptosignalalert.data.repository.AlertListRepositoryImpl
+import com.owusu.cryptosignalalert.data.models.api.CoinAPI
+import com.owusu.cryptosignalalert.data.models.api.PriceAPIWrapper
+import com.owusu.cryptosignalalert.data.repository.PriceTargetsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.CoinsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.PriceInfoRepositoryImpl
-import com.owusu.cryptosignalalert.domain.models.Coin
-import com.owusu.cryptosignalalert.domain.models.PriceWrapper
-import com.owusu.cryptosignalalert.domain.repository.AlertListRepository
+import com.owusu.cryptosignalalert.domain.models.CoinDomain
+import com.owusu.cryptosignalalert.domain.models.PriceWrapperDomain
+import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
 import com.owusu.cryptosignalalert.domain.repository.PriceInfoRepository
 import io.ktor.client.*
@@ -34,8 +34,8 @@ private const val PRICE_GSON_ADAPTOR = "PRICE_GSON_ADAPTOR"
 
 val dataModule = module(override = true) {
 
-    single<AlertListRepository> {
-        AlertListRepositoryImpl()
+    single<PriceTargetsRepository> {
+        PriceTargetsRepositoryImpl()
     }
 
     single<CoinsRepository> {
@@ -46,9 +46,9 @@ val dataModule = module(override = true) {
         PriceInfoRepositoryImpl(get(), get())
     }
 
-    factory<DataAPIListMapper<CoinAPI, Coin>>{ CoinsAPIMapper() }
+    factory<DataAPIListMapper<CoinAPI, CoinDomain>>{ CoinsAPIMapper() }
 
-    factory<DataAPIMapper<PriceAPIWrapper, PriceWrapper>>{ PriceAPIMapper() }
+    factory<DataMapper<PriceAPIWrapper, PriceWrapperDomain>>{ PriceAPIMapper() }
 
     factory(named(PRICE_GSON_ADAPTOR)) {
         GsonBuilder().registerTypeAdapter(PriceAPIWrapper::class.java, PriceJsonAdapter())

@@ -1,4 +1,4 @@
-package com.owusu.cryptosignalalert.data.models
+package com.owusu.cryptosignalalert.data.models.api
 
 import io.ktor.http.*
 import io.ktor.http.content.*

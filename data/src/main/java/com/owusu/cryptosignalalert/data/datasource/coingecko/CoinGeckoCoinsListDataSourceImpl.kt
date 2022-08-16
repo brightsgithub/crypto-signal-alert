@@ -2,7 +2,7 @@ package com.owusu.cryptosignalalert.data.datasource.coingecko
 
 import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
-import com.owusu.cryptosignalalert.data.models.CoinAPI
+import com.owusu.cryptosignalalert.data.models.api.CoinAPI
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

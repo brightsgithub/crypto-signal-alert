@@ -12,7 +12,6 @@ import org.junit.Test
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.lang.StringBuilder
-import java.net.URL
 import java.net.URLEncoder
 
 class PriceInfoRepositoryImplTest: BaseCoreTest(), KoinComponent {
@@ -37,7 +36,7 @@ class PriceInfoRepositoryImplTest: BaseCoreTest(), KoinComponent {
         initDispatcher(getResponseMapForPriceData(R.raw.get_single_price_data, ids, currencies))
 
         val priceWrapper = priceInfoRepository.getPrices(ids, currencies)
-        val bitcoinPrice = priceWrapper.prices[0]
+        val bitcoinPrice = priceWrapper.domainPrices[0]
 
         assert(bitcoinPrice.id == ids)
         assert(bitcoinPrice.usd > 0)
@@ -57,8 +56,8 @@ class PriceInfoRepositoryImplTest: BaseCoreTest(), KoinComponent {
         initDispatcher(getResponseMapForPriceData(R.raw.get_multi_price_data, ids, currencies))
 
         val priceWrapper = priceInfoRepository.getPrices(ids, currencies)
-        val bitcoinPrice = priceWrapper.prices[0]
-        val ethereumPrice = priceWrapper.prices[1]
+        val bitcoinPrice = priceWrapper.domainPrices[0]
+        val ethereumPrice = priceWrapper.domainPrices[1]
 
         assert(bitcoinPrice.id == bitcoinId)
         assert(bitcoinPrice.usd > 0)

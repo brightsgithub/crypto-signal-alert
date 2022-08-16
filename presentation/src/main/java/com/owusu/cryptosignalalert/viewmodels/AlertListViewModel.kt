@@ -2,7 +2,7 @@ package com.owusu.cryptosignalalert.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.owusu.cryptosignalalert.domain.models.AlertListDomainWrapper
+import com.owusu.cryptosignalalert.domain.models.PriceTargetsWrapper
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.AlertListUIWrapper
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AlertListViewModel(
-    private val alertListUIMapper: UIMapper<AlertListDomainWrapper, AlertListUIWrapper>,
+    private val alertListUIMapper: UIMapper<PriceTargetsWrapper, AlertListUIWrapper>,
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher
@@ -44,7 +44,7 @@ class AlertListViewModel(
         }
     }
 
-    private suspend fun handleAlertList(alertListDomainWrapper: AlertListDomainWrapper) {
+    private suspend fun handleAlertList(alertListDomainWrapper: PriceTargetsWrapper) {
         withContext(dispatcherMain) {
             val alertListUIWrapper = alertListUIMapper.mapDomainToUI(alertListDomainWrapper)
             _state.emit(AlertListViewState.AlertListDataSuccess(alertListUIWrapper))

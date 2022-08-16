@@ -1,13 +1,10 @@
 package com.owusu.cryptosignalalert.data.datasource.coingecko
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.owusu.cryptosignalalert.data.datasource.PricesDataSource
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
-import com.owusu.cryptosignalalert.data.models.PriceAPI
-import com.owusu.cryptosignalalert.data.models.PriceAPIWrapper
+import com.owusu.cryptosignalalert.data.models.api.PriceAPIWrapper
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

@@ -1,6 +1,8 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
-import com.owusu.cryptosignalalert.domain.models.Coin
+import com.owusu.cryptosignalalert.domain.models.CoinDomain
+import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.models.PriceTargetsWrapper
 import com.owusu.cryptosignalalert.domain.utils.DateUtils
 
 class SyncForPriceTargetsUseCase(
@@ -17,27 +19,52 @@ class SyncForPriceTargetsUseCase(
     override suspend fun invoke() {
 
          // 1. getPriceTargetsUseCase which will give you a list of price targets
-        val ids = arrayListOf("bitcoin","ethereum","ripple","solana")
+        val priceTargets = getPriceTargets()
+        val ids = getListOfIds(priceTargets)
 
         // 2. Query against the api for targets obtained above.
+        val coinsList = getCoinsList(ids)
+
+        // 3. carry out business rules so we know what targets have been met etc. and we know
+        // what fields to update in the DB via savePriceTargetUseCase
+        val updatedPriceTargets = getUpdatedPriceTargets(coinsList, priceTargets)
+
+        saveNewPriceTargets(updatedPriceTargets)
+    }
+
+    private fun saveNewPriceTargets(updatedPriceTargets: List<PriceTargetDomain>) {
+        savePriceTargetUseCase
+    }
+
+    private fun getUpdatedPriceTargets(
+        coinsList: List<CoinDomain>,
+        priceTargets: List<PriceTargetDomain>): List<PriceTargetDomain> {
+            TODO()
+    }
+
+    private suspend fun getPriceTargets(): List<PriceTargetDomain> {
+        return getPriceTargetsUseCase.invoke().filter {
+            !it.hasPriceTargetBeenHit && !it.hasUserBeenAlerted
+        }
+    }
+
+    private fun getListOfIds(priceTargets: List<PriceTargetDomain>): List<String> {
+        val ids = arrayListOf<String>()
+        priceTargets.map {
+            ids.add(requireNotNull(it.id))
+        }
+        return ids
+    }
+
+    private suspend fun getCoinsList(ids: List<String>): List<CoinDomain> {
+
         val params = GetCoinsListUseCase.Params(
             page = 1,
             recordsPerPage = ids.size,
             ids = ids.joinToString(","),
             currencies = "usd"
         )
-        val coinsList = getCoinsList(params)
 
-
-        // 3. carry out business rules so we know what targets have been met etc. so we know
-        // what fields to update in the DB via savePriceTargetUseCase
-    }
-
-    private fun getMatchingPriceTargets(coinsList: List<Coin>) {
-
-    }
-
-    private suspend fun getCoinsList(params: GetCoinsListUseCase.Params): List<Coin> {
         return getCoinsListUseCase.invoke(params)
     }
 }

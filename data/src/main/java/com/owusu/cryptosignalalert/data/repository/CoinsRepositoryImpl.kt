@@ -1,19 +1,14 @@
 package com.owusu.cryptosignalalert.data.repository
 
 import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
-import com.owusu.cryptosignalalert.data.datasource.PricesDataSource
 import com.owusu.cryptosignalalert.data.mappers.DataAPIListMapper
-import com.owusu.cryptosignalalert.data.mappers.DataAPIMapper
-import com.owusu.cryptosignalalert.data.models.CoinAPI
-import com.owusu.cryptosignalalert.data.models.PriceAPIWrapper
-import com.owusu.cryptosignalalert.domain.models.Coin
-import com.owusu.cryptosignalalert.domain.models.Price
-import com.owusu.cryptosignalalert.domain.models.PriceWrapper
+import com.owusu.cryptosignalalert.data.models.api.CoinAPI
+import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
 
 class CoinsRepositoryImpl(
     private val coinsDataSource: CoinsListDataSource,
-    private val dataAPIListMapper: DataAPIListMapper<CoinAPI, Coin>
+    private val dataAPIListMapper: DataAPIListMapper<CoinAPI, CoinDomain>
 ): CoinsRepository {
 
     override suspend fun getCoinsList(
@@ -21,7 +16,7 @@ class CoinsRepositoryImpl(
         recordsPerPage: Int,
         currencies: String,
         ids: String?
-    ): List<Coin> {
+    ): List<CoinDomain> {
         val coinsApiList = coinsDataSource.getCoinsList(page, recordsPerPage, currencies, ids)
         return dataAPIListMapper.mapAPIToDomain(coinsApiList)
     }

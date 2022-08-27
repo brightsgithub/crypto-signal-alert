@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.AlertListUIWrapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
+import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
@@ -66,7 +67,7 @@ class FragmentAlertList: Fragment() {
             viewModel.viewState.collect { state ->
                 when(state) {
                     is AlertListViewState.AlertListDataFailure -> {}
-                    is AlertListViewState.AlertListDataSuccess -> { displayData(state.alertListUIWrapper) }
+                    is AlertListViewState.AlertListDataSuccess -> { displayData(state.priceTargets) }
                     is AlertListViewState.HideLoadingState -> {}
                     is AlertListViewState.ShowLoadingState -> {}
                 }
@@ -74,10 +75,9 @@ class FragmentAlertList: Fragment() {
         }
     }
 
-    private fun displayData(alertListUIWrapper: AlertListUIWrapper) {
-        for (item in alertListUIWrapper.alertList) {
+    private fun displayData(priceTargets: List<PriceTargetUI>) {
+        for (item in priceTargets) {
             Log.v("FragmentAlertList", item.toString())
         }
-
     }
 }

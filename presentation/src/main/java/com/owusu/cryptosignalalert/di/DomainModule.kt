@@ -15,7 +15,11 @@ val domainModule = module(override = true) {
         GetCoinsListUseCase(get())
     }
 
+    factory {
+        GetPriceTargetsUseCase(get())
+    }
+
     single {
-        SyncForPriceTargetsUseCase(get())
+        SyncForPriceTargetsUseCase(get(), get(), get(), get())
     }
 }

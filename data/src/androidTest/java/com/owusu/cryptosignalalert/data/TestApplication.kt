@@ -1,7 +1,7 @@
 package com.owusu.cryptosignalalert.data
 
 import android.support.multidex.MultiDexApplication
-import com.owusu.cryptosignalalert.data.di.dataModule
+import com.owusu.cryptosignalalert.data.di.TestDataModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -19,7 +19,7 @@ class TestApplication : MultiDexApplication()  {
                 androidLogger()
             }
             androidContext(this@TestApplication)
-            modules(listOf(dataModule))
+            modules(listOf(TestDataModule(this@TestApplication).getDataModule()))
         }
     }
 }

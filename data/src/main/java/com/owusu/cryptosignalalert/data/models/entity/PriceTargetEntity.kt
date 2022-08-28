@@ -9,7 +9,7 @@ data class PriceTargetEntity(
 
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name="id")
-    val id: String? = null,
+    val id: String,
     @ColumnInfo(name="ath")
     val ath: Double? = null,
     @ColumnInfo(name="ath_change_percentage")

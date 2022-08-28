@@ -17,14 +17,14 @@ class PriceTargetDaoTest : KoinComponent {
 
     @Test
     fun testInsertPriceTargets()  = runBlocking {
-        val numOfCoins = 10
+        val numOfCoins = 1
         val coinsToBeAddedToBb = createPriceTargets(numOfCoins)
         priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
 
         val coinsListFromDb = priceTargetDao.getPriceTargets()
 
-        Assert.assertTrue(coinsToBeAddedToBb[0].id ==  coinsListFromDb[0].id)
-        Assert.assertTrue(coinsToBeAddedToBb.size == numOfCoins +1)
+        Assert.assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
+        Assert.assertTrue(coinsListFromDb.size == numOfCoins)
     }
 
     @Test
@@ -39,11 +39,11 @@ class PriceTargetDaoTest : KoinComponent {
 
         // Assert that the contact was inserted into the db
         Assert.assertTrue(coinsToBeAddedToBb[0].id ==  coinsListFromDb[0].id)
-        Assert.assertTrue(coinsToBeAddedToBb.size == numOfCoins +1)
+        Assert.assertTrue(coinsToBeAddedToBb.size == numOfCoins)
 
         // Now delete the contact that was added
         val numOfCoinsDeleted = priceTargetDao.deletePriceTargets(coinsListFromDb)
-        Assert.assertTrue(numOfCoinsDeleted == numOfCoins + 1)
+        Assert.assertTrue(numOfCoinsDeleted == numOfCoins)
 
     }
 
@@ -51,7 +51,7 @@ class PriceTargetDaoTest : KoinComponent {
 
         val list = arrayListOf<PriceTargetEntity>()
 
-        for (i in 0.. size) {
+        for (i in 1.. size) {
             list.add(getPriceTarget())
         }
         return list

@@ -15,9 +15,9 @@ interface PriceTargetDao {
     @Delete
     suspend fun deletePriceTargets(priceTargets: List<PriceTargetEntity>) : Int
 
-    @Query("SELECT * FROM price_targets_table pt where pt.has_price_target_been_hit = 1")
+    @Query("SELECT * FROM price_targets_table pt")
     suspend fun getPriceTargets() : List<PriceTargetEntity>
 
-    @Query("SELECT * FROM price_targets_table pt")
+    @Query("SELECT * FROM price_targets_table pt where pt.has_price_target_been_hit = 1")
     suspend fun getPriceTargetsToAlertUser() : List<PriceTargetEntity>
 }

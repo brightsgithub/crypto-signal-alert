@@ -11,7 +11,7 @@ data class CoinDomain(
     val currentPrice: Double? = null,
     val fullyDilutedValuation: Long? = null,
     val high24h: Double? = null,
-    val id: String? = null,
+    val id: String,
     val image: String? = null,
     val lastUpdated: String? = null,
     val low24h: Double? = null,

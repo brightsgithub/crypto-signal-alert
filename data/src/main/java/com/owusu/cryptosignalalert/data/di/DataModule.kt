@@ -9,6 +9,7 @@ import com.owusu.cryptosignalalert.data.datasource.PricesDataSource
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoCoinsListDataSourceImpl
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoPricesDataSourceImpl
 import com.owusu.cryptosignalalert.data.datasource.db.CryptoSignalAlertDB
+import com.owusu.cryptosignalalert.data.datasource.db.PriceTargetDao
 import com.owusu.cryptosignalalert.data.datasource.db.PriceTargetsDataSourceImpl
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.mappers.*
@@ -39,95 +40,98 @@ import java.lang.Exception
 
 private const val TIME_OUT = 60_000
 private const val PRICE_GSON_ADAPTOR = "PRICE_GSON_ADAPTOR"
-open class DataModule(private val context: Context) {
-    open fun getDataModule() : Module {
-        return module(override = true) {
+open class DataModuleWrapper(private val context: Context) {
 
-            single<PriceTargetsRepository> {
-                PriceTargetsRepositoryImpl(get())
-            }
+    val dataModule = module(override = true) {
 
-            single<CoinsRepository> {
-                CoinsRepositoryImpl(get(), get())
-            }
+        single<PriceTargetsRepository> {
+            PriceTargetsRepositoryImpl(get())
+        }
 
-            single<PriceInfoRepository> {
-                PriceInfoRepositoryImpl(get(), get())
-            }
+        single<CoinsRepository> {
+            CoinsRepositoryImpl(get(), get())
+        }
 
-            factory<DataAPIListMapper<CoinAPI, CoinDomain>>{ CoinsAPIMapper() }
+        single<PriceInfoRepository> {
+            PriceInfoRepositoryImpl(get(), get())
+        }
 
-            factory<DataMapper<PriceAPIWrapper, PriceWrapperDomain>>{ PriceAPIMapper() }
+        factory<DataAPIListMapper<CoinAPI, CoinDomain>>{ CoinsAPIMapper() }
 
-            factory<DataAPIListMapper<PriceTargetEntity, PriceTargetDomain>>{ PriceTargetEntityToPriceTargetDomainMapper() }
+        factory<DataMapper<PriceAPIWrapper, PriceWrapperDomain>>{ PriceAPIMapper() }
 
-            factory(named(PRICE_GSON_ADAPTOR)) {
-                GsonBuilder().registerTypeAdapter(PriceAPIWrapper::class.java, PriceJsonAdapter())
-                    .setPrettyPrinting()
-                    .create()
-            }
+        factory<DataAPIListMapper<PriceTargetEntity, PriceTargetDomain>>{ PriceTargetEntityToPriceTargetDomainMapper() }
 
-            single<CoinsListDataSource> {
-                CoinGeckoCoinsListDataSourceImpl(get(), get())
-            }
+        factory(named(PRICE_GSON_ADAPTOR)) {
+            GsonBuilder().registerTypeAdapter(PriceAPIWrapper::class.java, PriceJsonAdapter())
+                .setPrettyPrinting()
+                .create()
+        }
 
-            single<PricesDataSource> {
-                CoinGeckoPricesDataSourceImpl(get(), get(), get(named(PRICE_GSON_ADAPTOR)))
-            }
+        single<CoinsListDataSource> {
+            CoinGeckoCoinsListDataSourceImpl(get(), get())
+        }
 
-            single<CryptoSignalAlertDB> {
-                CryptoSignalAlertDB.invoke(context)
-            }
+        single<PricesDataSource> {
+            CoinGeckoPricesDataSourceImpl(get(), get(), get(named(PRICE_GSON_ADAPTOR)))
+        }
 
-            single<PriceTargetsDataSource> {
-                PriceTargetsDataSourceImpl(get(), get())
-            }
+        single<PriceTargetDao> {
+            get<CryptoSignalAlertDB>().priceTargetDao()
+        }
 
-            single {
-                EndPoints()
-            }
+        single<CryptoSignalAlertDB> {
+            CryptoSignalAlertDB.invoke(context)
+        }
 
-            single {
-                HttpClient(Android) {
+        single<PriceTargetsDataSource> {
+            PriceTargetsDataSourceImpl(get(), get())
+        }
 
-                    // https://ktor.io/docs/default-request.html
-                    defaultRequest {
-                        url(get<EndPoints>().getHostName())
-                    }
+        single {
+            EndPoints()
+        }
 
-                    engine {
-                        connectTimeout = TIME_OUT
-                        socketTimeout = TIME_OUT
-                        //proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 8080))
-                    }
+        single {
+            HttpClient(Android) {
 
-                    install(ContentNegotiation) {
-                        // register(ContentType.Application.Json, SimpleCoinConverter())
-                        json(Json {
-                            prettyPrint = true
-                            isLenient = true
-                            ignoreUnknownKeys = true
-                        })
-                    }
+                // https://ktor.io/docs/default-request.html
+                defaultRequest {
+                    url(get<EndPoints>().getHostName())
+                }
 
-                    install(Logging) {
-                        logger = object : Logger {
-                            override fun log(message: String) {
-                                Log.v("Logger Ktor =>", message)
-                            }
+                engine {
+                    connectTimeout = TIME_OUT
+                    socketTimeout = TIME_OUT
+                    //proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 8080))
+                }
 
+                install(ContentNegotiation) {
+                    // register(ContentType.Application.Json, SimpleCoinConverter())
+                    json(Json {
+                        prettyPrint = true
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    })
+                }
+
+                install(Logging) {
+                    logger = object : Logger {
+                        override fun log(message: String) {
+                            Log.v("Logger Ktor =>", message)
                         }
-                        level = LogLevel.ALL
-                    }
 
-                    install(ResponseObserver) {
-                        onResponse { response ->
-                            Log.d("HTTP status:", "${response.status.value}")
-                        }
+                    }
+                    level = LogLevel.ALL
+                }
+
+                install(ResponseObserver) {
+                    onResponse { response ->
+                        Log.d("HTTP status:", "${response.status.value}")
                     }
                 }
             }
         }
     }
-}
 
+}

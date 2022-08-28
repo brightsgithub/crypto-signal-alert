@@ -4,28 +4,34 @@ import android.content.Context
 import androidx.room.Room
 import com.owusu.cryptosignalalert.data.datasource.db.CryptoSignalAlertDB
 import org.koin.core.module.Module
+import org.koin.dsl.module
 
 /**
  * Here we can override dependencies
  */
-class TestDataModule(private val context: Context): DataModule(context) {
+class TestDataModule(private val context: Context): DataModuleWrapper(context) {
 
-    override fun getDataModule(): Module {
+    val testDataModule = super.dataModule
 
-        // Get the original dataModule and override what we need.
-        val dataModule = super.getDataModule()
-
-        dataModule.single<CryptoSignalAlertDB> {
+    init {
+        testDataModule.single<CryptoSignalAlertDB> {
             // https://developer.android.com/training/data-storage/room/testing-db
             Room.inMemoryDatabaseBuilder(
                 context, CryptoSignalAlertDB::class.java
             ).build()
         }
-
-        dataModule.single<CryptoSignalAlertDB> {
-            CryptoSignalAlertDB.invoke(context)
-        }
-
-        return dataModule
     }
+//
+//    override fun getDataModule(): Module {
+//
+//        // Get the original dataModule and override what we need.
+//        dataModule.single<CryptoSignalAlertDB> {
+//            // https://developer.android.com/training/data-storage/room/testing-db
+//            Room.inMemoryDatabaseBuilder(
+//                context, CryptoSignalAlertDB::class.java
+//            ).build()
+//        }
+//
+//        return dataModule
+//    }
 }

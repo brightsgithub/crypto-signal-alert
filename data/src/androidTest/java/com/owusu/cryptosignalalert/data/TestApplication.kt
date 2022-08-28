@@ -19,7 +19,7 @@ class TestApplication : MultiDexApplication()  {
                 androidLogger()
             }
             androidContext(this@TestApplication)
-            modules(listOf(TestDataModule(this@TestApplication).getDataModule()))
+            modules(listOf(TestDataModule(this@TestApplication).testDataModule))
         }
     }
 }

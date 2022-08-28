@@ -1,7 +1,7 @@
 package com.owusu.cryptosignalalert
 
 import android.support.multidex.MultiDexApplication
-import com.owusu.cryptosignalalert.data.di.DataModule
+import com.owusu.cryptosignalalert.data.di.DataModuleWrapper
 import com.owusu.cryptosignalalert.di.appModule
 import com.owusu.cryptosignalalert.di.domainModule
 import com.owusu.cryptosignalalert.di.uiModule
@@ -28,7 +28,7 @@ class CryptoSignalAlertApp : MultiDexApplication() {
                 androidLogger()
             }
             androidContext(this@CryptoSignalAlertApp)
-            modules(listOf(appModule, uiModule, domainModule, DataModule(this@CryptoSignalAlertApp).getDataModule()))
+            modules(listOf(appModule, uiModule, domainModule, DataModuleWrapper(this@CryptoSignalAlertApp).dataModule))
         }
     }
 }

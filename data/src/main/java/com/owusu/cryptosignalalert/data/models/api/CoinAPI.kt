@@ -28,7 +28,7 @@ data class CoinAPI(
     @SerialName("high_24h")
     val high24h: Double? = null,
     @SerialName("id")
-    val id: String? = null,
+    val id: String,
     @SerialName("image")
     val image: String? = null,
     @SerialName("last_updated")

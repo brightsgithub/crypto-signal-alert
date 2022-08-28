@@ -40,6 +40,11 @@ import java.lang.Exception
 
 private const val TIME_OUT = 60_000
 private const val PRICE_GSON_ADAPTOR = "PRICE_GSON_ADAPTOR"
+const val NAMED_CoinsAPIMapper = "CoinsAPIMapper"
+const val NAMED_PriceTargetEntityToPriceTargetDomainMapper = "PriceTargetEntityToPriceTargetDomainMapper"
+const val NAMED_PriceAPIMapper = "PriceAPIMapper"
+
+// so we can pass in Context!
 open class DataModuleWrapper(private val context: Context) {
 
     val dataModule = module(override = true) {
@@ -49,18 +54,18 @@ open class DataModuleWrapper(private val context: Context) {
         }
 
         single<CoinsRepository> {
-            CoinsRepositoryImpl(get(), get())
+            CoinsRepositoryImpl(get(), get(named(NAMED_CoinsAPIMapper)))
         }
 
         single<PriceInfoRepository> {
-            PriceInfoRepositoryImpl(get(), get())
+            PriceInfoRepositoryImpl(get(), get(named(NAMED_PriceAPIMapper)))
         }
 
-        factory<DataAPIListMapper<CoinAPI, CoinDomain>>{ CoinsAPIMapper() }
-
-        factory<DataMapper<PriceAPIWrapper, PriceWrapperDomain>>{ PriceAPIMapper() }
-
-        factory<DataAPIListMapper<PriceTargetEntity, PriceTargetDomain>>{ PriceTargetEntityToPriceTargetDomainMapper() }
+        // mappers. Using names since Im using an inetrface, Koin wont know which one to use and will
+        // en up overriding i.e. using the latest declared DataMapper<>. so use named
+        factory<DataAPIListMapper<CoinAPI, CoinDomain>>(named(NAMED_CoinsAPIMapper)){ CoinsAPIMapper() }
+        factory<DataAPIListMapper<PriceTargetEntity, PriceTargetDomain>>(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)) { PriceTargetEntityToPriceTargetDomainMapper() }
+        factory<DataMapper<PriceAPIWrapper, PriceWrapperDomain>>(named(NAMED_PriceAPIMapper)){ PriceAPIMapper() }
 
         factory(named(PRICE_GSON_ADAPTOR)) {
             GsonBuilder().registerTypeAdapter(PriceAPIWrapper::class.java, PriceJsonAdapter())
@@ -85,7 +90,7 @@ open class DataModuleWrapper(private val context: Context) {
         }
 
         single<PriceTargetsDataSource> {
-            PriceTargetsDataSourceImpl(get(), get())
+            PriceTargetsDataSourceImpl(get(), get(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)))
         }
 
         single {

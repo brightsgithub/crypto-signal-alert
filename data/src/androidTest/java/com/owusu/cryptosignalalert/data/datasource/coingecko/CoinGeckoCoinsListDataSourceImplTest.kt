@@ -44,7 +44,6 @@ class CoinGeckoCoinsListDataSourceImplTest : BaseCoreTest(), KoinComponent {
 
         assert(coinsAPIList.isNotEmpty())
         assert(coinsAPIList.size == recordsPerPage)
-        assert(coinsAPIList[0].id != null)
         assert(coinsAPIList[0].name != null)
         assert(coinsAPIList[0].currentPrice != null)
     }

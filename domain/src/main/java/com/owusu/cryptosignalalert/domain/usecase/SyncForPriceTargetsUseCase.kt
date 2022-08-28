@@ -30,7 +30,7 @@ class SyncForPriceTargetsUseCase(
         val updatedPriceTargets = getUpdatedPriceTargets(coinsList, priceTargets)
 
         // 4. update all price targets. At this point some may have met their price targets
-        // and some will just have updated their price targets
+        // and some will just have updated their current price updated
         updatePriceTargets(updatedPriceTargets)
     }
 

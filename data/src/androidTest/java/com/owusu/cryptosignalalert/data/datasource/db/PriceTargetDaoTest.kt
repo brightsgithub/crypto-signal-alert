@@ -14,11 +14,14 @@ class PriceTargetDaoTest : KoinComponent {
 
     private val priceTargetDao: PriceTargetDao by inject()
 
-
     @Test
     fun testInsertPriceTargets()  = runBlocking {
-        val numOfCoins = 1
-        val coinsToBeAddedToBb = createPriceTargets(numOfCoins)
+        val numOfCoins = 3
+        val hasPriceTargetBeenHit = false
+        val hasUserBeenAlerted = false
+        val userPriceTarget = 20000.0
+
+        val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
         priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
 
         val coinsListFromDb = priceTargetDao.getPriceTargets()
@@ -28,9 +31,39 @@ class PriceTargetDaoTest : KoinComponent {
     }
 
     @Test
+    fun testUpdatePriceTargets()  = runBlocking {
+        val numOfCoins = 3
+        val hasPriceTargetBeenHit = false
+        val hasUserBeenAlerted = false
+        val userPriceTarget = 20000.0
+
+        val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
+        priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
+        val coinsListFromDb = priceTargetDao.getPriceTargets()
+
+
+        // now update the userPriceTargets
+        coinsToBeAddedToBb.forEach {
+            it.userPriceTarget = 1000.0
+        }
+        priceTargetDao.updatePriceTargets(coinsToBeAddedToBb)
+
+        // get the updated list from the db
+        val updatedCoinsListFromDb = priceTargetDao.getPriceTargets()
+
+        // ensure the prices are different
+        Assert.assertTrue(coinsListFromDb[0].userPriceTarget != updatedCoinsListFromDb[0].userPriceTarget)
+        Assert.assertTrue(coinsListFromDb.size == numOfCoins)
+    }
+
+
+    @Test
     fun testRemovePriceTarget()  = runBlocking {
-        val numOfCoins = 1
-        val coinsToBeAddedToBb = createPriceTargets(numOfCoins)
+        val numOfCoins = 3
+        val hasPriceTargetBeenHit = false
+        val hasUserBeenAlerted = false
+        val userPriceTarget = 20000.0
+        val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
 
         // Insert some allowed contacts
         priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
@@ -44,22 +77,67 @@ class PriceTargetDaoTest : KoinComponent {
         // Now delete the contact that was added
         val numOfCoinsDeleted = priceTargetDao.deletePriceTargets(coinsListFromDb)
         Assert.assertTrue(numOfCoinsDeleted == numOfCoins)
-
     }
 
-    private fun createPriceTargets(size: Int) : List<PriceTargetEntity>{
+    @Test
+    fun testInsertPriceTargetsToAlertUser()  = runBlocking {
+        val numOfCoins = 3
+        val hasPriceTargetBeenHit = true
+        val hasUserBeenAlerted = false
+        val userPriceTarget = 20000.0
+        val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
+        priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
+
+        val coinsListFromDb = priceTargetDao.getPriceTargetsToAlertUser()
+
+        Assert.assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
+        Assert.assertTrue(coinsListFromDb.size == numOfCoins)
+    }
+
+    @Test
+    fun testRemovePriceTargetToAlertUser()  = runBlocking {
+        val numOfCoins = 3
+        val hasPriceTargetBeenHit = true
+        val hasUserBeenAlerted = false
+        val userPriceTarget = 20000.0
+        val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
+
+        // Insert some allowed contacts
+        priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
+
+        val coinsListFromDb = priceTargetDao.getPriceTargetsToAlertUser()
+
+        // Assert that the contact was inserted into the db
+        Assert.assertTrue(coinsToBeAddedToBb[0].id ==  coinsListFromDb[0].id)
+        Assert.assertTrue(coinsToBeAddedToBb.size == numOfCoins)
+
+        // Now delete the contact that was added
+        val numOfCoinsDeleted = priceTargetDao.deletePriceTargets(coinsListFromDb)
+        Assert.assertTrue(numOfCoinsDeleted == numOfCoins)
+    }
+
+
+    private fun createPriceTargets(
+        size: Int,
+        hasPriceTargetBeenHit: Boolean,
+        hasUserBeenAlerted: Boolean,
+        userPriceTarget: Double) : List<PriceTargetEntity>{
 
         val list = arrayListOf<PriceTargetEntity>()
-
         for (i in 1.. size) {
-            list.add(getPriceTarget())
+            list.add(getPriceTarget(i, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget))
         }
         return list
     }
 
-    private fun getPriceTarget(): PriceTargetEntity {
+    private fun getPriceTarget(
+        index: Int,
+        hasPriceTargetBeenHit: Boolean,
+        hasUserBeenAlerted: Boolean,
+        userPriceTarget: Double
+    ): PriceTargetEntity {
         return PriceTargetEntity(
-            id = "bitcoin",
+            id = "bitcoin_$index",
             symbol = "btc",
             name = "Bitcoin",
             image = "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
@@ -84,9 +162,9 @@ class PriceTargetDaoTest : KoinComponent {
             atlChangePercentage = 31577.13346,
             atlDate = "2013-07-06T00:00:00.000Z",
             lastUpdated = "2022-07-09T12:31:40.339Z",
-            userPriceTarget = 22000.0,
-            hasPriceTargetBeenHit = false,
-            hasUserBeenAlerted = false
+            userPriceTarget = userPriceTarget,
+            hasPriceTargetBeenHit = hasPriceTargetBeenHit,
+            hasUserBeenAlerted = hasUserBeenAlerted
         )
     }
 }

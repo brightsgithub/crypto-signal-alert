@@ -21,17 +21,4 @@ class TestDataModule(private val context: Context): DataModuleWrapper(context) {
             ).build()
         }
     }
-//
-//    override fun getDataModule(): Module {
-//
-//        // Get the original dataModule and override what we need.
-//        dataModule.single<CryptoSignalAlertDB> {
-//            // https://developer.android.com/training/data-storage/room/testing-db
-//            Room.inMemoryDatabaseBuilder(
-//                context, CryptoSignalAlertDB::class.java
-//            ).build()
-//        }
-//
-//        return dataModule
-//    }
 }

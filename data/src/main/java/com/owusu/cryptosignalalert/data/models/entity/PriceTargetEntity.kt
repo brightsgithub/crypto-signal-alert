@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.data.models.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 
 @Entity(tableName = "price_targets_table")
 data class PriceTargetEntity(
@@ -63,5 +64,7 @@ data class PriceTargetEntity(
     @ColumnInfo(name = "has_price_target_been_hit")
     var hasPriceTargetBeenHit: Boolean = false,
     @ColumnInfo(name = "has_user_been_alerted")
-    var hasUserBeenAlerted: Boolean = false
+    var hasUserBeenAlerted: Boolean = false,
+    @ColumnInfo(name = "price_target_direction")
+    var priceTargetDirection: PriceTargetDirection
 )

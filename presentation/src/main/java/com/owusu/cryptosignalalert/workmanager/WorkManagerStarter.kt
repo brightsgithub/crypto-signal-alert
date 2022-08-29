@@ -18,9 +18,9 @@ object WorkManagerStarter {
             .setConstraints(constraints)
             .build()
 
-        val notificationRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-            .setConstraints(constraints)
-            .build()
+//        val notificationRequest = OneTimeWorkRequestBuilder<PriceNotificationHelper>()
+//            .setConstraints(constraints)
+//            .build()
 
         // here we chain the work.
         WorkManager.getInstance(context)

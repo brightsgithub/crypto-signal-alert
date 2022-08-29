@@ -1,33 +1,25 @@
 package com.owusu.cryptosignalalert.views.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.data.datasource.db.PriceTargetDao
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
-import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
-import com.owusu.cryptosignalalert.domain.utils.DateUtils
-import com.owusu.cryptosignalalert.models.AlertListUIWrapper
+import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.notification.NotificationUtil
-import com.owusu.cryptosignalalert.service.CryptoSignalAlertService
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
-import com.owusu.cryptosignalalert.workmanager.Constants
-import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_NOT_UPDATED
-import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED
-import kotlinx.android.synthetic.main.activity_main.*
+import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED_STATUS
+import com.owusu.cryptosignalalert.workmanager.Constants.PRICE_TARGET_UPDATED
 import kotlinx.android.synthetic.main.fragment_alert_list.*
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -38,9 +30,10 @@ import java.util.*
 class FragmentAlertList: Fragment(), KoinComponent {
 
     private lateinit var viewStateJob: Job
+    private lateinit var workManagerJob: Job
     private val viewModel: AlertListViewModel by viewModel()
     private val notificationUtil: NotificationUtil by inject()
-    private val dateUtils: DateUtils by inject()
+    private val cryptoDateUtils: CryptoDateUtils by inject()
     private val repoForTesting: PriceTargetDao by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +66,8 @@ class FragmentAlertList: Fragment(), KoinComponent {
                 val numOfCoins = 1
                 val hasPriceTargetBeenHit = false
                 val hasUserBeenAlerted = false
-                val userPriceTarget = 22000.0
+                //val userPriceTarget = 22000.0
+                val userPriceTarget = 19000.0
 
                 val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
                 repoForTesting.insertPriceTargets(coinsToBeAddedToBb)
@@ -81,7 +75,7 @@ class FragmentAlertList: Fragment(), KoinComponent {
         }
 
         create_notification.setOnClickListener {
-            notificationUtil.sendNewStandAloneNotification("Created at "+ dateUtils.convertDateToFormattedStringWithTime(
+            notificationUtil.sendNewStandAloneNotification("Created at "+ cryptoDateUtils.convertDateToFormattedStringWithTime(
                 Calendar.getInstance().timeInMillis))
         }
     }
@@ -124,16 +118,18 @@ class FragmentAlertList: Fragment(), KoinComponent {
     }
 
     private fun observeWorkManagerStatus() {
-        viewModel.workInfoLiveData.observe(this) { workInfo ->
-            if ((workInfo != null) && (workInfo.state == WorkInfo.State.ENQUEUED)) {
-                val myOutputData = workInfo.outputData.getString(Constants.KEY_PRICE_TARGET_UPDATED)
-                if (myOutputData !== KEY_PRICE_TARGET_UPDATED) {
-                    viewModel.loadAlertList()
-                } else if (myOutputData !== KEY_PRICE_TARGET_NOT_UPDATED) {
+       // viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.workInfoLiveData.observe(this) { workInfo ->
+                if ((workInfo != null) && (workInfo.state == WorkInfo.State.ENQUEUED)) {
+                    val myOutputData = workInfo.outputData.getString(KEY_PRICE_TARGET_UPDATED_STATUS)
+                    if (myOutputData !== PRICE_TARGET_UPDATED) {
+                        viewModel.loadAlertList()
+                    } else if (myOutputData !== PRICE_TARGET_UPDATED) {
 
+                    }
                 }
             }
-        }
+      //  }
     }
 
     private fun displayData(priceTargets: List<PriceTargetUI>) {

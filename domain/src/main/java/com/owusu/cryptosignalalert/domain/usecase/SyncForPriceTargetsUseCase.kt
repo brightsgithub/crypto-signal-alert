@@ -3,13 +3,13 @@ package com.owusu.cryptosignalalert.domain.usecase
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
-import com.owusu.cryptosignalalert.domain.utils.DateUtils
+import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 
 class SyncForPriceTargetsUseCase(
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
     private val getCoinsListUseCase: GetCoinsListUseCase,
     private val updatePriceTargetsUseCase: UpdatePriceTargetsUseCase,
-    private val dateUtil: DateUtils
+    private val dateUtil: CryptoDateUtils
     ): SuspendedUseCaseUnit<Boolean> {
 
     // needs to have a flow so that the Alarm manager can listen

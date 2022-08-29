@@ -11,7 +11,7 @@ import com.owusu.cryptosignalalert.domain.usecase.SyncForPriceTargetsUseCase
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.receivers.AlarmReceiver
 import com.owusu.cryptosignalalert.service.CryptoSignalAlertService
-import com.owusu.cryptosignalalert.domain.utils.DateUtils
+import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -30,7 +30,7 @@ class CryptoAlarmManager(
     }
 
     // private lateinit var context: CryptoSignalAlertApp
-    private val dateUtils: DateUtils by inject()
+    private val cryptoDateUtils: CryptoDateUtils by inject()
     private val notificationUtil: NotificationUtil by inject()
     private val getLatestPricesForTargetsUseCase: SyncForPriceTargetsUseCase by inject()
     private val START_ALARM_REQUEST_CODE = 412232
@@ -89,11 +89,11 @@ class CryptoAlarmManager(
 
     private fun sendNotifications(interval: Long) {
 
-        val nextAlarm = dateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis + interval)
+        val nextAlarm = cryptoDateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis + interval)
         val nextUpdatedAMsg = "Next alarm scheduled at " + nextAlarm
 
         if (CryptoSignalAlertService.isMyServiceRunning(CryptoSignalAlertApp.instance)) {
-            notificationUtil.updateServiceNotification("Last updated at "+ dateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis) + "\n" + nextUpdatedAMsg)
+            notificationUtil.updateServiceNotification("Last updated at "+ cryptoDateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis) + "\n" + nextUpdatedAMsg)
         }
 
         Log.v("CryptoSignalService",nextUpdatedAMsg)

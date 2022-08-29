@@ -9,10 +9,10 @@ import java.util.Locale;
  * Created by bright.owusu-amankwa on 05/09/2017.
  */
 
-public class DateUtils {
+public class CryptoDateUtils {
 
     // http://www.sdfonlinetester.info/# (always use lowercase yy)
-    private static final String LOG_TAG = DateUtils.class.getSimpleName();
+    private static final String LOG_TAG = CryptoDateUtils.class.getSimpleName();
     private SimpleDateFormat calendarTimeFormat;
     private SimpleDateFormat calendarDateFormatXAxis24Hrs;
     private SimpleDateFormat calendarDateFormatXAxis7Day;
@@ -40,16 +40,16 @@ public class DateUtils {
         return calendarDateFormatXAxisPastYear = new SimpleDateFormat("MM/yy", Locale.getDefault());
     }
 
-    private static DateUtils SINGLE_INSTANCE;
+    private static CryptoDateUtils SINGLE_INSTANCE;
 
-    public static DateUtils getInstance() {
+    public static CryptoDateUtils getInstance() {
         if(SINGLE_INSTANCE == null) {
-            SINGLE_INSTANCE = new DateUtils();
+            SINGLE_INSTANCE = new CryptoDateUtils();
         }
         return SINGLE_INSTANCE;
     }
 
-    private DateUtils(){}
+    private CryptoDateUtils(){}
 
     public long getTimeNow(){
         Calendar calendar = Calendar.getInstance();

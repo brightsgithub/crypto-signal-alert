@@ -1,14 +1,14 @@
 package com.owusu.cryptosignalalert.di
 
-import android.app.Application
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.notification.NotificationUtil
-import com.owusu.cryptosignalalert.domain.utils.DateUtils
+import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.mappers.PriceTargetUIMapper
 import com.owusu.cryptosignalalert.mappers.UIListMapper
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -20,12 +20,16 @@ val uiModule = module(override = true) {
         PriceTargetUIMapper()
     }
 
+    factory {
+        PriceNotificationHelper(get(), get())
+    }
+
     viewModel {
         AlertListViewModel(get(), get(), get(named(IO)), get(named(MAIN)), androidApplication())
     }
 
     single {
-        DateUtils.getInstance()
+        CryptoDateUtils.getInstance()
     }
 
     single {

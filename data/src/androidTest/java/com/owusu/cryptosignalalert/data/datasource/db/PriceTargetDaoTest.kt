@@ -2,7 +2,9 @@ package com.owusu.cryptosignalalert.data.datasource.db
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
+import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import junit.framework.Assert
+import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,8 +28,9 @@ class PriceTargetDaoTest : KoinComponent {
 
         val coinsListFromDb = priceTargetDao.getPriceTargets()
 
-        Assert.assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
-        Assert.assertTrue(coinsListFromDb.size == numOfCoins)
+        assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
+        assertTrue(coinsListFromDb.size == numOfCoins)
+        assertTrue(coinsToBeAddedToBb[0].priceTargetDirection == coinsListFromDb[0].priceTargetDirection)
     }
 
     @Test
@@ -164,7 +167,8 @@ class PriceTargetDaoTest : KoinComponent {
             lastUpdated = "2022-07-09T12:31:40.339Z",
             userPriceTarget = userPriceTarget,
             hasPriceTargetBeenHit = hasPriceTargetBeenHit,
-            hasUserBeenAlerted = hasUserBeenAlerted
+            hasUserBeenAlerted = hasUserBeenAlerted,
+            priceTargetDirection = PriceTargetDirection.NOT_SET
         )
     }
 }

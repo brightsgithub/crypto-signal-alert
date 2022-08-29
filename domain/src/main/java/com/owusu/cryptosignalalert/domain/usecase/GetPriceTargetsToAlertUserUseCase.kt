@@ -10,6 +10,8 @@ class GetPriceTargetsToAlertUserUseCase(
 
     // needs to return a flow since we will receiving constant updates
     override suspend fun invoke(): List<PriceTargetDomain> {
-        return priceTargetsRepository.getPriceTargets()
+        return priceTargetsRepository.getPriceTargets().filter {
+            it.hasPriceTargetBeenHit
+        }
     }
 }

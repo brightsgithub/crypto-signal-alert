@@ -6,12 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkInfo
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.AlertListUIWrapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.workmanager.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -51,6 +54,7 @@ class FragmentAlertList: Fragment() {
 
     private fun registerViewStates() {
         observeViewState()
+        observeWorkManagerStatus()
     }
 
     private fun unRegisterViewStates() {
@@ -70,6 +74,18 @@ class FragmentAlertList: Fragment() {
                     is AlertListViewState.AlertListDataSuccess -> { displayData(state.priceTargets) }
                     is AlertListViewState.HideLoadingState -> {}
                     is AlertListViewState.ShowLoadingState -> {}
+                }
+            }
+        }
+    }
+
+    private fun observeWorkManagerStatus() {
+        viewModel.workInfoLiveData.observe(this) { workInfo ->
+            if ((workInfo != null) &&                (workInfo.state == WorkInfo.State.SUCCEEDED)
+            ) {
+                val myOutputData = workInfo.outputData.getString(Constants.KEY_PRICE_TARGET_UPDATED)
+                if (myOutputData != null) {
+                    viewModel.loadAlertList()
                 }
             }
         }

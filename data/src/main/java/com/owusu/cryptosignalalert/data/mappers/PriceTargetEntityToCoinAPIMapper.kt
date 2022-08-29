@@ -2,6 +2,7 @@ package com.owusu.cryptosignalalert.data.mappers
 
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
+import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 
 class PriceTargetEntityToCoinAPIMapper: DataMapper<CoinAPI, PriceTargetEntity> {
     override fun transform(coinAPI: CoinAPI): PriceTargetEntity {
@@ -31,7 +32,8 @@ class PriceTargetEntityToCoinAPIMapper: DataMapper<CoinAPI, PriceTargetEntity> {
                 priceChangePercentage24h = priceChangePercentage24h,
                 symbol = symbol,
                 totalSupply = totalSupply,
-                totalVolume = totalVolume
+                totalVolume = totalVolume,
+                priceTargetDirection = PriceTargetDirection.NOT_SET
             )
         }
     }

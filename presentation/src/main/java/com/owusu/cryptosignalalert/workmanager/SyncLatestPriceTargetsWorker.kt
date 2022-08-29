@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.owusu.cryptosignalalert.domain.usecase.SyncForPriceTargetsUseCase
+import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
@@ -19,10 +20,11 @@ class SyncLatestPriceTargetsWorker(context: Context, workerParams: WorkerParamet
             withContext(Dispatchers.IO) {
                 syncForPriceTargetsUseCase.invoke()
                 // not designed for large data. Instead place data maybe in your db and fetch?
-                val outputData = workDataOf(Constants.KEY_PRICE_TARGET_UPDATED to "SOME STRING")
+                val outputData = workDataOf(KEY_PRICE_TARGET_UPDATED to KEY_PRICE_TARGET_UPDATED)
                 Result.success(outputData)
             }
         } catch (t: Throwable) {
+            t.printStackTrace()
             Result.failure()
         }
     }

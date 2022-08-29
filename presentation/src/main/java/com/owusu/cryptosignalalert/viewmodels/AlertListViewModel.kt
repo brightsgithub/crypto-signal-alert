@@ -1,7 +1,13 @@
 package com.owusu.cryptosignalalert.viewmodels
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import com.owusu.cryptosignalalert.CryptoSignalAlertApp
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetsWrapper
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
@@ -22,11 +28,24 @@ class AlertListViewModel(
     private val priceTargetsMapper: UIListMapper<PriceTargetDomain, PriceTargetUI>,
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
-    private val dispatcherMain: CoroutineDispatcher
-    ): ViewModel() {
+    private val dispatcherMain: CoroutineDispatcher,
+    private val app: Application): AndroidViewModel(app) {
+
+    val workInfoLiveData: LiveData<WorkInfo> // <-- ADD THIS
+    private val workManager: WorkManager = WorkManager.getInstance(app)
 
     private val _state = MutableSharedFlow<AlertListViewState>() // for emitting
     val viewState: Flow<AlertListViewState> = _state // for clients to listen to
+
+    // WorkManager in AndroidViewModel https://developer.android.com/codelabs/android-adv-workmanager#3
+    init {
+        // we won't observe here since we don't want to pass in the lifecycleScope.
+        // let the view observe and let it call back the viewmodel.
+        //
+        app as CryptoSignalAlertApp
+        val workerId = app.workerId
+        workInfoLiveData = workManager.getWorkInfoByIdLiveData(workerId)
+    }
 
     fun loadAlertList(scope: CoroutineScope = viewModelScope) {
         scope.launch(dispatcherBackground) {

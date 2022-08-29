@@ -65,11 +65,17 @@ class SyncForPriceTargetsUseCase(
                 val priceTargetDirection = it.priceTargetDirection
 
                 // has the target been hit
-                val hasPriceTargetBeenHit = checkIfPriceTargetBeenHit(
-                    coinDomain.currentPrice,
-                    it.userPriceTarget,
-                    it.priceTargetDirection
-                )
+                val hasPriceTargetBeenHit = if (!it.hasPriceTargetBeenHit) {
+                    checkIfPriceTargetBeenHit(
+                        coinDomain.currentPrice,
+                        it.userPriceTarget,
+                        it.priceTargetDirection
+                    )
+                } else {
+                    true // it has already been hit, so keep the same value
+                }
+
+                // TODO - also update the progress to show how close we are
 
                 // Convert the latest price with our updated PriceTargetDomain
                 val updatedPriceTargetDomain = getUpdatedPriceTargetDomain(

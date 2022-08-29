@@ -49,7 +49,7 @@ class CryptoSignalAlertApp : MultiDexApplication() {
     // the below was recommend by android: WorkManager Periodicity: https://developer.android.com/topic/libraries/architecture/workmanager/basics
     // https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
     private fun startWorkManager(): UUID {
-        //return WorkManagerStarter.startPeriodicWorker(context = this)
-        return WorkManagerStarter.startOneTimeWorkers(context = this)
+        return WorkManagerStarter.startPeriodicWorker(context = this)
+        //return WorkManagerStarter.startOneTimeWorkers(context = this)
     }
 }

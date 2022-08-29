@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.mappers
 
+import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 
@@ -37,7 +38,8 @@ class PriceTargetUIMapper:UIListMapper<PriceTargetDomain, PriceTargetUI> {
                         totalSupply = totalSupply,
                         totalVolume = totalVolume,
                         userPriceTarget = userPriceTarget,
-                        hasPriceTargetBeenHit = hasPriceTargetBeenHit
+                        hasPriceTargetBeenHit = hasPriceTargetBeenHit,
+                        priceTargetDirection = mapPriceDirectionToUI(priceTargetDirection)
                     )
                 )
             }
@@ -78,11 +80,33 @@ class PriceTargetUIMapper:UIListMapper<PriceTargetDomain, PriceTargetUI> {
                         totalSupply = totalSupply,
                         totalVolume = totalVolume,
                         userPriceTarget = userPriceTarget,
-                        hasPriceTargetBeenHit = hasPriceTargetBeenHit
+                        hasPriceTargetBeenHit = hasPriceTargetBeenHit,
+                        priceTargetDirection = mapPriceDirectionToDomain(priceTargetDirection)
+
                     )
                 )
             }
         }
         return list
     }
+
+    private fun mapPriceDirectionToUI(priceTargetDirDomain: PriceTargetDirection): PriceTargetDirectionUI {
+        return when (priceTargetDirDomain) {
+            PriceTargetDirection.ABOVE -> PriceTargetDirectionUI.ABOVE
+            PriceTargetDirection.BELOW -> PriceTargetDirectionUI.BELOW
+            PriceTargetDirection.NOT_SET -> PriceTargetDirectionUI.NOT_SET
+        }
+    }
+
+    private fun mapPriceDirectionToDomain(priceTargetDirUI: PriceTargetDirectionUI): PriceTargetDirection {
+        return when (priceTargetDirUI) {
+            PriceTargetDirectionUI.ABOVE -> PriceTargetDirection.ABOVE
+            PriceTargetDirectionUI.BELOW -> PriceTargetDirection.BELOW
+            PriceTargetDirectionUI.NOT_SET -> PriceTargetDirection.NOT_SET
+        }
+    }
+}
+
+enum class PriceTargetDirectionUI {
+    ABOVE, BELOW, NOT_SET
 }

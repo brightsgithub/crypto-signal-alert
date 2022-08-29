@@ -8,4 +8,5 @@ interface PriceTargetsRepository {
     suspend fun saveNewPriceTargets(priceTargets: List<PriceTargetDomain>)
     suspend fun updatePriceTargets(priceTargets: List<PriceTargetDomain>)
     suspend fun deletePriceTargets(priceTargets: List<PriceTargetDomain>)
+    suspend fun nukeAll()
 }

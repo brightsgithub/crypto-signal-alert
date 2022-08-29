@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.models
 
 import android.os.Parcelable
+import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -32,5 +33,6 @@ data class PriceTargetUI(
     val totalVolume: Double? = null,
     val userPriceTarget: Double? = null,
     val hasPriceTargetBeenHit: Boolean = false,
-    val hasUserBeenAlerted: Boolean = false
+    val hasUserBeenAlerted: Boolean = false,
+    val priceTargetDirection: PriceTargetDirectionUI = PriceTargetDirectionUI.NOT_SET
 ): Parcelable

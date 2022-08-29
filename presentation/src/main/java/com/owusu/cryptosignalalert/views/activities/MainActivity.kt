@@ -14,36 +14,12 @@ import java.util.*
 
 class MainActivity : AppCompatActivity(), KoinComponent {
 
-    private val notificationUtil: NotificationUtil by inject()
-    private val dateUtils: DateUtils by inject()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupToolbar()
-        initViews()
         navigateToFragmentAlertList()
     }
-
-    private fun initViews() {
-        initListeners()
-    }
-
-    private fun initListeners() {
-        start_service.setOnClickListener {
-            CryptoSignalAlertService.startAppForegroundService(this.applicationContext, "From Main Activity")
-        }
-
-        stop_service.setOnClickListener {
-            CryptoSignalAlertService.stopAlertService(this.applicationContext)
-        }
-
-        create_notification.setOnClickListener {
-            notificationUtil.sendNewStandAloneNotification("Created at "+ dateUtils.convertDateToFormattedStringWithTime(
-                Calendar.getInstance().timeInMillis))
-        }
-    }
-
     private fun setupToolbar() {
         setSupportActionBar(app_toolbar)
         supportActionBar?.setDisplayShowHomeEnabled(true)

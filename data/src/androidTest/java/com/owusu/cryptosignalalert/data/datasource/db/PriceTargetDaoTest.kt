@@ -6,6 +6,7 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import junit.framework.Assert
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.KoinComponent
@@ -14,7 +15,20 @@ import org.koin.core.inject
 @RunWith(AndroidJUnit4::class)
 class PriceTargetDaoTest : KoinComponent {
 
+    /**
+     * If you do not run these tests under inMemoryDatabaseBuilder, then the data inserts will hand around
+     * somewhere. Not sure where. I tried to uninstall the app and the data is still there on the emulator
+     * when an insert of records is run before hand, uninstalling the app will not remove the data.
+     * everytime i select its always there.
+     * When I enable the inMemoryDatabaseBuilder then the data is NOT there. I guess the only way to remove
+     * data via the non inMemoryDatabaseBuilder is to delete all from this table
+     */
     private val priceTargetDao: PriceTargetDao by inject()
+
+    @Before
+    fun startUp() = runBlocking {
+        //priceTargetDao.nukeTable() // no need if we are using a inMemoryDatabase
+    }
 
     @Test
     fun testInsertPriceTargets()  = runBlocking {

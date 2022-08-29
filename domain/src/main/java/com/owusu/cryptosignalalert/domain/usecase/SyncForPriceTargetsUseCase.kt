@@ -10,16 +10,16 @@ class SyncForPriceTargetsUseCase(
     private val getCoinsListUseCase: GetCoinsListUseCase,
     private val updatePriceTargetsUseCase: UpdatePriceTargetsUseCase,
     private val dateUtil: DateUtils
-    ): SuspendedUseCaseUnit<Unit> {
+    ): SuspendedUseCaseUnit<Boolean> {
 
     // needs to have a flow so that the Alarm manager can listen
     // and the calling view model can listen
-    override suspend fun invoke() {
+    override suspend fun invoke(): Boolean {
 
         // 1. getPriceTargetsUseCase which will give you a list of price targets.
         // need to get the price targets that have not been hit
-        val priceTargets = getPriceTargetsThatHaveNotBeenMet()
-        if (priceTargets.isEmpty()) return
+        val priceTargets = getPriceTargets()
+        if (priceTargets.isEmpty()) return false
 
         val ids = getListOfIds(priceTargets)
 
@@ -33,6 +33,7 @@ class SyncForPriceTargetsUseCase(
         // 4. update all price targets. At this point some may have met their price targets
         // and some will just have updated their current price updated
         updatePriceTargets(updatedPriceTargets)
+        return updatedPriceTargets.isNotEmpty()
     }
 
     private suspend fun updatePriceTargets(updatedPriceTargets: List<PriceTargetDomain>) {
@@ -157,10 +158,8 @@ class SyncForPriceTargetsUseCase(
         }
     }
 
-    private suspend fun getPriceTargetsThatHaveNotBeenMet(): List<PriceTargetDomain> {
-        return getPriceTargetsUseCase.invoke().filter {
-            !it.hasPriceTargetBeenHit
-        }
+    private suspend fun getPriceTargets(): List<PriceTargetDomain> {
+        return getPriceTargetsUseCase.invoke()
     }
 
     private fun getListOfIds(priceTargets: List<PriceTargetDomain>): List<String> {

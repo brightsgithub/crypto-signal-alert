@@ -20,4 +20,7 @@ interface PriceTargetDao {
 
     @Query("SELECT * FROM price_targets_table pt where pt.has_price_target_been_hit = 1")
     suspend fun getPriceTargetsToAlertUser() : List<PriceTargetEntity>
+
+    @Query("DELETE FROM price_targets_table")
+    suspend fun nukeTable()
 }

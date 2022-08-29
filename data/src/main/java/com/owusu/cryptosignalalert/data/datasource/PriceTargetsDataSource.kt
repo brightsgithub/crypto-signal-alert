@@ -8,4 +8,5 @@ interface PriceTargetsDataSource {
     suspend fun insertPriceTargets(priceTargets: List<PriceTargetDomain>)
     suspend fun updatePriceTargets(priceTargets: List<PriceTargetDomain>)
     suspend fun deletePriceTargets(priceTargets: List<PriceTargetDomain>)
+    suspend fun nukeAll()
 }

@@ -27,4 +27,8 @@ class PriceTargetsRepositoryImpl(
     override suspend fun deletePriceTargets(priceTargets: List<PriceTargetDomain>) {
         priceTargetsDataSource.deletePriceTargets(priceTargets)
     }
+
+    override suspend fun nukeAll() {
+        priceTargetsDataSource.nukeAll()
+    }
 }

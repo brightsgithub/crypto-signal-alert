@@ -10,6 +10,7 @@ class PriceTargetsDataSourceImpl(
     private val mapper: DataAPIListMapper<PriceTargetEntity, PriceTargetDomain>
     ): PriceTargetsDataSource {
 
+    @Synchronized
     override suspend fun getPriceTargets(): List<PriceTargetDomain> {
         val entityList = priceTargetDao.getPriceTargets()
         return mapper.transform(entityList)
@@ -33,5 +34,9 @@ class PriceTargetsDataSourceImpl(
     override suspend fun deletePriceTargets(priceTargets: List<PriceTargetDomain>) {
         val entityList = mapper.reverseTransformation(priceTargets)
         priceTargetDao.deletePriceTargets(entityList)
+    }
+
+    override suspend fun nukeAll() {
+        priceTargetDao.nukeTable()
     }
 }

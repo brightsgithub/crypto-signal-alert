@@ -5,13 +5,10 @@ import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
 
 class GetPriceTargetsToAlertUserUseCase(
     private val priceTargetsRepository: PriceTargetsRepository
-):
-    SuspendedUseCaseUnit<List<PriceTargetDomain>> {
+): SuspendedUseCaseUnit<List<PriceTargetDomain>> {
 
     // needs to return a flow since we will receiving constant updates
     override suspend fun invoke(): List<PriceTargetDomain> {
-        return priceTargetsRepository.getPriceTargets().filter {
-            (it.hasPriceTargetBeenHit && !it.hasUserBeenAlerted)
-        }
+        return priceTargetsRepository.getPriceTargetsToAlertUser()
     }
 }

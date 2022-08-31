@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.views.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.workmanager.Constants.DISPLAY_LATEST_DATA
 import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED_STATUS
 import com.owusu.cryptosignalalert.workmanager.Constants.PRICE_TARGET_UPDATED
 import kotlinx.android.synthetic.main.fragment_alert_list.*
@@ -67,9 +69,9 @@ class FragmentAlertList: Fragment(), KoinComponent {
                 val hasPriceTargetBeenHit = false
                 val hasUserBeenAlerted = false
                 //val userPriceTarget = 22000.0
-                val userPriceTarget = 19000.0
-
-                val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
+                val userPriceTarget = 21000.0
+                val priceTargetDirection = PriceTargetDirection.ABOVE
+                val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget, priceTargetDirection)
                 repoForTesting.insertPriceTargets(coinsToBeAddedToBb)
             }
         }
@@ -97,6 +99,7 @@ class FragmentAlertList: Fragment(), KoinComponent {
 
     private fun unRegisterViewStates() {
         viewStateJob.cancel()
+        workManagerJob.cancel()
     }
 
     override fun onResume() {
@@ -118,18 +121,19 @@ class FragmentAlertList: Fragment(), KoinComponent {
     }
 
     private fun observeWorkManagerStatus() {
-       // viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.workInfoLiveData.observe(this) { workInfo ->
+        workManagerJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.workInfoLiveData.observe(viewLifecycleOwner) { workInfo ->
                 if ((workInfo != null) && (workInfo.state == WorkInfo.State.ENQUEUED)) {
+                    Log.v("FragmentAlertList", "state" + workInfo.state.toString())
                     val myOutputData = workInfo.outputData.getString(KEY_PRICE_TARGET_UPDATED_STATUS)
-                    if (myOutputData !== PRICE_TARGET_UPDATED) {
+                    //if (myOutputData == DISPLAY_LATEST_DATA) {
+                        Log.v("FragmentAlertList", "DISPLAY_LATEST_DATA")
+                        // When a sync has occurred, refresh the screen
                         viewModel.loadAlertList()
-                    } else if (myOutputData !== PRICE_TARGET_UPDATED) {
-
-                    }
+                    //}
                 }
             }
-      //  }
+        }
     }
 
     private fun displayData(priceTargets: List<PriceTargetUI>) {
@@ -147,11 +151,12 @@ class FragmentAlertList: Fragment(), KoinComponent {
         size: Int,
         hasPriceTargetBeenHit: Boolean,
         hasUserBeenAlerted: Boolean,
-        userPriceTarget: Double) : List<PriceTargetEntity>{
+        userPriceTarget: Double,
+        priceTargetDirection: PriceTargetDirection) : List<PriceTargetEntity>{
 
         val list = arrayListOf<PriceTargetEntity>()
         for (i in 1.. size) {
-            list.add(getPriceTarget(i, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget))
+            list.add(getPriceTarget(i, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget, priceTargetDirection))
         }
         return list
     }
@@ -160,7 +165,8 @@ class FragmentAlertList: Fragment(), KoinComponent {
         index: Int,
         hasPriceTargetBeenHit: Boolean,
         hasUserBeenAlerted: Boolean,
-        userPriceTarget: Double
+        userPriceTarget: Double,
+        priceTargetDirection: PriceTargetDirection
     ): PriceTargetEntity {
         return PriceTargetEntity(
             id = "bitcoin",
@@ -191,7 +197,7 @@ class FragmentAlertList: Fragment(), KoinComponent {
             userPriceTarget = userPriceTarget,
             hasPriceTargetBeenHit = hasPriceTargetBeenHit,
             hasUserBeenAlerted = hasUserBeenAlerted,
-            priceTargetDirection = PriceTargetDirection.ABOVE
+            priceTargetDirection = priceTargetDirection
         )
     }
 }

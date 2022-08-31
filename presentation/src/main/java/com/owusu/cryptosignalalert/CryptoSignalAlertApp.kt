@@ -26,7 +26,7 @@ class CryptoSignalAlertApp : MultiDexApplication() {
         super.onCreate()
         instance = this
         initKoin()
-        workerId = startWorkManager()
+        initWorkManager()
     }
 
     private fun initKoin() {
@@ -48,8 +48,8 @@ class CryptoSignalAlertApp : MultiDexApplication() {
     // Perodic work stated by application
     // the below was recommend by android: WorkManager Periodicity: https://developer.android.com/topic/libraries/architecture/workmanager/basics
     // https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
-    private fun startWorkManager(): UUID {
-        return WorkManagerStarter.startPeriodicWorker(context = this)
-        //return WorkManagerStarter.startOneTimeWorkers(context = this)
+    fun initWorkManager() {
+        workerId = WorkManagerStarter.startPeriodicWorker(context = this)
+        //workerId = WorkManagerStarter.startOneTimeWorkers(context = this)
     }
 }

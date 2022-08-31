@@ -4,6 +4,7 @@ import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
+import java.util.*
 
 class SyncForPriceTargetsUseCase(
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
@@ -116,7 +117,7 @@ class SyncForPriceTargetsUseCase(
                 fullyDilutedValuation = fullyDilutedValuation,
                 high24h = high24h,
                 image = image,
-                lastUpdated = lastUpdated,
+                lastUpdated = dateUtil.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis),
                 low24h = low24h,
                 marketCap = marketCap,
                 marketCapChange24h = marketCapChange24h,

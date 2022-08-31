@@ -18,9 +18,24 @@ val domainModule = module(override = true) {
     }
 
     factory {
+        UpdatePriceTargetsForAlertedUserUseCase(get())
+    }
+
+    factory {
         GetPriceTargetsToAlertUserUseCase(get())
     }
 
+    factory {
+        SaveNewPriceTargetsUseCase(get())
+    }
+
+    factory {
+        DeletePriceTargetsUseCase(get())
+    }
+
+    factory {
+        DeleteAllPriceTargetsUseCase(get())
+    }
 
     single {
         SyncForPriceTargetsUseCase(get(), get(), get(), get())

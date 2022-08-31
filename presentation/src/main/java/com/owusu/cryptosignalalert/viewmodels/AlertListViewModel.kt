@@ -3,20 +3,14 @@ package com.owusu.cryptosignalalert.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.owusu.cryptosignalalert.CryptoSignalAlertApp
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
-import com.owusu.cryptosignalalert.domain.models.PriceTargetsWrapper
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
 import com.owusu.cryptosignalalert.mappers.UIListMapper
-import com.owusu.cryptosignalalert.mappers.UIMapper
-import com.owusu.cryptosignalalert.models.AlertListUIWrapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
-import com.owusu.cryptosignalalert.models.PriceTargetWrapperUI
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -29,9 +23,10 @@ class AlertListViewModel(
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher,
+    private val workerTag: String,
     private val app: Application): AndroidViewModel(app) {
 
-    val workInfoLiveData: LiveData<WorkInfo> // <-- ADD THIS
+    var workInfoLiveData: LiveData<List<WorkInfo>> // <-- ADD THIS
     private val workManager: WorkManager = WorkManager.getInstance(app)
 
     private val _state = MutableSharedFlow<AlertListViewState>() // for emitting
@@ -41,10 +36,7 @@ class AlertListViewModel(
     init {
         // we won't observe here since we don't want to pass in the lifecycleScope.
         // let the view observe and let it call back the viewmodel.
-        //
-        app as CryptoSignalAlertApp
-        val workerId = app.workerId
-        workInfoLiveData = workManager.getWorkInfoByIdLiveData(workerId)
+        workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(workerTag)
     }
 
     fun loadAlertList(scope: CoroutineScope = viewModelScope) {

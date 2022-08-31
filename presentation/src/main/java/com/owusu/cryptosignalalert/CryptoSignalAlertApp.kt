@@ -5,22 +5,23 @@ import com.owusu.cryptosignalalert.data.di.DataModuleWrapper
 import com.owusu.cryptosignalalert.di.appModule
 import com.owusu.cryptosignalalert.di.domainModule
 import com.owusu.cryptosignalalert.di.uiModule
+import com.owusu.cryptosignalalert.workmanager.Constants.SYNC_PRICES_WORKER_TAG
 import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.BuildConfig
 import org.koin.core.context.startKoin
-import java.util.*
 
 class CryptoSignalAlertApp : MultiDexApplication() {
+
+    private val workManagerStarter: WorkManagerStarter by inject()
 
     companion object {
         lateinit var instance: CryptoSignalAlertApp
     }
-
-    lateinit var workerId: UUID
 
     override fun onCreate() {
         super.onCreate()
@@ -48,8 +49,7 @@ class CryptoSignalAlertApp : MultiDexApplication() {
     // Perodic work stated by application
     // the below was recommend by android: WorkManager Periodicity: https://developer.android.com/topic/libraries/architecture/workmanager/basics
     // https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
-    fun initWorkManager() {
-        workerId = WorkManagerStarter.startPeriodicWorker(context = this)
-        //workerId = WorkManagerStarter.startOneTimeWorkers(context = this)
+    private fun initWorkManager() {
+        workManagerStarter.startPeriodicWorker(context = this, SYNC_PRICES_WORKER_TAG)
     }
 }

@@ -8,7 +8,9 @@ import com.owusu.cryptosignalalert.mappers.PriceTargetUIMapper
 import com.owusu.cryptosignalalert.mappers.UIListMapper
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.workmanager.Constants
 import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
+import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -25,7 +27,14 @@ val uiModule = module(override = true) {
     }
 
     viewModel {
-        AlertListViewModel(get(), get(), get(named(IO)), get(named(MAIN)), androidApplication())
+        AlertListViewModel(
+            get(),
+            get(),
+            get(named(IO)),
+            get(named(MAIN)),
+            Constants.SYNC_PRICES_WORKER_TAG,
+            androidApplication()
+        )
     }
 
     single {
@@ -38,5 +47,9 @@ val uiModule = module(override = true) {
 
     single {
        CryptoAlarmManager(get(named(IO)), get(named(MAIN)))
+    }
+
+    single {
+        WorkManagerStarter
     }
 }

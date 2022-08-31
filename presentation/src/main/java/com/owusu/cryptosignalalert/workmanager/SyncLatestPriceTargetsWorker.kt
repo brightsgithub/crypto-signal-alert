@@ -19,8 +19,8 @@ class SyncLatestPriceTargetsWorker(val context: Context, workerParams: WorkerPar
 
     private val syncForPriceTargetsUseCase: SyncForPriceTargetsUseCase by inject()
     private val getPriceTargetsToAlertUserUseCase: GetPriceTargetsToAlertUserUseCase by inject()
+    private val updatePriceUseCase: UpdatePriceTargetsForAlertedUserUseCase by inject()
     private val priceNotificationHelper: PriceNotificationHelper by inject()
-    private val updateTargetsUseCase: UpdatePriceTargetsForAlertedUserUseCase by inject()
 
     override suspend fun doWork(): Result {
         return try {
@@ -28,10 +28,11 @@ class SyncLatestPriceTargetsWorker(val context: Context, workerParams: WorkerPar
                 syncForPriceTargetsUseCase.invoke()
                 val updatedPriceTargets = getPriceTargetsToAlertUserUseCase.invoke()
                 val hasUserBeenAlerted = priceNotificationHelper.notifyUser(context, updatedPriceTargets)
-                updateTargetsUseCase.invoke(UpdatePriceTargetsForAlertedUserUseCase.Params(hasUserBeenAlerted,updatedPriceTargets))
-                val outputData = workDataOf(KEY_PRICE_TARGET_UPDATED_STATUS to DISPLAY_LATEST_DATA)
+                updatePriceUseCase.invoke(UpdatePriceTargetsForAlertedUserUseCase.Params(hasUserBeenAlerted, updatedPriceTargets))
                 // not designed for large data. Instead place data maybe in your db and fetch?
-                Result.success(outputData)
+                val outputData = workDataOf(KEY_PRICE_TARGET_UPDATED_STATUS to DISPLAY_LATEST_DATA)
+                val result = Result.success(outputData)
+                result
             }
         } catch (t: Throwable) {
             t.printStackTrace()

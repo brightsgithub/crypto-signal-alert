@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.data.datasource.db.PriceTargetDao
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
@@ -20,6 +21,8 @@ import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.workmanager.Constants.DISPLAY_LATEST_DATA
 import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED_STATUS
 import com.owusu.cryptosignalalert.workmanager.Constants.PRICE_TARGET_UPDATED
+import com.owusu.cryptosignalalert.workmanager.Constants.SYNC_PRICES_WORKER_TAG
+import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter
 import kotlinx.android.synthetic.main.fragment_alert_list.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -69,11 +72,15 @@ class FragmentAlertList: Fragment(), KoinComponent {
                 val hasPriceTargetBeenHit = false
                 val hasUserBeenAlerted = false
                 //val userPriceTarget = 22000.0
-                val userPriceTarget = 21000.0
-                val priceTargetDirection = PriceTargetDirection.ABOVE
+                val userPriceTarget = 19300.0
+                val priceTargetDirection = PriceTargetDirection.BELOW
                 val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget, priceTargetDirection)
                 repoForTesting.insertPriceTargets(coinsToBeAddedToBb)
             }
+        }
+
+        create_request.setOnClickListener {
+            startOneTimeReq()
         }
 
         create_notification.setOnClickListener {
@@ -104,7 +111,7 @@ class FragmentAlertList: Fragment(), KoinComponent {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadAlertList()
+        //viewModel.loadAlertList()
     }
 
     private fun observeViewState() {
@@ -122,18 +129,29 @@ class FragmentAlertList: Fragment(), KoinComponent {
 
     private fun observeWorkManagerStatus() {
         workManagerJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.workInfoLiveData.observe(viewLifecycleOwner) { workInfo ->
-                if ((workInfo != null) && (workInfo.state == WorkInfo.State.ENQUEUED)) {
-                    Log.v("FragmentAlertList", "state" + workInfo.state.toString())
+            viewModel.workInfoLiveData.observe(viewLifecycleOwner) { workInfoList ->
+                Log.v("My_Sync_FragAlertList", "START")
+
+                if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.RUNNING)) {
+                    Log.v("My_Sync_FragAlertList", "show spinner")
+                } else if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.ENQUEUED)) {
+                    val workInfo =workInfoList.first()
+                    Log.v("My_Sync_FragAlertList", "state" + workInfo.state.toString())
                     val myOutputData = workInfo.outputData.getString(KEY_PRICE_TARGET_UPDATED_STATUS)
-                    //if (myOutputData == DISPLAY_LATEST_DATA) {
-                        Log.v("FragmentAlertList", "DISPLAY_LATEST_DATA")
+                    //if (myOutputData == DISPLAY_LATEST_DATA) { // only seems to work with one time req. maybe for chained workers?
+                        Log.v("My_Sync_FragAlertList", DISPLAY_LATEST_DATA)
                         // When a sync has occurred, refresh the screen
                         viewModel.loadAlertList()
-                    //}
+                  // }
                 }
+                Log.v("My_Sync_FragAlertList", "END")
             }
+
         }
+    }
+
+    private fun startOneTimeReq() {
+        WorkManagerStarter.startPeriodicWorker(context = requireActivity().application, SYNC_PRICES_WORKER_TAG)
     }
 
     private fun displayData(priceTargets: List<PriceTargetUI>) {

@@ -7,16 +7,22 @@ class UpdatePriceTargetsForAlertedUserUseCase(
 ): SuspendedUseCase<UpdatePriceTargetsForAlertedUserUseCase.Params, Unit> {
     override suspend fun invoke(params: Params) {
 
-        val hasUserBeenAlerted = params.hasUserBeenAlerted
-        val updatedPriceTargets = params.updatedPriceTargets
+        try {
+            val hasUserBeenAlerted = params.hasUserBeenAlerted
+            val updatedPriceTargets = params.updatedPriceTargets
 
-        if (hasUserBeenAlerted) {
-            val newUpdatedPriceTargetList = arrayListOf<PriceTargetDomain>()
-            updatedPriceTargets.forEach {
-                newUpdatedPriceTargetList.add(it.copy(hasUserBeenAlerted = hasUserBeenAlerted))
+            if (hasUserBeenAlerted) {
+                val newUpdatedPriceTargetList = arrayListOf<PriceTargetDomain>()
+                updatedPriceTargets.forEach {
+                    newUpdatedPriceTargetList.add(it.copy(hasUserBeenAlerted = hasUserBeenAlerted))
+                }
+                updatePriceTargetsUseCase.invoke(UpdatePriceTargetsUseCase.Params(newUpdatedPriceTargetList))
             }
-            updatePriceTargetsUseCase.invoke(UpdatePriceTargetsUseCase.Params(newUpdatedPriceTargetList))
         }
+        catch (t: Throwable) {
+            t.printStackTrace()
+        }
+
     }
     data class Params(val hasUserBeenAlerted: Boolean, val updatedPriceTargets: List<PriceTargetDomain>)
 }

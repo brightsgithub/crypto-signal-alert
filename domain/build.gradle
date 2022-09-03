@@ -7,3 +7,14 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
 }
+
+dependencies {
+    // MockK
+    // The latest version of MockK depends on: org.junit.jupiter:junit-jupiter-api:5.8.2
+    // which for some reason cannot be found. Even when including org.junit.jupiter:junit-jupiter-api:5.8.2
+    // as a lib jar file, it still fails. Seems to be an issue with importing org.junit.jupiter:junit-jupiter-api:5.8.2
+    // Junit 5. so using previous versions: io.mockk:mockk:1.12.2
+    testImplementation "io.mockk:mockk:1.12.2"
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.2"
+}

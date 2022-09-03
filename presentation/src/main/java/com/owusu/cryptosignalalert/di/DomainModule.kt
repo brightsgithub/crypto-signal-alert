@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.di
 
+import com.owusu.cryptosignalalert.domain.helpers.MergeOldPriceTargetWithNewDataUseCase
 import com.owusu.cryptosignalalert.domain.usecase.*
 import org.koin.dsl.module
 
@@ -37,7 +38,11 @@ val domainModule = module(override = true) {
         DeleteAllPriceTargetsUseCase(get())
     }
 
+    factory {
+        MergeOldPriceTargetWithNewDataUseCase()
+    }
+
     single {
-        SyncForPriceTargetsUseCase(get(), get(), get(), get())
+        SyncForPriceTargetsUseCase(get(), get(), get(), get(), get())
     }
 }

@@ -1,16 +1,32 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
+import com.owusu.cryptosignalalert.domain.helpers.MergeOldPriceTargetWithNewDataUseCase
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import java.util.*
 
+/*
+SINGLE RESPONSIBILITY PRINCIPLE VIOLATIONS
+Testing a private method directly is a good indicator of an SRP violation.
+One option, and often the easiest if the abstraction makes sense, is to perform an extract class
+refactoring. The result of this refactoring is that the private method in question is now a
+public method on a newly created class. Now that method can be tested directly in a unit
+test targeting the extracted class. This new class now becomes a dependency of the original
+class and can be replaced with a test double in the original class’ test cases.
+https://anthonysciamanna.com/2016/02/14/should-private-methods-be-tested.html
+
+Applying the above allowed me to create MergeOldPriceTargetWithNewDataUseCase since these methods
+used to be in this class and has now been extracted out and is now testable
+*/
+
 class SyncForPriceTargetsUseCase(
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
     private val getCoinsListUseCase: GetCoinsListUseCase,
     private val updatePriceTargetsUseCase: UpdatePriceTargetsUseCase,
-    private val dateUtil: CryptoDateUtils
+    private val mergeOldPriceTargetWithNewDataUseCase: MergeOldPriceTargetWithNewDataUseCase,
+    private val dateUtils: CryptoDateUtils
     ): SuspendedUseCaseUnit<Boolean> {
 
     // needs to have a flow so that the Alarm manager can listen
@@ -29,7 +45,7 @@ class SyncForPriceTargetsUseCase(
 
         // 3. carry out business rules so we know what targets have been met etc. and we know
         // what fields to update in the DB via savePriceTargetUseCase
-        val updatedPriceTargets = getUpdatedPriceTargets(coinsList, priceTargets)
+        val updatedPriceTargets = mergeOldPriceTargetWithNew(coinsList,priceTargets)
 
         // 4. update all price targets. At this point some may have met their price targets
         // and some will just have updated their current price updated
@@ -41,126 +57,15 @@ class SyncForPriceTargetsUseCase(
         updatePriceTargetsUseCase.invoke(UpdatePriceTargetsUseCase.Params(updatedPriceTargets))
     }
 
-    private fun getUpdatedPriceTargets(
-        coinsList: List<CoinDomain>,
-        priceTargets: List<PriceTargetDomain>): List<PriceTargetDomain> {
-
-        // convert list to map more efficient if we search across a map than O(n.size of array) array
-        val searchableMapOfCoins = mutableMapOf<String, CoinDomain>()
-        coinsList.associateByTo(searchableMapOfCoins) {it.id}
-
-        // New updated list
-        val updatedPriceTargetDomainList = arrayListOf<PriceTargetDomain>()
-        priceTargets.forEach {
-
-            val coinDomain = searchableMapOfCoins[it.id]
-
-            if (
-                coinDomain?.currentPrice != null
-                && it.userPriceTarget != null
-                && it.priceTargetDirection != PriceTargetDirection.NOT_SET
-            ) {
-
-                // keep track of our current values
-                val hasUserBeenAlerted = it.hasUserBeenAlerted
-                val userPriceTarget = it.userPriceTarget
-                val priceTargetDirection = it.priceTargetDirection
-
-                // has the target been hit
-                val hasPriceTargetBeenHit = if (!it.hasPriceTargetBeenHit) {
-                    checkIfPriceTargetBeenHit(
-                        coinDomain.currentPrice,
-                        it.userPriceTarget,
-                        it.priceTargetDirection
-                    )
-                } else {
-                    true // it has already been hit, so keep the same value
-                }
-
-                // TODO - also update the progress to show how close we are
-
-                // Convert the latest price with our updated PriceTargetDomain
-                val updatedPriceTargetDomain = getUpdatedPriceTargetDomain(
-                    coinDomain,
-                    hasUserBeenAlerted,
-                    userPriceTarget,
-                    priceTargetDirection,
-                    hasPriceTargetBeenHit,
-                )
-
-                updatedPriceTargetDomainList.add(updatedPriceTargetDomain)
-            }
-
-        }
-        return updatedPriceTargetDomainList
-    }
-
-    private fun getUpdatedPriceTargetDomain(
-        coinDomain: CoinDomain,
-        hasUserBeenAlerted: Boolean,
-        userPriceTarget: Double,
-        priceTargetDirection: PriceTargetDirection,
-        hasPriceTargetBeenHit: Boolean
-
-    ): PriceTargetDomain {
-        coinDomain.apply {
-            return PriceTargetDomain(
-                id = id,
-                ath = ath,
-                athChangePercentage = athChangePercentage,
-                athDate = athDate,
-                atl = atl,
-                atlChangePercentage = atlChangePercentage,
-                atlDate = atlDate,
-                circulatingSupply = circulatingSupply,
-                currentPrice = currentPrice,
-                fullyDilutedValuation = fullyDilutedValuation,
-                high24h = high24h,
-                image = image,
-                lastUpdated = dateUtil.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis),
-                low24h = low24h,
-                marketCap = marketCap,
-                marketCapChange24h = marketCapChange24h,
-                marketCapChangePercentage24h = marketCapChangePercentage24h,
-                marketCapRank = marketCapRank,
-                maxSupply = maxSupply,
-                name = name,
-                priceChange24h = priceChange24h,
-                priceChangePercentage24h = priceChangePercentage24h,
-                symbol = symbol,
-                totalSupply = totalSupply,
-                totalVolume = totalVolume,
-                userPriceTarget = userPriceTarget,
-                hasPriceTargetBeenHit = hasPriceTargetBeenHit,
-                hasUserBeenAlerted = hasUserBeenAlerted,
-                priceTargetDirection = priceTargetDirection
-            )
-        }
-
-    }
-
-    /**
-     * We cannot check if the price has hit a target outside an interval of 5 mins. API restrictions
-     * The highest frequency is 5 mins. If we set our price target of 10k at 10:00 and our next check
-     * for price is scheduled at 10:05, if the price in the meantime dips below to 9.8k and then back up
-     * to 10.1k before our next check at 10:05, we will never know.
-     *
-     * This method will simply check at the interval of 5 mins, if the price target has been hit at that time.
-     */
-    private fun checkIfPriceTargetBeenHit(
-        currentPrice: Double,
-        userPriceTarget: Double,
-        priceTargetDirection: PriceTargetDirection): Boolean {
-
-        return when (priceTargetDirection) {
-            PriceTargetDirection.ABOVE -> { currentPrice >= userPriceTarget }
-            PriceTargetDirection.BELOW -> { currentPrice <= userPriceTarget }
-            else -> { false }
-        }
-    }
-
     private suspend fun getPriceTargets(): List<PriceTargetDomain> {
         return getPriceTargetsUseCase.invoke()
+    }
+
+    private suspend fun mergeOldPriceTargetWithNew(
+        coinsList: List<CoinDomain>, priceTargets: List<PriceTargetDomain>): List<PriceTargetDomain> {
+        val lastUpdated = dateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis)
+        val params = MergeOldPriceTargetWithNewDataUseCase.Params(coinsList, priceTargets, lastUpdated)
+        return mergeOldPriceTargetWithNewDataUseCase.invoke(params)
     }
 
     private fun getListOfIds(priceTargets: List<PriceTargetDomain>): List<String> {

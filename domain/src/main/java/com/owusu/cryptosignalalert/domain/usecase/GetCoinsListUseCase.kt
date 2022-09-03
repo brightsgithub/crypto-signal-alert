@@ -17,8 +17,8 @@ class GetCoinsListUseCase(
         }
     }
 
-    data class Params(val page: Int,
-                      val recordsPerPage: Int,
-                      val currencies: String,
+    data class Params(val page: Int = 1,
+                      val recordsPerPage: Int = 1,
+                      val currencies: String = "usd",
                       var ids: String? = null)
 }

@@ -1,0 +1,16 @@
+task testAll(dependsOn: ['domain:test',
+                         'data:connectedMockServerDebugAndroidTest']) {
+    group = "Verification"
+    description = "test all in this project"
+}
+
+task testDomain(dependsOn: ['domain:test']) {
+    group = "Verification"
+    description = "Runs unit tests in Domain module"
+}
+
+task testData(dependsOn: ['data:connectedMockServerDebugAndroidTest']) {
+    group = "Verification"
+    description = "Runs unit instrumented tests in Data module"
+}
+

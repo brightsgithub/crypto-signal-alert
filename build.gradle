@@ -10,3 +10,19 @@ plugins {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+/**
+ *
+JAVA_HOME SETUP
+https://stackoverflow.com/questions/45182717/java-home-is-set-to-an-invalid-directory
+
+ * Overwrite master with some_branch
+ *
+ git checkout some_branch
+ git merge -s ours master
+ git checkout master
+ git merge some_branch
+ *
+ */
+
+apply from: 'verification.gradle'

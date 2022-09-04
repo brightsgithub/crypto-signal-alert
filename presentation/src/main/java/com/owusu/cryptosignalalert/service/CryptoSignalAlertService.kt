@@ -35,7 +35,7 @@ class CryptoSignalAlertService : Service(), KoinComponent {
 
         fun isMyServiceRunning(context: Context) : Boolean {
             val serviceClass = CryptoSignalAlertService::class.java
-            var manager = context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            var manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
                 if (serviceClass.name.equals(service.service.className)) {
                     return true

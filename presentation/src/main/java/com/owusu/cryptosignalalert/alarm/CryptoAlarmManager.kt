@@ -67,8 +67,7 @@ class CryptoAlarmManager(
             Log.v("CryptoSignalService", "CryptoAlertAlarm.starting alarm.....")
             val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            var pendingIntent: PendingIntent? = null
-            pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            var pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(context), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT)
             } else {
                 PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(context), PendingIntent.FLAG_CANCEL_CURRENT)
@@ -108,8 +107,7 @@ class CryptoAlarmManager(
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
-        var pendingIntent: PendingIntent? = null
-        pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        var pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(context), PendingIntent.FLAG_IMMUTABLE)
         } else {
             PendingIntent.getBroadcast(context, START_ALARM_REQUEST_CODE, getAlarmIntent(context), PendingIntent.FLAG_NO_CREATE)

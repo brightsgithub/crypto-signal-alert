@@ -25,7 +25,7 @@ class NotificationUtil {
         fun sendNewStandAloneNotification(newMsg: String) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val manager = CryptoSignalAlertApp.instance.getSystemService(NotificationManager::class.java)
-                val notificationId = rand(1, Int.MAX_VALUE) as Int
+                val notificationId = rand(1, Int.MAX_VALUE)
                 manager.notify(notificationId, getNewNotification(notificationId ,newMsg, CryptoSignalAlertApp.instance))
             }
         }

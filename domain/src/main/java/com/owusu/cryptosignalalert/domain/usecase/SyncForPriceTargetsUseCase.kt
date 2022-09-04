@@ -1,8 +1,6 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
-import com.owusu.cryptosignalalert.domain.helpers.MergeOldPriceTargetWithNewDataUseCase
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
-import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import java.util.*

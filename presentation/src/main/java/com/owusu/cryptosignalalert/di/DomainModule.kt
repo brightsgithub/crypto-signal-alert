@@ -1,6 +1,6 @@
 package com.owusu.cryptosignalalert.di
 
-import com.owusu.cryptosignalalert.domain.helpers.MergeOldPriceTargetWithNewDataUseCase
+import com.owusu.cryptosignalalert.domain.usecase.MergeOldPriceTargetWithNewDataUseCase
 import com.owusu.cryptosignalalert.domain.usecase.*
 import org.koin.dsl.module
 

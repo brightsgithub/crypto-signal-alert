@@ -1,9 +1,8 @@
-package com.owusu.cryptosignalalert.domain.helpers
+package com.owusu.cryptosignalalert.domain.usecase
 
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
-import com.owusu.cryptosignalalert.domain.usecase.SuspendedUseCase
 
 class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
         MergeOldPriceTargetWithNewDataUseCase.Params, List<PriceTargetDomain>> {

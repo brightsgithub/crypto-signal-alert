@@ -82,18 +82,28 @@ class FragmentAlertList: Fragment(), KoinComponent {
                 val currentTime = cryptoDateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis)
                 val list = arrayListOf<PriceTargetEntity>()
                 list.add(getPriceTarget(
+                    id = "bitcoin",
+                    name = "Bitcoin",
+                    symbol = "btc",
                     lastUpdated = currentTime,
-                    hasPriceTargetBeenHit = false,
-                    hasUserBeenAlerted = false,
                     userPriceTarget = 22000.0,
                     priceTargetDirection = PriceTargetDirection.ABOVE))
 
                 list.add(getPriceTarget(
+                    id = "bitcoin",
+                    name = "Bitcoin",
+                    symbol = "btc",
                     lastUpdated = currentTime,
-                    hasPriceTargetBeenHit = false,
-                    hasUserBeenAlerted = false,
                     userPriceTarget = 21300.0,
                     priceTargetDirection = PriceTargetDirection.BELOW))
+
+                list.add(getPriceTarget(
+                    id = "ethereum",
+                    name = "Ethereum",
+                    symbol = "eth",
+                    lastUpdated = currentTime,
+                    userPriceTarget = 1791.0,
+                    priceTargetDirection = PriceTargetDirection.ABOVE))
 
                 repoForTesting.insertPriceTargets(list)
             }
@@ -180,18 +190,19 @@ class FragmentAlertList: Fragment(), KoinComponent {
     }
 
     private fun getPriceTarget(
+        id: String,
+        name: String,
+        symbol: String,
         lastUpdated: String,
-        hasPriceTargetBeenHit: Boolean,
-        hasUserBeenAlerted: Boolean,
         userPriceTarget: Double,
         priceTargetDirection: PriceTargetDirection
     ): PriceTargetEntity {
         return PriceTargetEntity(
             localPrimeId = 0,
-            id = "bitcoin",
-            symbol = "btc",
-            name = "Bitcoin",
-            image = "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
+            id = id,
+            symbol = symbol,
+            name = name,
+            image = null,
             currentPrice = 0.0,
             marketCap = 411096596530.0,
             marketCapRank = 1.0,
@@ -214,8 +225,8 @@ class FragmentAlertList: Fragment(), KoinComponent {
             atlDate = "2013-07-06T00:00:00.000Z",
             lastUpdated = lastUpdated,
             userPriceTarget = userPriceTarget,
-            hasPriceTargetBeenHit = hasPriceTargetBeenHit,
-            hasUserBeenAlerted = hasUserBeenAlerted,
+            hasPriceTargetBeenHit = false,
+            hasUserBeenAlerted = false,
             priceTargetDirection = priceTargetDirection
         )
     }

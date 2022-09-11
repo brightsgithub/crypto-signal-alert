@@ -11,6 +11,7 @@ class PriceTargetEntityToPriceTargetDomainMapper: DataAPIListMapper<PriceTargetE
             it.apply {
                 domainList.add(
                     PriceTargetDomain(
+                        localPrimeId = localPrimeId,
                         id = id,
                         ath = ath,
                         athChangePercentage = athChangePercentage,
@@ -53,6 +54,7 @@ class PriceTargetEntityToPriceTargetDomainMapper: DataAPIListMapper<PriceTargetE
             it.apply {
                 entityList.add(
                     PriceTargetEntity(
+                        localPrimeId = localPrimeId,
                         id = id,
                         ath = ath,
                         athChangePercentage = athChangePercentage,

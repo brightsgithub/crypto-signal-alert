@@ -8,7 +8,16 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 @Entity(tableName = "price_targets_table")
 data class PriceTargetEntity(
 
-    @PrimaryKey(autoGenerate = false)
+    /**
+     * https://stackoverflow.com/questions/44109700/how-to-make-primary-key-as-autoincrement-for-room-persistence-lib
+     * If the field type is long or int (or its TypeConverter converts it to a long or int),
+     * Insert methods treat 0 as not-set while inserting the item.
+     *
+     *  If the field's type is Integer or Long (Object) (or its TypeConverter converts it to an
+     *  Integer or a Long), Insert methods treat null as not-set while inserting the item.
+     */
+    @PrimaryKey(autoGenerate = true)
+    var localPrimeId: Int,
     @ColumnInfo(name="id")
     val id: String,
     @ColumnInfo(name="ath")

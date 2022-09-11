@@ -8,6 +8,7 @@ class PriceTargetEntityToCoinAPIMapper: DataMapper<CoinAPI, PriceTargetEntity> {
     override fun transform(coinAPI: CoinAPI): PriceTargetEntity {
         coinAPI.apply {
             return PriceTargetEntity(
+                localPrimeId = 0,
                 id = id,
                 ath = ath,
                 athChangePercentage = athChangePercentage,

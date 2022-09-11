@@ -45,8 +45,8 @@ class UpdatePriceTargetsForAlertedUserUseCaseTest {
 
     private fun getPriceTargetsAlreadyHit(): List<PriceTargetDomain> {
         return listOf(
-            PriceTargetDomain(id = "bitcoin", hasUserBeenAlerted = true),
-            PriceTargetDomain(id = "ethereum", hasUserBeenAlerted = true)
+            PriceTargetDomain(localPrimeId = 0, id = "bitcoin", hasUserBeenAlerted = true),
+            PriceTargetDomain(localPrimeId = 1, id = "ethereum", hasUserBeenAlerted = true)
         )
     }
 }

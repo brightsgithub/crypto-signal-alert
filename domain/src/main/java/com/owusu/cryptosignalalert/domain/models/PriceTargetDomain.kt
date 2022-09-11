@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.domain.models
 
 data class PriceTargetDomain(
+    val localPrimeId: Int,
     val id: String,
     val ath: Double? = null,
     val athChangePercentage: Double? = null,

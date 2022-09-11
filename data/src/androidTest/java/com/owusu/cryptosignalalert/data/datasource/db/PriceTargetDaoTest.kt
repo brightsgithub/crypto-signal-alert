@@ -1,11 +1,13 @@
 package com.owusu.cryptosignalalert.data.datasource.db
 
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import junit.framework.Assert
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,12 +24,27 @@ class PriceTargetDaoTest : KoinComponent {
      * everytime i select its always there.
      * When I enable the inMemoryDatabaseBuilder then the data is NOT there. I guess the only way to remove
      * data via the non inMemoryDatabaseBuilder is to delete all from this table
+     *
+     * FOUND THE REASON! - allow backup can be played with
+     * (Also when you get the error:
+     * Room cannot verify the data integrity. Looks like you've changed schema but forgot to update
+     * the version number. You can simply fix this by increasing the version number.)
+     *
+     * https://stackoverflow.com/questions/44197309/room-cannot-verify-the-data-integrity
+     *
+     * You should clear the application's app data from Android settings. You might alternatively be
+     * able to uninstall the previous app version and then install the new version to get passed
+     * the exception. This latter approach does not work under certain conditions
+     * (such as when allow backup is enabled)
+     * Since clearing application data always works, I take that route every time.
+     * If you do increment the database version:
+     *
      */
     private val priceTargetDao: PriceTargetDao by inject()
 
     @Before
     fun startUp() = runBlocking {
-        //priceTargetDao.nukeTable() // no need if we are using a inMemoryDatabase
+        priceTargetDao.nukeTable()
     }
 
     @Test
@@ -54,22 +71,22 @@ class PriceTargetDaoTest : KoinComponent {
         val hasUserBeenAlerted = false
         val userPriceTarget = 20000.0
 
-        val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
-        priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
+        var coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
+        priceTargetDao.insertPriceTargets(createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget))
         val coinsListFromDb = priceTargetDao.getPriceTargets()
 
 
         // now update the userPriceTargets
-        coinsToBeAddedToBb.forEach {
+        coinsListFromDb.forEach {
             it.userPriceTarget = 1000.0
         }
-        priceTargetDao.updatePriceTargets(coinsToBeAddedToBb)
+        priceTargetDao.updatePriceTargets(coinsListFromDb)
 
         // get the updated list from the db
         val updatedCoinsListFromDb = priceTargetDao.getPriceTargets()
 
         // ensure the prices are different
-        Assert.assertTrue(coinsListFromDb[0].userPriceTarget != updatedCoinsListFromDb[0].userPriceTarget)
+        Assert.assertTrue(coinsToBeAddedToBb[0].userPriceTarget != updatedCoinsListFromDb[0].userPriceTarget)
         Assert.assertTrue(coinsListFromDb.size == numOfCoins)
     }
 
@@ -142,19 +159,19 @@ class PriceTargetDaoTest : KoinComponent {
 
         val list = arrayListOf<PriceTargetEntity>()
         for (i in 1.. size) {
-            list.add(getPriceTarget(i, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget))
+            list.add(getPriceTarget(hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget))
         }
         return list
     }
 
     private fun getPriceTarget(
-        index: Int,
         hasPriceTargetBeenHit: Boolean,
         hasUserBeenAlerted: Boolean,
         userPriceTarget: Double
     ): PriceTargetEntity {
         return PriceTargetEntity(
-            id = "bitcoin_$index",
+            localPrimeId = 0,
+            id = "bitcoin",
             symbol = "btc",
             name = "Bitcoin",
             image = "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",

@@ -61,73 +61,16 @@
         app:layout_constraintVertical_bias="0.0"
         />
 
-    <androidx.cardview.widget.CardView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/alertList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        tools:itemCount="5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_notification"
-        android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="8dp"
-
-        >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="4dp"
-            >
-            <TextView
-                android:id="@+id/coin_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Coin Name: Bitcoin"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                >
-            </TextView>
-            <TextView
-                android:id="@+id/last_updated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Last Updated: 11/01/2019"
-                android:textStyle="bold"
-                >
-            </TextView>
-            <TextView
-                android:id="@+id/current_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Current Price"
-                >
-            </TextView>
-            <TextView
-                android:id="@+id/price_target"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Price Target"
-                >
-            </TextView>
-            <TextView
-                android:id="@+id/price_direction"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Price Direction"
-                >
-            </TextView>
-            <TextView
-                android:id="@+id/has_target_been_hit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="false"
-                android:textStyle="bold"
-                >
-            </TextView>
-
-
-        </LinearLayout>
-
-
-
-
-    </androidx.cardview.widget.CardView>
+        tools:listitem="@layout/item_alert_row" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

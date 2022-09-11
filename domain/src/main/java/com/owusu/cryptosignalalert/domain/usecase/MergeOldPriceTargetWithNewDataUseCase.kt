@@ -35,6 +35,7 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
             ) {
 
                 // keep track of our current values
+                val localPrimeId = it.localPrimeId
                 val hasUserBeenAlerted = it.hasUserBeenAlerted
                 val userPriceTarget = it.userPriceTarget
                 val priceTargetDirection = it.priceTargetDirection
@@ -54,6 +55,7 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
 
                 // Convert the latest price with our updated PriceTargetDomain
                 val updatedPriceTargetDomain = getUpdatedPriceTargetDomain(
+                    localPrimeId,
                     coinDomain,
                     hasUserBeenAlerted,
                     userPriceTarget,
@@ -70,6 +72,7 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
     }
 
     private fun getUpdatedPriceTargetDomain(
+        localPrimeId: Int,
         coinDomain: CoinDomain,
         hasUserBeenAlerted: Boolean,
         userPriceTarget: Double,
@@ -79,6 +82,7 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
     ): PriceTargetDomain {
         coinDomain.apply {
             return PriceTargetDomain(
+                localPrimeId = localPrimeId,
                 id = id,
                 ath = ath,
                 athChangePercentage = athChangePercentage,
@@ -108,6 +112,7 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
                 hasPriceTargetBeenHit = hasPriceTargetBeenHit,
                 hasUserBeenAlerted = hasUserBeenAlerted,
                 priceTargetDirection = priceTargetDirection
+
             )
         }
     }
@@ -135,5 +140,4 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
     data class Params(val coinsList: List<CoinDomain>,
                       val priceTargets: List<PriceTargetDomain>,
                       val lastUpdated: String)
-
 }

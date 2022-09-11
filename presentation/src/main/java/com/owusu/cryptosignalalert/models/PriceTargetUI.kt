@@ -6,6 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class PriceTargetUI(
+    val localPrimeId: Int,
     val id: String,
     val ath: Double? = null,
     val athChangePercentage: Double? = null,

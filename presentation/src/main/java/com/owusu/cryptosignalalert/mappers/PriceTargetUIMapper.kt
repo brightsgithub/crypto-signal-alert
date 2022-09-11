@@ -12,6 +12,7 @@ class PriceTargetUIMapper:UIListMapper<PriceTargetDomain, PriceTargetUI> {
             it.apply {
                 list.add(
                     PriceTargetUI(
+                        localPrimeId = localPrimeId,
                         id = id,
                         ath = ath,
                         athChangePercentage = athChangePercentage,
@@ -54,6 +55,7 @@ class PriceTargetUIMapper:UIListMapper<PriceTargetDomain, PriceTargetUI> {
             it.apply {
                 list.add(
                     PriceTargetDomain(
+                        localPrimeId = localPrimeId,
                         id = id,
                         ath = ath,
                         athChangePercentage = athChangePercentage,

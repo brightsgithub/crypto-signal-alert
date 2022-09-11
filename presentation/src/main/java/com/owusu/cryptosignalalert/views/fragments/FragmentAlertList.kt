@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.R
@@ -18,6 +19,7 @@ import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.views.adapters.AlertListAdapter
 import com.owusu.cryptosignalalert.workmanager.Constants.DISPLAY_LATEST_DATA
 import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED_STATUS
 import com.owusu.cryptosignalalert.workmanager.Constants.PRICE_TARGET_UPDATED
@@ -40,7 +42,7 @@ class FragmentAlertList: Fragment(), KoinComponent {
     private val notificationUtil: NotificationUtil by inject()
     private val cryptoDateUtils: CryptoDateUtils by inject()
     private val repoForTesting: PriceTargetDao by inject()
-
+    private lateinit var alertListAdapter: AlertListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -57,6 +59,14 @@ class FragmentAlertList: Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initListeners()
+        initAdapter()
+    }
+
+    private fun initAdapter() {
+        // this creates a vertical layout Manager
+        alertList.layoutManager = LinearLayoutManager(activity)
+        alertListAdapter = AlertListAdapter()
+        alertList.adapter = alertListAdapter
     }
 
     private fun initListeners() {
@@ -68,14 +78,24 @@ class FragmentAlertList: Fragment(), KoinComponent {
 
         create_entries.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                val numOfCoins = 1
-                val hasPriceTargetBeenHit = false
-                val hasUserBeenAlerted = false
-                //val userPriceTarget = 22000.0
-                val userPriceTarget = 19300.0
-                val priceTargetDirection = PriceTargetDirection.BELOW
-                val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget, priceTargetDirection)
-                repoForTesting.insertPriceTargets(coinsToBeAddedToBb)
+
+                val currentTime = cryptoDateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis)
+                val list = arrayListOf<PriceTargetEntity>()
+                list.add(getPriceTarget(
+                    lastUpdated = currentTime,
+                    hasPriceTargetBeenHit = false,
+                    hasUserBeenAlerted = false,
+                    userPriceTarget = 22000.0,
+                    priceTargetDirection = PriceTargetDirection.ABOVE))
+
+                list.add(getPriceTarget(
+                    lastUpdated = currentTime,
+                    hasPriceTargetBeenHit = false,
+                    hasUserBeenAlerted = false,
+                    userPriceTarget = 21300.0,
+                    priceTargetDirection = PriceTargetDirection.BELOW))
+
+                repoForTesting.insertPriceTargets(list)
             }
         }
 
@@ -155,43 +175,24 @@ class FragmentAlertList: Fragment(), KoinComponent {
     }
 
     private fun displayData(priceTargets: List<PriceTargetUI>) {
-        for (item in priceTargets) {
-            coin_name.text = "Coin name: " + item.name
-            last_updated.text = "Last updated: " + item.lastUpdated
-            has_target_been_hit.text = "Has target been hit: " + item.hasPriceTargetBeenHit.toString()
-            current_price.text = "Current price: " + item.currentPrice.toString()
-            price_direction.text = "Price direction: " + item.priceTargetDirection.toString()
-            price_target.text = "Price target: " + item.userPriceTarget
-        }
-    }
-
-    private fun createPriceTargets(
-        size: Int,
-        hasPriceTargetBeenHit: Boolean,
-        hasUserBeenAlerted: Boolean,
-        userPriceTarget: Double,
-        priceTargetDirection: PriceTargetDirection) : List<PriceTargetEntity>{
-
-        val list = arrayListOf<PriceTargetEntity>()
-        for (i in 1.. size) {
-            list.add(getPriceTarget(i, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget, priceTargetDirection))
-        }
-        return list
+        alertListAdapter.setData(priceTargets)
+        alertListAdapter.notifyDataSetChanged()
     }
 
     private fun getPriceTarget(
-        index: Int,
+        lastUpdated: String,
         hasPriceTargetBeenHit: Boolean,
         hasUserBeenAlerted: Boolean,
         userPriceTarget: Double,
         priceTargetDirection: PriceTargetDirection
     ): PriceTargetEntity {
         return PriceTargetEntity(
+            localPrimeId = 0,
             id = "bitcoin",
             symbol = "btc",
             name = "Bitcoin",
             image = "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
-            currentPrice = 21518.0,
+            currentPrice = 0.0,
             marketCap = 411096596530.0,
             marketCapRank = 1.0,
             fullyDilutedValuation = 452245724314L,
@@ -211,7 +212,7 @@ class FragmentAlertList: Fragment(), KoinComponent {
             atl = 67.81,
             atlChangePercentage = 31577.13346,
             atlDate = "2013-07-06T00:00:00.000Z",
-            lastUpdated = "2022-07-09T12:31:40.339Z",
+            lastUpdated = lastUpdated,
             userPriceTarget = userPriceTarget,
             hasPriceTargetBeenHit = hasPriceTargetBeenHit,
             hasUserBeenAlerted = hasUserBeenAlerted,

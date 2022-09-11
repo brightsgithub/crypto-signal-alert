@@ -98,6 +98,7 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
     private fun getMockedCurrentPriceTargetsDomain(): List<PriceTargetDomain> {
         return listOf<PriceTargetDomain>(
             mockk {
+                every { localPrimeId } returns 0
                 every { id } returns "bitcoin"
                 every { name } returns "Bitcoin"
                 every { currentPrice } returns 21518.0
@@ -108,6 +109,7 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { priceTargetDirection } returns PriceTargetDirection.BELOW
             },
             mockk {
+                every { localPrimeId } returns 1
                 every { id } returns "ethereum"
                 every { name } returns "Ethereum"
                 every { currentPrice } returns 1500.0
@@ -123,6 +125,7 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
     private fun getMockedPriceTargetsAlreadyHit(): List<PriceTargetDomain> {
         return listOf<PriceTargetDomain>(
             mockk {
+                every { localPrimeId } returns 0
                 every { id } returns "bitcoin"
                 every { name } returns "Bitcoin"
                 every { currentPrice } returns 21518.0
@@ -133,6 +136,7 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { priceTargetDirection } returns PriceTargetDirection.BELOW
             },
             mockk {
+                every { localPrimeId } returns 1
                 every { id } returns "ethereum"
                 every { name } returns "Ethereum"
                 every { currentPrice } returns 1500.0

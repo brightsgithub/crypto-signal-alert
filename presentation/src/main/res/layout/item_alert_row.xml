@@ -38,7 +38,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="Last Updated: 11/01/2019"
-                android:textStyle="bold"
                 >
             </TextView>
             <TextView
@@ -46,6 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="Current Price"
+                android:textStyle="bold"
                 >
             </TextView>
             <TextView
@@ -53,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="Price Target"
+                android:textStyle="bold"
                 >
             </TextView>
             <TextView
@@ -67,7 +68,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="false"
-                android:textStyle="bold"
                 >
             </TextView>
 

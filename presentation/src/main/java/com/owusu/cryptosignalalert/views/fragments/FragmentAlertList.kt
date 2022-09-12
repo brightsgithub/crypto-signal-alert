@@ -105,6 +105,14 @@ class FragmentAlertList: Fragment(), KoinComponent {
                     userPriceTarget = 1791.0,
                     priceTargetDirection = PriceTargetDirection.ABOVE))
 
+                list.add(getPriceTarget(
+                    id = "ethereum",
+                    name = "Ethereum",
+                    symbol = "eth",
+                    lastUpdated = currentTime,
+                    userPriceTarget = 1700.0,
+                    priceTargetDirection = PriceTargetDirection.BELOW))
+
                 repoForTesting.insertPriceTargets(list)
             }
         }

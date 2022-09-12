@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 
 class AlertListAdapter : RecyclerView.Adapter<AlertListAdapter.ViewHolder>() {
@@ -39,7 +41,18 @@ class AlertListAdapter : RecyclerView.Adapter<AlertListAdapter.ViewHolder>() {
         holder.hasTargetBenHit.text = "Has target been hit: " + item.hasPriceTargetBeenHit.toString()
         holder.currentPrice.text = "Current price: " + item.currentPrice.toString()
         holder.priceDirection.text = "Price direction: " + item.priceTargetDirection.toString()
+        setPriceTarget(holder, item)
+    }
+
+    private fun setPriceTarget(holder: ViewHolder, item: PriceTargetUI) {
         holder.priceTarget.text = "Price target: " + item.userPriceTarget
+        val txtColor = when (item.priceTargetDirection) {
+            PriceTargetDirectionUI.ABOVE -> { R.color.btn_green }
+            PriceTargetDirectionUI.BELOW -> { R.color.yellow }
+            PriceTargetDirectionUI.NOT_SET -> { R.color.white }
+        }
+        val ctx = holder.itemView.context
+        holder.priceTarget.setTextColor(ContextCompat.getColor(ctx, txtColor))
     }
 
     // Holds the views for adding it to image and text

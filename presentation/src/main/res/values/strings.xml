@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">CryptoSignalAlert</string>
+
+    <string-array name="price_direction_array">
+        <item>ABOVE</item>
+        <item>BELOW</item>
+        <item>NOT_SET</item>
+    </string-array>
+
 </resources>

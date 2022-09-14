@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
+import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.data.datasource.db.PriceTargetDao
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
@@ -44,6 +46,7 @@ class FragmentAlertList: Fragment(), KoinComponent {
     private val notificationUtil: NotificationUtil by inject()
     private val cryptoDateUtils: CryptoDateUtils by inject()
     private val repoForTesting: PriceTargetDao by inject()
+    private val cryptoMediaPlayer: CryptoMediaPlayer by inject()
     private lateinit var alertListAdapter: AlertListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,9 +90,8 @@ class FragmentAlertList: Fragment(), KoinComponent {
             startOneTimeReq()
         }
 
-        create_notification.setOnClickListener {
-            notificationUtil.sendNewStandAloneNotification("Created at "+ cryptoDateUtils.convertDateToFormattedStringWithTime(
-                Calendar.getInstance().timeInMillis))
+        stop_sound.setOnClickListener {
+            cryptoMediaPlayer.stopAlarmSounds()
         }
     }
 

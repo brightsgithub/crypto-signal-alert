@@ -49,11 +49,11 @@
         />
 
     <Button
-        android:id="@+id/create_notification"
+        android:id="@+id/stop_sound"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="34dp"
-        android:text="Create Notification"
+        android:text="Stop Sounds"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +70,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_notification"
+        app:layout_constraintTop_toBottomOf="@+id/stop_sound"
         tools:listitem="@layout/item_alert_row" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

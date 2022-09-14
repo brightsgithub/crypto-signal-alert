@@ -17,7 +17,7 @@ class CryptoMediaPlayer {
     private var isVibrateRunning = false
 
     @Synchronized
-    private fun startAlarmSounds() {
+    fun startAlarmSounds() {
         isVibrateRunning = true
         stopAlarmSounds()
         cancelTimerTask()
@@ -79,7 +79,7 @@ class CryptoMediaPlayer {
     }
 
     private fun stopMediaFile() {
-        if (mp != null) {
+        if (::mp.isInitialized) {
             mp.stop()
         }
         cancelTimerTask()

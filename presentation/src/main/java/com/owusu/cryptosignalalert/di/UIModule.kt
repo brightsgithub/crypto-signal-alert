@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.di
 
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
+import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
@@ -23,7 +24,7 @@ val uiModule = module(override = true) {
     }
 
     factory {
-        PriceNotificationHelper(get(), get())
+        PriceNotificationHelper(get(), get(), get())
     }
 
     viewModel {
@@ -51,5 +52,9 @@ val uiModule = module(override = true) {
 
     single {
         WorkManagerStarter
+    }
+
+    single {
+        CryptoMediaPlayer()
     }
 }

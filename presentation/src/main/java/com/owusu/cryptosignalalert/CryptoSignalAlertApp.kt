@@ -1,6 +1,8 @@
 package com.owusu.cryptosignalalert
 
+import android.app.Application
 import android.support.multidex.MultiDexApplication
+//import android.support.multidex.MultiDexApplication
 import com.owusu.cryptosignalalert.data.di.DataModuleWrapper
 import com.owusu.cryptosignalalert.di.appModule
 import com.owusu.cryptosignalalert.di.domainModule

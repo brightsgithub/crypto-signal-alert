@@ -1,28 +1,43 @@
 package com.owusu.cryptosignalalert.views.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.owusu.cryptosignalalert.R
-import com.owusu.cryptosignalalert.util.AppNavigationUtil
-import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.core.KoinComponent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 
-class MainActivity : AppCompatActivity(), KoinComponent {
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setupToolbar()
-        navigateToFragmentAlertList()
+        setContent {
+            CryptoSignalAlertTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    Greeting("Android")
+                }
+            }
+        }
     }
-    private fun setupToolbar() {
-        setSupportActionBar(app_toolbar)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        //supportActionBar!!.setHomeButtonEnabled(true)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-    }
+}
 
-    private fun navigateToFragmentAlertList() {
-        AppNavigationUtil.navigateToFragmentAlertList(this)
+@Composable
+fun Greeting(name: String) {
+    Text(text = "Hellsssssssso $name!")
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    CryptoSignalAlertTheme {
+        Greeting("Android")
     }
 }

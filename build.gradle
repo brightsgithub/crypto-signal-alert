@@ -1,10 +1,19 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext {
+        // compose
+        //compose_version = '1.1.0-beta01'
+        //kotlin_version = '1.5.31'
+        compose_version = '1.1.0'
+        kotlin_version = '1.6.10'
+    }
+}// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id 'com.android.application' version '7.2.2' apply false
     id 'com.android.library' version '7.2.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.6.20' apply false
-    id 'org.jetbrains.kotlin.jvm' version '1.6.20' apply false
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.20' apply false
+
+    id 'org.jetbrains.kotlin.android' version "$kotlin_version" apply false
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version" apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" apply false
 }
 
 task clean(type: Delete) {
@@ -25,4 +34,5 @@ https://stackoverflow.com/questions/45182717/java-home-is-set-to-an-invalid-dire
  *
  */
 
+// user for ./gradlew testAll
 apply from: 'verification.gradle'

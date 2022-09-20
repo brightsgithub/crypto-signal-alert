@@ -13,8 +13,10 @@ import com.owusu.cryptosignalalert.receivers.AlarmReceiver
 import com.owusu.cryptosignalalert.service.CryptoSignalAlertService
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import kotlinx.coroutines.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+//import org.koin.core.KoinComponent
+//import org.koin.core.inject
 import java.util.*
 
 /**

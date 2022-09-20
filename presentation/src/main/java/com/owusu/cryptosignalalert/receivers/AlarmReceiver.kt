@@ -9,8 +9,11 @@ import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager.Companion.INTENT_ACT
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+//import org.koin.core.KoinComponent
+//import org.koin.core.inject
 
 /**
  * Created by Bright Owusu-Amankwaa on 24/01/21.

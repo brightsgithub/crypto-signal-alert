@@ -6,7 +6,9 @@ import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.notification.NotificationUtil
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
+
+//import org.koin.core.KoinComponent
 
 class PriceNotificationHelper(
     private val notificationUtil: NotificationUtil,

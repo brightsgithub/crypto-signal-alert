@@ -20,9 +20,10 @@ import com.owusu.cryptosignalalert.workmanager.Constants.DISPLAY_LATEST_DATA
 import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED_STATUS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
+//import org.koin.core.KoinComponent
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
 class MainActivity : ComponentActivity(), KoinComponent {
 
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
     }
 
     private fun unRegisterViewStates() {
-        viewStateJob.cancel()
+        //viewStateJob.cancel()
         workManagerJob.cancel()
     }
 

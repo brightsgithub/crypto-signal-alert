@@ -14,7 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.androidx.viewmodel.BuildConfig
+//import org.koin.androidx.viewmodel.BuildConfig
 import org.koin.core.context.startKoin
 
 class CryptoSignalAlertApp : MultiDexApplication() {

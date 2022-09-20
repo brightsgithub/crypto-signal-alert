@@ -80,21 +80,18 @@ android {
 
 dependencies {
     def work_version = "2.7.1"
+    def koinVersion = "2.0.1"
+    def koinComposeVersion = "3.2.0"
 
-    implementation 'io.insert-koin:koin-core:2.0.1'
-    implementation 'io.insert-koin:koin-android:2.0.1'
-    implementation 'io.insert-koin:koin-androidx-viewmodel:2.0.1'
+    //implementation "io.insert-koin:koin-core:$koinVersion"
+//    implementation "io.insert-koin:koin-android:$koinVersion"
+//    implementation "io.insert-koin:koin-androidx-viewmodel:$koinVersion"
+    implementation"io.insert-koin:koin-androidx-compose:$koinComposeVersion"
+
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
-
     implementation 'androidx.core:core-ktx:1.7.0'
-//    implementation 'androidx.appcompat:appcompat:1.4.2'
-//    implementation 'com.google.android.material:material:1.6.1'
-//    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
-
-    
     implementation project(path: ':data')
     implementation project(path: ':domain')
     androidTestImplementation project(':testutils')
@@ -117,4 +114,6 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+
 }

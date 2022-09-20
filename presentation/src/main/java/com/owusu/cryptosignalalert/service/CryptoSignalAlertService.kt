@@ -12,8 +12,11 @@ import androidx.core.content.ContextCompat
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.notification.NotificationUtil.Companion.SERVICE_NOTIFICATION_ID
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+//import org.koin.core.KoinComponent
+//import org.koin.core.inject
 
 class CryptoSignalAlertService : Service(), KoinComponent {
 

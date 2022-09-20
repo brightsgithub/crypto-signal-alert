@@ -29,12 +29,12 @@ val uiModule = module(override = true) {
 
     viewModel {
         AlertListViewModel(
-            get(),
-            get(),
-            get(named(IO)),
-            get(named(MAIN)),
-            Constants.SYNC_PRICES_WORKER_TAG,
-            androidApplication()
+            priceTargetsMapper = get(),
+            getPriceTargetsUseCase = get(),
+            dispatcherBackground = get(named(IO)),
+            dispatcherMain = get(named(MAIN)),
+            workerTag = Constants.SYNC_PRICES_WORKER_TAG,
+            app = androidApplication()
         )
     }
 

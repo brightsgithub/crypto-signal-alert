@@ -2,13 +2,17 @@ package com.owusu.cryptosignalalert.di
 
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
+import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
+import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
 import com.owusu.cryptosignalalert.mappers.PriceTargetUIMapper
 import com.owusu.cryptosignalalert.mappers.UIListMapper
+import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.workmanager.Constants
 import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
 import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter
@@ -19,8 +23,12 @@ import org.koin.dsl.module
 
 val uiModule = module(override = true) {
 
-    factory<UIListMapper<PriceTargetDomain, PriceTargetUI>> {
+    factory<UIListMapper<PriceTargetDomain, PriceTargetUI>>(named(PriceTargetUIMapper::class.java.name)) {
         PriceTargetUIMapper()
+    }
+
+    factory<UIListMapper<CoinDomain, CoinUI>>(named(CoinDomainToUIMapper::class.java.name)) {
+        CoinDomainToUIMapper()
     }
 
     factory {
@@ -29,12 +37,21 @@ val uiModule = module(override = true) {
 
     viewModel {
         AlertListViewModel(
-            priceTargetsMapper = get(),
+            priceTargetsMapper = get(named(PriceTargetUIMapper::class.java.name)),
             getPriceTargetsUseCase = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN)),
             workerTag = Constants.SYNC_PRICES_WORKER_TAG,
             app = androidApplication()
+        )
+    }
+
+    viewModel {
+        CoinsListViewModel(
+            coinDomainToUIMapper = get(named(CoinDomainToUIMapper::class.java.name)),
+            getCoinsListUseCase = get(),
+            dispatcherBackground = get(named(IO)),
+            dispatcherMain = get(named(MAIN))
         )
     }
 

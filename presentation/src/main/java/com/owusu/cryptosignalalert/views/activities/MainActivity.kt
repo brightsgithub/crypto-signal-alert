@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -15,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 import com.owusu.cryptosignalalert.workmanager.Constants.DISPLAY_LATEST_DATA
 import com.owusu.cryptosignalalert.workmanager.Constants.KEY_PRICE_TARGET_UPDATED_STATUS
@@ -23,6 +26,7 @@ import kotlinx.coroutines.launch
 //import org.koin.core.KoinComponent
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.getViewModel
 import org.koin.core.component.KoinComponent
 
 class MainActivity : ComponentActivity(), KoinComponent {
@@ -94,8 +98,18 @@ private fun MyApp() {
 
 @Composable
 fun Greeting(name: String) {
+
+    // https://developer.android.com/jetpack/compose/libraries#streams
+    // https://insert-koin.io/docs/reference/koin-android/compose/
+    val vm = getViewModel<CoinsListViewModel>()
+
     Surface(color = MaterialTheme.colors.primary) {
-        Text(text = "Hello $name!", modifier = Modifier.padding(24.dp))
+        Row(modifier = Modifier.padding(4.dp)) {
+            Column {
+                Text(text = "Hello $name!")
+            }
+        }
+
     }
 }
 

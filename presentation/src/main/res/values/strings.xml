@@ -7,4 +7,6 @@
         <item>NOT_SET</item>
     </string-array>
 
+    <string name="image_coin_content_desc">Coin logo</string>
+
 </resources>

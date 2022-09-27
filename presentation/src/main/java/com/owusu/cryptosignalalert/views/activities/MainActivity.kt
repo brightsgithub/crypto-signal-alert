@@ -4,18 +4,34 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
+import coil.compose.rememberImagePainter
+import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.data.models.api.CoinAPI
+import com.owusu.cryptosignalalert.models.CoinUI
+import com.owusu.cryptosignalalert.models.CoinsListUiState
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
@@ -90,33 +106,80 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
 @Composable
 private fun MyApp() {
-    // A surface container using the 'background' color from the theme
-    Surface(color = MaterialTheme.colors.background) {
-        Greeting("Android")
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
 
     // https://developer.android.com/jetpack/compose/libraries#streams
     // https://insert-koin.io/docs/reference/koin-android/compose/
     val vm = getViewModel<CoinsListViewModel>()
+    vm.loadCoinsList(page = 1, recordsPerPage = 100)
 
-    Surface(color = MaterialTheme.colors.primary) {
-        Row(modifier = Modifier.padding(4.dp)) {
-            Column {
-                Text(text = "Hello $name!")
-            }
+    vm.viewState.collectAsState(initial = CoinsListUiState()).value.let {
+
+        // A surface container using the 'background' color from the theme
+        Surface(color = MaterialTheme.colors.background) {
+            Coins(it.coins)
         }
-
     }
 }
+
+@Composable
+fun Coins(coins: List<CoinUI>) {
+    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
+        items(items = coins) { coin ->
+            Coin(coin)
+        }
+    }
+}
+
+@Composable
+private fun Coin(coin: CoinUI) {
+
+    val expanded = remember { mutableStateOf(false) }
+
+    val extraPadding = if (expanded.value) 48.dp else 0.dp
+
+    Surface(
+        color = MaterialTheme.colors.primary,
+        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+    ) {
+        Row(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier
+                .padding(end = 14.dp)) {
+                Image(
+                    painter = rememberImagePainter(coin.image),
+                    contentDescription = stringResource(R.string.image_coin_content_desc),
+                    modifier = Modifier
+                        // Set image size to 40 dp
+                        .size(40.dp)
+                        // Clip image to be shaped as a circle
+                        .clip(CircleShape)
+                )
+            }
+            Column(modifier = Modifier
+                .weight(1f)
+                .padding(bottom = extraPadding)
+            ) {
+                Text(text = coin.name!!)
+                Text(text = coin.currentPrice!!.toString())
+            }
+            OutlinedButton(
+                onClick = { expanded.value = !expanded.value }
+            ) {
+                Text(if (expanded.value) "Show less" else "Show more")
+            }
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     CryptoSignalAlertTheme {
-        Greeting("Android")
+        Coins(listOf(
+            CoinUI(
+                id = "bitcoin",
+                name = "Bitcoin",
+                currentPrice = 19000.0
+            )))
     }
 }

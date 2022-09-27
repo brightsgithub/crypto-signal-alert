@@ -35,7 +35,7 @@ class CoinsListViewModel(
             )
             val coinsListDomain = getCoinsListUseCase.invoke(params)
             val coinsListUI = coinDomainToUIMapper.mapDomainListToUIList(coinsListDomain)
-
+            _state.value = _state.value.copy(coins = coinsListUI)
         }
     }
 }

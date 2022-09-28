@@ -19,7 +19,7 @@ data class CoinUI(
     val image: String? = null,
     val lastUpdated: String? = null,
     val low24h: Double? = null,
-    val marketCap: Double? = null,
+    val marketCap: String? = null,
     val marketCapChange24h: Double? = null,
     val marketCapChangePercentage24h: Double? = null,
     val marketCapRank: Double? = null,

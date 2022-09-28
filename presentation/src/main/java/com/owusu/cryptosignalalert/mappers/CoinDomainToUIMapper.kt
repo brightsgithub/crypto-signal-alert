@@ -2,6 +2,8 @@ package com.owusu.cryptosignalalert.mappers
 
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.models.CoinUI
+import com.owusu.cryptosignalalert.util.PriceUtils
+import java.math.BigDecimal
 
 class CoinDomainToUIMapper: UIListMapper<CoinDomain, CoinUI> {
     override fun mapDomainListToUIList(domainList: List<CoinDomain>): List<CoinUI> {
@@ -24,7 +26,7 @@ class CoinDomainToUIMapper: UIListMapper<CoinDomain, CoinUI> {
                         image = image,
                         lastUpdated = lastUpdated,
                         low24h = low24h,
-                        marketCap = marketCap,
+                        marketCap = convertPriceToString(marketCap),
                         marketCapChange24h = marketCapChange24h,
                         marketCapChangePercentage24h = marketCapChangePercentage24h,
                         marketCapRank = marketCapRank,
@@ -62,7 +64,7 @@ class CoinDomainToUIMapper: UIListMapper<CoinDomain, CoinUI> {
                         image = image,
                         lastUpdated = lastUpdated,
                         low24h = low24h,
-                        marketCap = marketCap,
+                        marketCap = convertPriceToDouble(marketCap),
                         marketCapChange24h = marketCapChange24h,
                         marketCapChangePercentage24h = marketCapChangePercentage24h,
                         marketCapRank = marketCapRank,
@@ -78,5 +80,15 @@ class CoinDomainToUIMapper: UIListMapper<CoinDomain, CoinUI> {
             }
         }
         return list
+    }
+
+    private fun convertPriceToString(price: Double?): String? {
+        if (price == null) return "TBA"
+        return PriceUtils.numberFormatter("USD", price.toString())
+    }
+
+    private fun convertPriceToDouble(price: String?): Double? {
+        if (price == null) return 0.0
+        return price.toDouble()
     }
 }

@@ -5,10 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -20,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -141,9 +139,14 @@ private fun Coin(coin: CoinUI) {
         color = MaterialTheme.colors.primary,
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Row(modifier = Modifier.padding(24.dp)) {
+        Row(
+            modifier = Modifier.padding(24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column(modifier = Modifier
-                .padding(end = 14.dp)) {
+                .padding(end = 16.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
                 Image(
                     painter = rememberImagePainter(coin.image),
                     contentDescription = stringResource(R.string.image_coin_content_desc),
@@ -160,6 +163,7 @@ private fun Coin(coin: CoinUI) {
             ) {
                 Text(text = coin.name!!)
                 Text(text = coin.currentPrice!!.toString())
+                Text(text = coin.marketCap!!.toString())
             }
             OutlinedButton(
                 onClick = { expanded.value = !expanded.value }

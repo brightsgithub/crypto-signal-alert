@@ -8,7 +8,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
-import com.owusu.cryptosignalalert.mappers.UIListMapper
+import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AlertListViewModel(
-    private val priceTargetsMapper: UIListMapper<PriceTargetDomain, PriceTargetUI>,
+    private val priceTargetsMapper: UIMapper<PriceTargetDomain, PriceTargetUI>,
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher,

@@ -178,7 +178,7 @@ class PriceTargetDaoTest : KoinComponent {
             currentPrice = 21518.0,
             marketCap = 411096596530.0,
             marketCapRank = 1.0,
-            fullyDilutedValuation = 452245724314L,
+            fullyDilutedValuation = 452245724314.0,
             totalVolume = 48963778515.0,
             high24h = 22007.0,
             low24h = 21251.0,

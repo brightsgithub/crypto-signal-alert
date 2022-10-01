@@ -4,7 +4,7 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 
-class PriceTargetUIMapper:UIListMapper<PriceTargetDomain, PriceTargetUI> {
+class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
     override fun mapDomainListToUIList(domainList: List<PriceTargetDomain>): List<PriceTargetUI> {
         val list = arrayListOf<PriceTargetUI>()
 
@@ -106,6 +106,14 @@ class PriceTargetUIMapper:UIListMapper<PriceTargetDomain, PriceTargetUI> {
             PriceTargetDirectionUI.BELOW -> PriceTargetDirection.BELOW
             PriceTargetDirectionUI.NOT_SET -> PriceTargetDirection.NOT_SET
         }
+    }
+
+    override fun mapDomainToUI(domainObj: PriceTargetDomain): PriceTargetUI {
+        TODO("Not yet implemented")
+    }
+
+    override fun mapUIToDomain(uiObj: PriceTargetUI): PriceTargetDomain {
+        TODO("Not yet implemented")
     }
 }
 

@@ -8,7 +8,7 @@ import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
 import com.owusu.cryptosignalalert.mappers.PriceTargetUIMapper
-import com.owusu.cryptosignalalert.mappers.UIListMapper
+import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
@@ -23,11 +23,11 @@ import org.koin.dsl.module
 
 val uiModule = module(override = true) {
 
-    factory<UIListMapper<PriceTargetDomain, PriceTargetUI>>(named(PriceTargetUIMapper::class.java.name)) {
+    factory<UIMapper<PriceTargetDomain, PriceTargetUI>>(named(PriceTargetUIMapper::class.java.name)) {
         PriceTargetUIMapper()
     }
 
-    factory<UIListMapper<CoinDomain, CoinUI>>(named(CoinDomainToUIMapper::class.java.name)) {
+    factory<UIMapper<CoinDomain, CoinUI>>(named(CoinDomainToUIMapper::class.java.name)) {
         CoinDomainToUIMapper()
     }
 

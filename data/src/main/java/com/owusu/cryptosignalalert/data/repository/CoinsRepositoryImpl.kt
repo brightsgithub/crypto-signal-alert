@@ -10,7 +10,6 @@ class CoinsRepositoryImpl(
     private val coinsDataSource: CoinsListDataSource,
     private val dataAPIListMapper: DataAPIListMapper<CoinAPI, CoinDomain>
 ): CoinsRepository {
-
     override suspend fun getCoinsList(
         page: Int,
         recordsPerPage: Int,

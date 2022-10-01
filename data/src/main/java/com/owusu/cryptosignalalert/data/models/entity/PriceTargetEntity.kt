@@ -37,7 +37,7 @@ data class PriceTargetEntity(
     @ColumnInfo(name="current_price")
     val currentPrice: Double? = null,
     @ColumnInfo(name="fully_diluted_valuation")
-    val fullyDilutedValuation: Long? = null,
+    val fullyDilutedValuation: Double? = null,
     @ColumnInfo(name="high_24h")
     val high24h: Double? = null,
     @ColumnInfo(name="image")

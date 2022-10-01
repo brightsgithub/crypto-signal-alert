@@ -9,7 +9,7 @@ data class CoinDomain(
     val atlDate: String? = null,
     val circulatingSupply: Double? = null,
     val currentPrice: Double? = null,
-    val fullyDilutedValuation: Long? = null,
+    val fullyDilutedValuation: Double? = null,
     val high24h: Double? = null,
     val id: String,
     val image: String? = null,

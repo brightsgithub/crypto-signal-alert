@@ -16,7 +16,7 @@ data class PriceTargetUI(
     val atlDate: String? = null,
     val circulatingSupply: Double? = null,
     val currentPrice: Double? = null,
-    val fullyDilutedValuation: Long? = null,
+    val fullyDilutedValuation: Double? = null,
     val high24h: Double? = null,
     val image: String? = null,
     val lastUpdated: String? = null,

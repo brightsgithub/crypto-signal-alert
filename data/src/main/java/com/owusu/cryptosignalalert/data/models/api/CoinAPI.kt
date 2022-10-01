@@ -24,7 +24,7 @@ data class CoinAPI(
     @SerialName("current_price")
     val currentPrice: Double? = null,
     @SerialName("fully_diluted_valuation")
-    val fullyDilutedValuation: Long? = null,
+    val fullyDilutedValuation: Double? = null,
     @SerialName("high_24h")
     val high24h: Double? = null,
     @SerialName("id")

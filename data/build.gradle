@@ -62,14 +62,10 @@ dependencies {
     def koinComposeVersion = "3.2.0"
     
     kapt "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
-    //implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-common:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
     // Koin for injection
-//    implementation "io.insert-koin:koin-core:$koinVersion"
-//    implementation "io.insert-koin:koin-android:$koinVersion"
-
     implementation"io.insert-koin:koin-androidx-compose:$koinComposeVersion"
 
     implementation project(path: ':domain')
@@ -106,4 +102,6 @@ dependencies {
     // Using Gson for my own custom serializer since the ktor one is difficult to use.
     // Need this for dynamic json responses
     implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
+
+    implementation "androidx.paging:paging-compose:1.0.0-alpha15"
 }

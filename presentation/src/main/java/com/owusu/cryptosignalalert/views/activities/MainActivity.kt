@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
@@ -143,6 +141,43 @@ fun Coins(lazyPagingItems: LazyPagingItems<CoinUI>) {
         items(lazyPagingItems) { coin ->
             Coin(coin)
         }
+
+        lazyPagingItems.apply {
+            when {
+                loadState.refresh is LoadState.Loading -> {
+                    item {
+                        loading(boxModifier = Modifier.fillParentMaxSize())
+                    }
+                }
+
+                loadState.append is LoadState.Loading -> {
+                    item {
+                        loading()
+                    }
+                }
+
+                loadState.prepend is LoadState.Loading -> {
+                    item {
+                        loading()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun loading(boxModifier: Modifier? = null) {
+
+    val modifier = boxModifier ?: Modifier
+        .fillMaxWidth()
+
+    Box(modifier = modifier.padding(16.dp)) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .padding(12.dp)
+                .align(Alignment.Center)
+        )
     }
 }
 

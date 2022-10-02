@@ -24,6 +24,8 @@ data class CoinUI(
     val marketCapStr: String? = null,
     val marketCapChange24h: Double? = null,
     val marketCapChangePercentage24h: Double? = null,
+    val priceChangePercentage24hStr: String? = null,
+    val is24HrPriceChangePositive: Boolean = false,
     val marketCapRank: Int? = null,
     val maxSupply: Double? = null,
     val name: String? = null,

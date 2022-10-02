@@ -32,7 +32,7 @@ fun CryptoSignalAlertTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (false) {
+    val colors = if (true) {
         DarkColorPalette
     } else {
         LightColorPalette

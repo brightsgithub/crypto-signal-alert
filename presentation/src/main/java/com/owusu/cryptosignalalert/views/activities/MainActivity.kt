@@ -19,11 +19,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -139,7 +143,7 @@ fun Coins(lazyPagingItems: LazyPagingItems<CoinUI>) {
 
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(lazyPagingItems) { coin ->
-            Coin(coin)
+            Coin2(coin)
         }
 
         lazyPagingItems.apply {
@@ -182,6 +186,98 @@ private fun loading(boxModifier: Modifier? = null) {
 }
 
 @Composable
+private fun Coin2(coin: CoinUI?) {
+
+    val expanded = remember { mutableStateOf(false) }
+
+    val extraPadding = if (expanded.value) 48.dp else 0.dp
+
+    Surface(
+        color = colorResource(id = R.color.dark_coin_row),
+        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+    ) {
+
+        ConstraintLayout(modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()) {
+            // Create references for the composables to constrain
+            val (
+                marketRank,
+                coinImage,
+                currentPriceLabel,
+                marketCapLabel,
+                currentPrice,
+                marketCap,
+                coinName,
+                priceChangePercentage24h,
+                marketCapChangePercentage24h
+            ) = createRefs()
+
+            Text(text = coin!!.marketCapRank.toString(),
+                modifier = Modifier.constrainAs(marketRank) {
+                top.linkTo(parent.top, margin = 4.dp)
+            }, fontSize = 12.sp)
+
+            Image(
+                painter = rememberImagePainter(coin?.image),
+                contentDescription = stringResource(R.string.image_coin_content_desc),
+                modifier = Modifier
+                    // Set image size to 40 dp
+                    .size(30.dp)
+                    // Clip image to be shaped as a circle
+                    .clip(CircleShape)
+//                    .padding(start = 4.dp)
+                    .constrainAs(coinImage) {
+                        start.linkTo(marketRank.end, margin = 16.dp)
+                    }
+            )
+
+            Text(text = coin!!.name.toString(), modifier = Modifier
+                .constrainAs(coinName) {
+                start.linkTo(marketCapLabel.end, margin = 16.dp)
+            }, fontWeight = FontWeight.Bold
+            )
+
+            Text(text = "Price:", modifier = Modifier.constrainAs(currentPriceLabel) {
+                start.linkTo(coinImage.start)
+                top.linkTo(coinImage.bottom, margin = 16.dp)
+            })
+
+            Text(text = "Market Cap:", modifier = Modifier.constrainAs(marketCapLabel) {
+                start.linkTo(currentPriceLabel.start)
+                top.linkTo(currentPriceLabel.bottom)
+            })
+
+            Text(text = coin.currentPriceStr!!, modifier = Modifier.constrainAs(currentPrice) {
+                start.linkTo(coinName.start)
+                top.linkTo(currentPriceLabel.top)
+            })
+
+            Text(text = coin.marketCapStr!!, modifier = Modifier.constrainAs(marketCap) {
+                start.linkTo(coinName.start)
+                top.linkTo(marketCapLabel.top)
+            })
+
+            Text(text = coin.priceChangePercentage24hStr!!, modifier = Modifier.constrainAs(priceChangePercentage24h) {
+                start.linkTo(marketCap.end, margin = 16.dp)
+                top.linkTo(currentPrice.top)
+            },
+            color = getPercentageColor(coin.is24HrPriceChangePositive), fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+private fun getPercentageColor(is24HrPriceChangePositive: Boolean) : Color {
+    return if (is24HrPriceChangePositive) {
+        colorResource(R.color.percentage_gain_green)
+    } else {
+        colorResource(R.color.red)
+    }
+}
+
+
+@Composable
 private fun Coin(coin: CoinUI?) {
 
     val expanded = remember { mutableStateOf(false) }
@@ -190,10 +286,12 @@ private fun Coin(coin: CoinUI?) {
 
     Surface(
         color = MaterialTheme.colors.primary,
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+        modifier = Modifier.padding(vertical = 1.dp, horizontal = 1.dp)
     ) {
         Row(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -229,6 +327,7 @@ private fun Coin(coin: CoinUI?) {
                 Text(text = coin.marketCapStr!!)
             }
             OutlinedButton(
+                modifier = Modifier.padding(end = 14.dp),
                 onClick = { expanded.value = !expanded.value }
             ) {
                 Text(if (expanded.value) "Show less" else "Show more")
@@ -242,13 +341,16 @@ private fun Coin(coin: CoinUI?) {
 @Composable
 fun DefaultPreview() {
     CryptoSignalAlertTheme {
-        Coin(
+        Coin2(
             CoinUI(
                 id = "bitcoin",
                 name = "Bitcoin",
-                currentPrice = 19000.0,
-                marketCap = 2000.0,
-                marketCapRank = 1
+                currentPriceStr = "19000.0",
+                marketCapStr = "20000000.0",
+                marketCapRank = 1,
+                image = "",
+                priceChangePercentage24h = 25.0,
+                marketCapChangePercentage24h = 10.0
             )
         )
     }

@@ -52,6 +52,8 @@ class CoinDomainToUIMapper: UIMapper<CoinDomain, CoinUI> {
                 name = name,
                 priceChange24h = priceChange24h,
                 priceChangePercentage24h = priceChangePercentage24h,
+                priceChangePercentage24hStr = applySymbols(priceChangePercentage24h),
+                is24HrPriceChangePositive = isPricePositive(priceChange24h),
                 symbol = symbol,
                 totalSupply = totalSupply,
                 totalVolume = totalVolume
@@ -99,5 +101,25 @@ class CoinDomainToUIMapper: UIMapper<CoinDomain, CoinUI> {
     private fun convertPriceToDouble(price: String?): Double? {
         if (price == null) return 0.0
         return price.toDouble()
+    }
+
+    private fun applySymbols(number: Double?): String? {
+
+        if (number == null) {
+            return ""
+        }
+
+        return if (number > 0) {
+            "+"+number
+        } else {
+            return number.toString()
+        }
+    }
+
+    private fun isPricePositive(number: Double?): Boolean {
+        if (number == null) {
+            return false
+        }
+        return number > 0
     }
 }

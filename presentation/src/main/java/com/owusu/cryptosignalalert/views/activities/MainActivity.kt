@@ -140,7 +140,6 @@ private fun MyApp() {
 @Composable
 fun Coins(lazyPagingItems: LazyPagingItems<CoinUI>) {
     val listState = rememberLazyListState()
-
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(lazyPagingItems) { coin ->
             Coin2(coin)
@@ -210,7 +209,9 @@ private fun Coin2(coin: CoinUI?) {
                 marketCap,
                 coinName,
                 priceChangePercentage24h,
-                marketCapChangePercentage24h
+                marketCapChangePercentage24h,
+                _24HrChangeLabel,
+                alertImage
             ) = createRefs()
 
             Text(text = coin!!.marketCapRank.toString(),
@@ -226,7 +227,6 @@ private fun Coin2(coin: CoinUI?) {
                     .size(30.dp)
                     // Clip image to be shaped as a circle
                     .clip(CircleShape)
-//                    .padding(start = 4.dp)
                     .constrainAs(coinImage) {
                         start.linkTo(marketRank.end, margin = 16.dp)
                     }
@@ -235,7 +235,18 @@ private fun Coin2(coin: CoinUI?) {
             Text(text = coin!!.name.toString(), modifier = Modifier
                 .constrainAs(coinName) {
                 start.linkTo(marketCapLabel.end, margin = 16.dp)
-            }, fontWeight = FontWeight.Bold
+            }, fontWeight = FontWeight.Bold)
+
+            Image(
+                painter = rememberImagePainter(R.drawable.ic_alert_not_set),
+                contentDescription = stringResource(R.string.alert_icon),
+                modifier = Modifier
+                    // Set image size to 40 dp
+                    .size(25.dp)
+                    .constrainAs(alertImage) {
+                        end.linkTo(parent.end, margin = 4.dp)
+                        top.linkTo(coinName.top)
+                    }
             )
 
             Text(text = "Price:", modifier = Modifier.constrainAs(currentPriceLabel) {
@@ -246,21 +257,26 @@ private fun Coin2(coin: CoinUI?) {
             Text(text = "Market Cap:", modifier = Modifier.constrainAs(marketCapLabel) {
                 start.linkTo(currentPriceLabel.start)
                 top.linkTo(currentPriceLabel.bottom)
-            })
+            }, fontSize = 14.sp)
 
             Text(text = coin.currentPriceStr!!, modifier = Modifier.constrainAs(currentPrice) {
                 start.linkTo(coinName.start)
                 top.linkTo(currentPriceLabel.top)
-            })
+            }, fontWeight = FontWeight.Bold)
 
             Text(text = coin.marketCapStr!!, modifier = Modifier.constrainAs(marketCap) {
                 start.linkTo(coinName.start)
                 top.linkTo(marketCapLabel.top)
-            })
+            }, fontSize = 14.sp)
+
+            Text(text = "24hr", modifier = Modifier.constrainAs(_24HrChangeLabel) {
+                end.linkTo(priceChangePercentage24h.start, margin = 4.dp)
+                top.linkTo(currentPrice.top)
+            }, fontSize = 12.sp)
 
             Text(text = coin.priceChangePercentage24hStr!!, modifier = Modifier.constrainAs(priceChangePercentage24h) {
-                start.linkTo(marketCap.end, margin = 16.dp)
-                top.linkTo(currentPrice.top)
+                end.linkTo(parent.end, margin = 4.dp)
+                top.linkTo(_24HrChangeLabel.top)
             },
             color = getPercentageColor(coin.is24HrPriceChangePositive), fontSize = 12.sp)
         }

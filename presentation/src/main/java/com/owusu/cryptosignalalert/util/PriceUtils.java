@@ -53,7 +53,7 @@ public class PriceUtils {
 
 
         double number = Double.valueOf(val);
-        DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+        DecimalFormat decimalFormat = new DecimalFormat("##0.00");
         String numberAsString = decimalFormat.format(number);
 
         // redo formatting

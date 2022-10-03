@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.mappers
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.util.PriceUtils
+import java.math.BigDecimal
 
 class CoinDomainToUIMapper: UIMapper<CoinDomain, CoinUI> {
     override fun mapDomainListToUIList(domainList: List<CoinDomain>): List<CoinUI> {
@@ -51,8 +52,8 @@ class CoinDomainToUIMapper: UIMapper<CoinDomain, CoinUI> {
                 maxSupply = maxSupply,
                 name = name,
                 priceChange24h = priceChange24h,
-                priceChangePercentage24h = priceChangePercentage24h,
-                priceChangePercentage24hStr = applySymbols(priceChangePercentage24h),
+                priceChangePercentage24h = convertToDecimalPlace(priceChangePercentage24h, 2),
+                priceChangePercentage24hStr = applySymbols(convertToDecimalPlace(priceChangePercentage24h, 2)),
                 is24HrPriceChangePositive = isPricePositive(priceChange24h),
                 symbol = symbol,
                 totalSupply = totalSupply,
@@ -110,9 +111,9 @@ class CoinDomainToUIMapper: UIMapper<CoinDomain, CoinUI> {
         }
 
         return if (number > 0) {
-            "+"+number
+            "+"+number+"%"
         } else {
-            return number.toString()
+            return number.toString()+"%"
         }
     }
 
@@ -121,5 +122,11 @@ class CoinDomainToUIMapper: UIMapper<CoinDomain, CoinUI> {
             return false
         }
         return number > 0
+    }
+
+    private fun convertToDecimalPlace(price: Double?, decimalPlaces: Int): Double? {
+        if (price == null) return price
+        val a = BigDecimal(price)
+        return a.setScale(decimalPlaces, BigDecimal.ROUND_HALF_EVEN).toDouble()
     }
 }

@@ -21,7 +21,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-val uiModule = module(override = true) {
+val uiModule = module() {
 
     factory<UIMapper<PriceTargetDomain, PriceTargetUI>>(named(PriceTargetUIMapper::class.java.name)) {
         PriceTargetUIMapper()

@@ -21,6 +21,11 @@ class PriceTargetsDataSourceImpl(
         return mapper.transform(entityList)
     }
 
+    override suspend fun getPriceTargetsThatHaveNotBeenHit(): List<PriceTargetDomain> {
+        val entityList = priceTargetDao.getPriceTargetsThatHaveNotBeenHit()
+        return mapper.transform(entityList)
+    }
+
     override suspend fun insertPriceTargets(priceTargets: List<PriceTargetDomain>) {
         val entityList = mapper.reverseTransformation(priceTargets)
         priceTargetDao.insertPriceTargets(entityList)

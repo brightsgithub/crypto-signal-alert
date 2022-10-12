@@ -4,7 +4,7 @@ import com.owusu.cryptosignalalert.domain.usecase.MergeOldPriceTargetWithNewData
 import com.owusu.cryptosignalalert.domain.usecase.*
 import org.koin.dsl.module
 
-val domainModule = module(override = true) {
+val domainModule = module() {
 
     factory {
         GetPriceTargetsUseCase(get())

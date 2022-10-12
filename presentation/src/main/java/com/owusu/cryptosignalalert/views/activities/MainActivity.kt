@@ -4,18 +4,19 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -137,10 +138,20 @@ private fun MyApp() {
     }
 }
 
+// https://developer.android.com/codelabs/jetpack-compose-state?continue=https%3A%2F%2Fdeveloper.android.com%2Fcourses%2Fpathways%2Fjetpack-compose-for-android-developers-1%23codelab-https%3A%2F%2Fdeveloper.android.com%2Fcodelabs%2Fjetpack-compose-state#9
 @Composable
 fun Coins(lazyPagingItems: LazyPagingItems<CoinUI>) {
-    val listState = rememberLazyListState()
-    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
+    // Remember our own LazyListState
+    val listState = lazyPagingItems.rememberLazyListStateWorkAround()
+
+    // My temp solution
+    val refresh = lazyPagingItems.loadState.refresh
+    if (lazyPagingItems.itemCount == 0 && refresh is LoadState.NotLoading ) return //skip dummy state, waiting next compose
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.padding(vertical = 4.dp),
+    ) {
         items(lazyPagingItems) { coin ->
             Coin2(coin)
         }
@@ -170,6 +181,19 @@ fun Coins(lazyPagingItems: LazyPagingItems<CoinUI>) {
 }
 
 @Composable
+fun <T : Any> LazyPagingItems<T>.rememberLazyListStateWorkAround(): LazyListState {
+    // After recreation, LazyPagingItems first return 0 items, then the cached items.
+    // This behavior/issue is resetting the LazyListState scroll position.
+    // Below is a workaround. More info: https://issuetracker.google.com/issues/177245496.
+    return when (itemCount) {
+        // Return a different LazyListState instance.
+        0 -> remember(this) { LazyListState(0, 0) }
+        // Return rememberLazyListState (normal case).
+        else -> androidx.compose.foundation.lazy.rememberLazyListState()
+    }
+}
+
+@Composable
 private fun loading(boxModifier: Modifier? = null) {
 
     val modifier = boxModifier ?: Modifier
@@ -187,7 +211,7 @@ private fun loading(boxModifier: Modifier? = null) {
 @Composable
 private fun Coin2(coin: CoinUI?) {
 
-    val expanded = remember { mutableStateOf(false) }
+    val expanded = rememberSaveable { mutableStateOf(false) }
 
     val extraPadding = if (expanded.value) 48.dp else 0.dp
 
@@ -232,22 +256,28 @@ private fun Coin2(coin: CoinUI?) {
                     }
             )
 
-            Text(text = coin!!.name.toString(), modifier = Modifier
+            Text(text = coin.name!! + " ("+coin.symbol?.uppercase()+")", modifier = Modifier
                 .constrainAs(coinName) {
                 start.linkTo(marketCapLabel.end, margin = 16.dp)
             }, fontWeight = FontWeight.Bold)
 
-            Image(
-                painter = rememberImagePainter(R.drawable.ic_alert_not_set),
-                contentDescription = stringResource(R.string.alert_icon),
-                modifier = Modifier
-                    // Set image size to 40 dp
-                    .size(25.dp)
-                    .constrainAs(alertImage) {
-                        end.linkTo(parent.end, margin = 4.dp)
-                        top.linkTo(coinName.top)
-                    }
-            )
+            Crossfade(
+                expanded.value,
+                animationSpec = tween(1000),
+                modifier = Modifier.constrainAs(alertImage) {
+                    end.linkTo(parent.end, margin = 4.dp)
+                    top.linkTo(coinName.top)
+                }
+            ) { targetState ->
+                Image(
+                    painter = rememberImagePainter(if (targetState) R.drawable.ic_alart_set else R.drawable.ic_alert_not_set),
+                    contentDescription = stringResource(R.string.alert_icon),
+                    modifier = Modifier
+                        // Set image size to 40 dp
+                        .size(25.dp)
+                        .clickable { expanded.value = !expanded.value }
+                )
+            }
 
             Text(text = "Price:", modifier = Modifier.constrainAs(currentPriceLabel) {
                 start.linkTo(coinImage.start)

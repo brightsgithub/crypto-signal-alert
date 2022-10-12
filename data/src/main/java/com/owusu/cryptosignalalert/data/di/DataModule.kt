@@ -47,7 +47,7 @@ const val NAMED_PriceAPIMapper = "PriceAPIMapper"
 // so we can pass in Context!
 open class DataModuleWrapper(private val context: Context) {
 
-    val dataModule = module(override = true) {
+    val dataModule = module() {
 
         single<PriceTargetsRepository> {
             PriceTargetsRepositoryImpl(get())

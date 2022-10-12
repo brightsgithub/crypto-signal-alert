@@ -10,7 +10,7 @@ import org.koin.dsl.module
 const val IO = "IO"
 const val MAIN = "MAIN"
 
-val appModule = module(override = true) {
+val appModule = module() {
 
     single { androidContext() as CryptoSignalAlertApp }
 

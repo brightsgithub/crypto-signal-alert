@@ -129,6 +129,22 @@ class PriceTargetDaoTest : KoinComponent {
     }
 
     @Test
+    fun testInsertPriceTargetsThatHaveNotBeenHit()  = runBlocking {
+        val numOfCoins = 3
+        val hasPriceTargetBeenHit = false
+        val hasUserBeenAlerted = false
+        val userPriceTarget = 20000.0
+        val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
+        priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
+
+        val coinsListFromDb = priceTargetDao.getPriceTargetsThatHaveNotBeenHit()
+
+        Assert.assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
+        Assert.assertTrue(!coinsToBeAddedToBb[0].hasPriceTargetBeenHit)
+        Assert.assertTrue(coinsListFromDb.size == numOfCoins)
+    }
+
+    @Test
     fun testRemovePriceTargetToAlertUser()  = runBlocking {
         val numOfCoins = 3
         val hasPriceTargetBeenHit = true

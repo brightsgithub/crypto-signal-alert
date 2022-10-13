@@ -33,5 +33,6 @@ data class CoinUI(
     val priceChangePercentage24h: Double? = null,
     val symbol: String? = null,
     val totalSupply: Double? = null,
-    val totalVolume: Double? = null
+    val totalVolume: Double? = null,
+    val hasPriceTarget: Boolean = false
 ): Parcelable

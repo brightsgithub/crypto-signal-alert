@@ -261,23 +261,17 @@ private fun Coin2(coin: CoinUI?) {
                 start.linkTo(marketCapLabel.end, margin = 16.dp)
             }, fontWeight = FontWeight.Bold)
 
-            Crossfade(
-                expanded.value,
-                animationSpec = tween(1000),
-                modifier = Modifier.constrainAs(alertImage) {
-                    end.linkTo(parent.end, margin = 4.dp)
-                    top.linkTo(coinName.top)
-                }
-            ) { targetState ->
-                Image(
-                    painter = rememberImagePainter(if (targetState) R.drawable.ic_alart_set else R.drawable.ic_alert_not_set),
-                    contentDescription = stringResource(R.string.alert_icon),
-                    modifier = Modifier
-                        // Set image size to 40 dp
-                        .size(25.dp)
-                        .clickable { expanded.value = !expanded.value }
-                )
-            }
+            Image(
+                painter = rememberImagePainter(if (coin.hasPriceTarget) R.drawable.ic_alart_set else R.drawable.ic_alert_not_set),
+                contentDescription = stringResource(R.string.alert_icon),
+                modifier = Modifier
+                    .size(25.dp)
+                    .constrainAs(alertImage){
+                        end.linkTo(parent.end, margin = 4.dp)
+                        top.linkTo(coinName.top)
+                    }
+                    .clickable { expanded.value = !expanded.value }
+            )
 
             Text(text = "Price:", modifier = Modifier.constrainAs(currentPriceLabel) {
                 start.linkTo(coinImage.start)

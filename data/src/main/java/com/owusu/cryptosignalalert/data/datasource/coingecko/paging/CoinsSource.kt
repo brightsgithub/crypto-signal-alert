@@ -12,11 +12,15 @@ class CoinsSource(
     private val getCoinsListUseCase: GetCoinsListUseCase
 ) : PagingSource<Int, CoinDomain>() {
 
+    private var currentPageNum = 1
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CoinDomain> {
 
         // Key may be null during a refresh, if no explicit key is passed into Pager
         // construction. Use 0 as default, because our API is indexed started at index 0
         val pageNumber = params.key ?: 1
+
+        currentPageNum = pageNumber
 
         // Make api call
         val params = GetCoinsListUseCase.Params(pageNumber, recordsPerPage, currencies, ids)
@@ -35,6 +39,10 @@ class CoinsSource(
             prevKey = prevKey,
             nextKey = nextKey
         )
+    }
+
+    fun getCurrentPageNumber(): Int {
+        return currentPageNum
     }
 
     override fun getRefreshKey(state: PagingState<Int, CoinDomain>): Int? {

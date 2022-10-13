@@ -27,6 +27,10 @@ val domainModule = module() {
     }
 
     factory {
+        GetPriceTargetsThatHaveNotBeenHitUseCase(get())
+    }
+
+    factory {
         SaveNewPriceTargetsUseCase(get())
     }
 

@@ -1,5 +1,7 @@
 package com.owusu.cryptosignalalert.views.activities
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -19,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -29,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -211,6 +216,7 @@ private fun loading(boxModifier: Modifier? = null) {
 @Composable
 private fun Coin2(coin: CoinUI?) {
 
+    val context = LocalContext.current
     val expanded = rememberSaveable { mutableStateOf(false) }
 
     val extraPadding = if (expanded.value) 48.dp else 0.dp
@@ -270,7 +276,8 @@ private fun Coin2(coin: CoinUI?) {
                         end.linkTo(parent.end, margin = 4.dp)
                         top.linkTo(coinName.top)
                     }
-                    .clickable { expanded.value = !expanded.value }
+                    .clickable { context.startActivity(PriceTargetEntryActivity.getIntent(context, coin)) }
+                    //.alpha( if(coin.hasPriceTarget) 1f else 0f)
             )
 
             Text(text = "Price:", modifier = Modifier.constrainAs(currentPriceLabel) {
@@ -389,8 +396,10 @@ fun DefaultPreview() {
                 marketCapStr = "20000000.0",
                 marketCapRank = 1,
                 image = "",
-                priceChangePercentage24h = 25.0,
-                marketCapChangePercentage24h = 10.0
+                priceChangePercentage24hStr = "25.0",
+                marketCapChangePercentage24h = 10.0,
+                is24HrPriceChangePositive = true,
+                hasPriceTarget = true
             )
         )
     }

@@ -10,6 +10,8 @@ class CoinDomainToUIMapper {
 
     fun mapDomainToUI(coinDomain: CoinDomain, priceTargetsMap: Map<String,PriceTargetDomain>): CoinUI {
 
+        val priceTargetDomain = priceTargetsMap[coinDomain.id]
+
         coinDomain.apply {
             return CoinUI(
                 ath = ath,
@@ -41,13 +43,15 @@ class CoinDomainToUIMapper {
                 symbol = symbol,
                 totalSupply = totalSupply,
                 totalVolume = totalVolume,
-                hasPriceTarget = priceTargetsMap[coinDomain.id] != null
+                hasPriceTarget = priceTargetDomain != null,
+                userPriceTarget = priceTargetDomain?.userPriceTarget,
+                userPriceTargetDisplay = convertPriceToString(priceTargetDomain?.userPriceTarget)
             )
         }
     }
 
     private fun convertPriceToString(price: Double?): String? {
-        if (price == null) return "TBA"
+        if (price == null) return ""
         return PriceUtils.numberFormatter("USD", price.toString())
     }
 

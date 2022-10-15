@@ -3,14 +3,17 @@ package com.owusu.cryptosignalalert.di
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.usecase.SaveNewPriceTargetsUseCase
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
+import com.owusu.cryptosignalalert.mappers.CoinUIToPriceTargetDomainMapper
 import com.owusu.cryptosignalalert.mappers.PriceTargetUIMapper
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
+import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
 import com.owusu.cryptosignalalert.workmanager.Constants
 import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
 import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter
@@ -33,6 +36,10 @@ val uiModule = module() {
         PriceNotificationHelper(get(), get(), get())
     }
 
+    factory {
+        CoinUIToPriceTargetDomainMapper()
+    }
+
     viewModel {
         AlertListViewModel(
             priceTargetsMapper = get(named(PriceTargetUIMapper::class.java.name)),
@@ -49,6 +56,15 @@ val uiModule = module() {
             coinDomainToUIMapper = get(),
             getCoinsListUseCase = get(),
             getPriceTargetsThatHaveNotBeenHitUseCase = get(),
+            dispatcherBackground = get(named(IO)),
+            dispatcherMain = get(named(MAIN))
+        )
+    }
+
+    viewModel {
+        PriceTargetEntryViewModel(
+            coinUIToPriceTargetDomainMapper = get(),
+            saveNewPriceTargetsUseCase = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN))
         )

@@ -276,8 +276,13 @@ private fun Coin2(coin: CoinUI?) {
                         end.linkTo(parent.end, margin = 4.dp)
                         top.linkTo(coinName.top)
                     }
-                    .clickable { context.startActivity(PriceTargetEntryActivity.getIntent(context, coin)) }
-                    //.alpha( if(coin.hasPriceTarget) 1f else 0f)
+                    .clickable {
+                        if (!coin.hasPriceTarget) {
+                            context.startActivity(PriceTargetEntryActivity.getIntent(context, coin))
+                        } else {
+                            // TODO - Open PriceTargetListScreen
+                        }
+                    }
             )
 
             Text(text = "Price:", modifier = Modifier.constrainAs(currentPriceLabel) {

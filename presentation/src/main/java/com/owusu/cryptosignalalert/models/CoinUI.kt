@@ -34,5 +34,7 @@ data class CoinUI(
     val symbol: String? = null,
     val totalSupply: Double? = null,
     val totalVolume: Double? = null,
-    val hasPriceTarget: Boolean = false
+    val hasPriceTarget: Boolean = false,
+    val userPriceTarget: Double? = null,
+    val userPriceTargetDisplay: String? = null
 ): Parcelable

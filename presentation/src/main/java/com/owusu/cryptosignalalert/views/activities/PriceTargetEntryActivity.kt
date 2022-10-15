@@ -7,22 +7,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -33,11 +26,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
+import org.koin.androidx.compose.getViewModel
 
 class PriceTargetEntryActivity : ComponentActivity(), KoinComponent {
 
@@ -65,20 +59,26 @@ class PriceTargetEntryActivity : ComponentActivity(), KoinComponent {
 @Composable
 private fun MyApp(coinUI: CoinUI) {
     Surface(color = MaterialTheme.colors.background) {
-        PriceTargetEntryScreen(coinUI)
+        val viewModel = getViewModel<PriceTargetEntryViewModel>()
+        PriceTargetEntryScreen(
+            coinUI,
+            onSaveClicked = {
+                userPriceTarget -> viewModel.saveNewPriceTarget(coinUI, userPriceTarget)
+            }
+        )
     }
 }
 
 @Composable
-private fun PriceTargetEntryScreen(coinUI: CoinUI) {
-
-    //Text(text = "Text Inputs", style = typography.h6, modifier = Modifier.padding(8.dp))
+private fun PriceTargetEntryScreen(coinUI: CoinUI, onSaveClicked:(target: String) -> Unit) {
 
     var text by rememberSaveable { mutableStateOf(coinUI.name!!) }
+    var userPriceTarget by rememberSaveable { mutableStateOf("") }
 
     ConstraintLayout(modifier = Modifier
         .padding(8.dp)
-        .fillMaxWidth()) {
+        .fillMaxWidth()
+        .fillMaxHeight()) {
         // Create references for the composables to constrain
         val (
             coinTitle,
@@ -86,7 +86,7 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI) {
             coinImage,
             currentPrice,
             priceTarget,
-            alertImage
+            saveBtn
         ) = createRefs()
 
         Image(
@@ -104,7 +104,7 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI) {
         )
 
         Text(
-            text = coinUI.name!!,
+            text = coinUI.name!! + " ("+coinUI.symbol?.uppercase()+")",
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             modifier = Modifier
@@ -129,11 +129,12 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI) {
             modifier = Modifier
                 .clickable(
                     enabled = false,
-                    onClick = {  }
+                    onClick = { }
                 )
                 .constrainAs(coinTextEntry) {
-                top.linkTo(currentPrice.bottom, margin = 32.dp)
-            }.fillMaxWidth(),
+                    top.linkTo(currentPrice.bottom, margin = 32.dp)
+                }
+                .fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             label = { Text(text = "Asset name") },
             placeholder = { Text(text = "Enter asset") },
@@ -143,18 +144,31 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI) {
         )
 
         OutlinedTextField(
-            value = text,
-            modifier = Modifier.constrainAs(priceTarget) {
-                top.linkTo(coinTextEntry.bottom, margin = 4.dp)
-            }.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            value = userPriceTarget,
+            modifier = Modifier
+                .constrainAs(priceTarget) {
+                    top.linkTo(coinTextEntry.bottom, margin = 4.dp)
+                }
+                .fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = { Text(text = "Price target") },
             placeholder = { Text(text = "Enter price target") },
             onValueChange = {
-                text = it
+                userPriceTarget = it
             }
         )
 
+        Button(
+            modifier = Modifier.constrainAs(saveBtn) {
+                top.linkTo(priceTarget.bottom, margin = 24.dp)
+                centerHorizontallyTo(parent)
+            }.fillMaxWidth(),
+            onClick = {
+                onSaveClicked(userPriceTarget)
+            }
+        ) {
+            Text("Save")
+        }
     }
 }
 
@@ -174,7 +188,10 @@ fun PriceTargetEntryScreenPreview() {
                 marketCapChangePercentage24h = 10.0,
                 is24HrPriceChangePositive = true,
                 hasPriceTarget = true
-            )
+            ),
+            onSaveClicked = {
+                    userPriceTarget -> { }
+            }
         )
     }
 }

@@ -277,11 +277,7 @@ private fun Coin2(coin: CoinUI?) {
                         top.linkTo(coinName.top)
                     }
                     .clickable {
-                        if (!coin.hasPriceTarget.value) {
-                            context.startActivity(PriceTargetEntryActivity.getIntent(context, coin))
-                        } else {
-                            // TODO - Open PriceTargetListScreen
-                        }
+                        context.startActivity(PriceTargetEntryActivity.getIntent(context, coin))
                     }
             )
 

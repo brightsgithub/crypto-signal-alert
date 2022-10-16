@@ -6,6 +6,7 @@ import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import junit.framework.Assert
 import junit.framework.Assert.assertTrue
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -137,7 +138,7 @@ class PriceTargetDaoTest : KoinComponent {
         val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
         priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
 
-        val coinsListFromDb = priceTargetDao.getPriceTargetsThatHaveNotBeenHit()
+        val coinsListFromDb = priceTargetDao.getPriceTargetsThatHaveNotBeenHit().first()
 
         Assert.assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
         Assert.assertTrue(!coinsToBeAddedToBb[0].hasPriceTargetBeenHit)

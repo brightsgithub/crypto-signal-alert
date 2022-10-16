@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.views.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -28,12 +29,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.models.PriceEntryScreenEvents
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PriceTargetEntryActivity : ComponentActivity(), KoinComponent {
+
+    private val viewModel: PriceTargetEntryViewModel by viewModel()
+    private lateinit var viewStateJob: Job
 
     companion object {
         private const val INTENT_EXTRA_COIN_UI = "INTENT_EXTRA_COIN_UI"
@@ -47,10 +56,40 @@ class PriceTargetEntryActivity : ComponentActivity(), KoinComponent {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        registerViewStates()
         setContent {
             CryptoSignalAlertTheme {
                 val coinUI = requireNotNull(intent.getParcelableExtra<CoinUI>(INTENT_EXTRA_COIN_UI))
                 MyApp(coinUI)
+            }
+        }
+    }
+
+    private fun registerViewStates() {
+        observeViewState()
+    }
+
+    private fun unRegisterViewStates() {
+        viewStateJob.cancel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unRegisterViewStates()
+    }
+
+    private fun observeViewState() {
+        viewStateJob = lifecycleScope.launch {
+            viewModel.screenEvents.collect {
+                when (it) {
+                    is PriceEntryScreenEvents.SavePriceTargetSuccess -> {
+                        Toast.makeText(this@PriceTargetEntryActivity, "Target added", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                    is PriceEntryScreenEvents.SavePriceTargetSuccess -> {
+                        Toast.makeText(this@PriceTargetEntryActivity, "could not save", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }

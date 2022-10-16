@@ -187,7 +187,7 @@ fun PriceTargetEntryScreenPreview() {
                 priceChangePercentage24hStr = "25.0",
                 marketCapChangePercentage24h = 10.0,
                 is24HrPriceChangePositive = true,
-                hasPriceTarget = true
+                hasPriceTarget = mutableStateOf(false)
             ),
             onSaveClicked = {
                     userPriceTarget -> { }

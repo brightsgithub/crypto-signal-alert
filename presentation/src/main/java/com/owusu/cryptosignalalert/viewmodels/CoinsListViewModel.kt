@@ -11,9 +11,8 @@ import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.CoinsListUiState
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class CoinsListViewModel(
     private val coinDomainToUIMapper: CoinDomainToUIMapper,
@@ -23,11 +22,36 @@ class CoinsListViewModel(
     private val dispatcherMain: CoroutineDispatcher
 ): ViewModel() {
 
-    private val _state = MutableStateFlow<CoinsListUiState>(CoinsListUiState()) // for emitting
+    private val _state = MutableStateFlow(CoinsListUiState()) // for emitting
     val viewState: Flow<CoinsListUiState> = _state // for clients to listen to
     val coinsListFlow = fetchCoinsList()
     private var currentPage = -1
+    private val entireLoadedCoinMap = mutableListOf<CoinUI>()
 
+    init {
+        listenForPriceTargetsUpdates()
+    }
+
+    private fun listenForPriceTargetsUpdates() {
+        viewModelScope.launch {
+            getPriceTargetsThatHaveNotBeenHitUseCase().collect { pt->
+                var priceTargetsMap = mutableMapOf<String,PriceTargetDomain>()
+                pt.associateByTo(priceTargetsMap) { it.id }
+                entireLoadedCoinMap.forEach { coinUI ->
+                    val priceTarget = priceTargetsMap[coinUI.id]
+                    coinUI.apply {
+                        // The list ui wont update on these two, since compose does not observe these.
+                        // See CoinUI for more details
+                        userPriceTarget = priceTarget?.userPriceTarget
+                        userPriceTargetDisplay = coinDomainToUIMapper.convertPriceToString(priceTarget?.userPriceTarget)
+
+                        // compose is observing this however.
+                        hasPriceTarget.value = priceTarget != null // mutableState only update UI when changed.
+                    }
+                }
+            }
+        }
+    }
 
     private fun fetchCoinsList(): Flow<PagingData<CoinUI>> {
 
@@ -40,13 +64,17 @@ class CoinsListViewModel(
         }.flow.map { pagingData ->
             pagingData.map { coinDomain ->
                 val pageNum = coinsSource!!.getCurrentPageNumber()
+
                 if(currentPage != pageNum) {
                     currentPage = pageNum
                     // convert list to map more efficient if we search across a map
-                    val priceTargets = getPriceTargetsThatHaveNotBeenHitUseCase()
-                    priceTargets.associateByTo(priceTargetsMap) {it.id}
+                    val priceTargetsList = getPriceTargetsThatHaveNotBeenHitUseCase().first()
+                    priceTargetsList.associateByTo(priceTargetsMap) { it.id }
                 }
-                coinDomainToUIMapper.mapDomainToUI(coinDomain, priceTargetsMap)
+
+                val coinUI = coinDomainToUIMapper.mapDomainToUI(coinDomain, priceTargetsMap)
+                entireLoadedCoinMap.add(coinUI)
+                coinUI
             }
         }.cachedIn(viewModelScope) // cache data even for config change screen rotation.
     }

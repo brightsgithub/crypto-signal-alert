@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.data.repository
 import com.owusu.cryptosignalalert.data.datasource.PriceTargetsDataSource
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
+import kotlinx.coroutines.flow.Flow
 
 class PriceTargetsRepositoryImpl(
     private val priceTargetsDataSource: PriceTargetsDataSource
@@ -16,12 +17,12 @@ class PriceTargetsRepositoryImpl(
         return priceTargetsDataSource.getPriceTargetsToAlertUser()
     }
 
-    override suspend fun getPriceTargetsThatHaveNotBeenHit(): List<PriceTargetDomain> {
+    override fun getPriceTargetsThatHaveNotBeenHit(): Flow<List<PriceTargetDomain>> {
         return priceTargetsDataSource.getPriceTargetsThatHaveNotBeenHit()
     }
 
-    override suspend fun saveNewPriceTargets(priceTargets: List<PriceTargetDomain>) {
-        priceTargetsDataSource.insertPriceTargets(priceTargets)
+    override suspend fun saveNewPriceTargets(priceTargets: List<PriceTargetDomain>): Boolean {
+        return priceTargetsDataSource.insertPriceTargets(priceTargets)
     }
 
     override suspend fun updatePriceTargets(priceTargets: List<PriceTargetDomain>) {

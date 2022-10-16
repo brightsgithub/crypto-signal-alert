@@ -2,12 +2,13 @@ package com.owusu.cryptosignalalert.data.datasource.db
 
 import androidx.room.*
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PriceTargetDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPriceTargets(priceTargets: List<PriceTargetEntity>)
+    suspend fun insertPriceTargets(priceTargets: List<PriceTargetEntity>): List<Long>
 
     @Update
     suspend fun updatePriceTargets(priceTargets: List<PriceTargetEntity>)
@@ -22,7 +23,7 @@ interface PriceTargetDao {
     suspend fun getPriceTargetsToAlertUser() : List<PriceTargetEntity>
 
     @Query("SELECT * FROM price_targets_table pt where pt.has_price_target_been_hit = 0 and pt.has_user_been_alerted = 0")
-    suspend fun getPriceTargetsThatHaveNotBeenHit() : List<PriceTargetEntity>
+    fun getPriceTargetsThatHaveNotBeenHit() : Flow<List<PriceTargetEntity>>
 
     @Query("DELETE FROM price_targets_table")
     suspend fun nukeTable()

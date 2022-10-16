@@ -268,7 +268,7 @@ private fun Coin2(coin: CoinUI?) {
             }, fontWeight = FontWeight.Bold)
 
             Image(
-                painter = rememberImagePainter(if (coin.hasPriceTarget) R.drawable.ic_alart_set else R.drawable.ic_alert_not_set),
+                painter = rememberImagePainter(if (coin.hasPriceTarget.value) R.drawable.ic_alart_set else R.drawable.ic_alert_not_set),
                 contentDescription = stringResource(R.string.alert_icon),
                 modifier = Modifier
                     .size(25.dp)
@@ -277,7 +277,7 @@ private fun Coin2(coin: CoinUI?) {
                         top.linkTo(coinName.top)
                     }
                     .clickable {
-                        if (!coin.hasPriceTarget) {
+                        if (!coin.hasPriceTarget.value) {
                             context.startActivity(PriceTargetEntryActivity.getIntent(context, coin))
                         } else {
                             // TODO - Open PriceTargetListScreen
@@ -404,7 +404,7 @@ fun DefaultPreview() {
                 priceChangePercentage24hStr = "25.0",
                 marketCapChangePercentage24h = 10.0,
                 is24HrPriceChangePositive = true,
-                hasPriceTarget = true
+                hasPriceTarget = mutableStateOf(false)
             )
         )
     }

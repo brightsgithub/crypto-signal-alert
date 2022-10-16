@@ -22,7 +22,7 @@ class SaveNewPriceTargetsUseCaseTest {
         runTest {
 
             val listOfPriceTargets = mockk<List<PriceTargetDomain>>()
-            coEvery { mockPriceTargetsRepository.saveNewPriceTargets(listOfPriceTargets) } just runs
+            coEvery { mockPriceTargetsRepository.saveNewPriceTargets(listOfPriceTargets) } returns true
 
 
             val params = SaveNewPriceTargetsUseCase.Params(listOfPriceTargets)

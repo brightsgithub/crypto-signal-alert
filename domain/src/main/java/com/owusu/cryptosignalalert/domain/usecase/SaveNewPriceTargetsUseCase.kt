@@ -5,9 +5,9 @@ import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
 
 class SaveNewPriceTargetsUseCase(
     private val priceTargetsRepository: PriceTargetsRepository
-): SuspendedUseCase<SaveNewPriceTargetsUseCase.Params, Unit> {
-    override suspend fun invoke(params: Params) {
-        priceTargetsRepository.saveNewPriceTargets(params.priceTargets)
+): SuspendedUseCase<SaveNewPriceTargetsUseCase.Params, Boolean> {
+    override suspend fun invoke(params: Params): Boolean {
+        return priceTargetsRepository.saveNewPriceTargets(params.priceTargets)
     }
     data class Params(val priceTargets: List<PriceTargetDomain>)
 }

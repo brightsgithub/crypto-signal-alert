@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.mappers
 
+import androidx.compose.runtime.mutableStateOf
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.models.CoinUI
@@ -43,14 +44,14 @@ class CoinDomainToUIMapper {
                 symbol = symbol,
                 totalSupply = totalSupply,
                 totalVolume = totalVolume,
-                hasPriceTarget = priceTargetDomain != null,
+                hasPriceTarget = mutableStateOf(priceTargetDomain != null),
                 userPriceTarget = priceTargetDomain?.userPriceTarget,
                 userPriceTargetDisplay = convertPriceToString(priceTargetDomain?.userPriceTarget)
             )
         }
     }
 
-    private fun convertPriceToString(price: Double?): String? {
+    fun convertPriceToString(price: Double?): String? {
         if (price == null) return ""
         return PriceUtils.numberFormatter("USD", price.toString())
     }

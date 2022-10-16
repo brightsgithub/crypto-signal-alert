@@ -4,6 +4,9 @@ import com.owusu.cryptosignalalert.data.datasource.PriceTargetsDataSource
 import com.owusu.cryptosignalalert.data.mappers.DataAPIListMapper
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 
 class PriceTargetsDataSourceImpl(
     private val priceTargetDao: PriceTargetDao,
@@ -21,14 +24,16 @@ class PriceTargetsDataSourceImpl(
         return mapper.transform(entityList)
     }
 
-    override suspend fun getPriceTargetsThatHaveNotBeenHit(): List<PriceTargetDomain> {
-        val entityList = priceTargetDao.getPriceTargetsThatHaveNotBeenHit()
-        return mapper.transform(entityList)
+    override fun getPriceTargetsThatHaveNotBeenHit(): Flow<List<PriceTargetDomain>> {
+        return priceTargetDao.getPriceTargetsThatHaveNotBeenHit().map {
+            mapper.transform(it)
+        }
     }
 
-    override suspend fun insertPriceTargets(priceTargets: List<PriceTargetDomain>) {
+    override suspend fun insertPriceTargets(priceTargets: List<PriceTargetDomain>): Boolean {
         val entityList = mapper.reverseTransformation(priceTargets)
-        priceTargetDao.insertPriceTargets(entityList)
+        val rowIds = priceTargetDao.insertPriceTargets(entityList)
+        return rowIds.isNotEmpty()
     }
 
     override suspend fun updatePriceTargets(priceTargets: List<PriceTargetDomain>) {

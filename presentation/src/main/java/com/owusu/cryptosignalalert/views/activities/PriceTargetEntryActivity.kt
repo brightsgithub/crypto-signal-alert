@@ -26,9 +26,12 @@ import org.koin.core.component.KoinComponent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
@@ -83,7 +86,7 @@ class PriceTargetEntryActivity : ComponentActivity(), KoinComponent {
             viewModel.screenEvents.collect {
                 when (it) {
                     is PriceEntryScreenEvents.SavePriceTargetSuccess -> {
-                        Toast.makeText(this@PriceTargetEntryActivity, "Target added", Toast.LENGTH_SHORT).show()
+                        startActivity(PriceTargetsActivity.getIntent(this@PriceTargetEntryActivity))
                         finish()
                     }
                     is PriceEntryScreenEvents.SavePriceTargetSuccess -> {
@@ -113,6 +116,8 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI, onSaveClicked:(target: String
 
     var text by rememberSaveable { mutableStateOf(coinUI.name!!) }
     var userPriceTarget by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
+    val activity = (LocalLifecycleOwner.current as ComponentActivity)
 
     ConstraintLayout(modifier = Modifier
         .padding(8.dp)
@@ -125,7 +130,8 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI, onSaveClicked:(target: String
             coinImage,
             currentPrice,
             priceTarget,
-            saveBtn
+            saveBtn,
+            viewTargetsBtn
         ) = createRefs()
 
         Image(
@@ -207,6 +213,19 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI, onSaveClicked:(target: String
             }
         ) {
             Text("Save")
+        }
+
+        Button(
+            modifier = Modifier.constrainAs(viewTargetsBtn) {
+                top.linkTo(saveBtn.bottom, margin = 24.dp)
+                centerHorizontallyTo(parent)
+            }.fillMaxWidth(),
+            onClick = {
+                context.startActivity(PriceTargetsActivity.getIntent(context))
+                activity.finish()
+            }
+        ) {
+            Text("View Targets")
         }
     }
 }

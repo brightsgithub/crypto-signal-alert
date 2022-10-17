@@ -11,6 +11,8 @@ import com.owusu.cryptosignalalert.mappers.CoinUIToPriceTargetDomainMapper
 import com.owusu.cryptosignalalert.mappers.PriceTargetUIMapper
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.PriceTargetUI
+import com.owusu.cryptosignalalert.util.PriceDisplayUtils
+import com.owusu.cryptosignalalert.util.PriceUtils
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
@@ -25,11 +27,19 @@ import org.koin.dsl.module
 val uiModule = module() {
 
     factory<UIMapper<PriceTargetDomain, PriceTargetUI>>(named(PriceTargetUIMapper::class.java.name)) {
-        PriceTargetUIMapper()
+        PriceTargetUIMapper(priceDisplayUtils = get())
     }
 
     factory {
-        CoinDomainToUIMapper()
+        CoinDomainToUIMapper(priceDisplayUtils = get())
+    }
+
+    factory {
+        PriceDisplayUtils(priceUtils = get())
+    }
+
+    factory {
+        PriceUtils()
     }
 
     factory {
@@ -56,6 +66,7 @@ val uiModule = module() {
             coinDomainToUIMapper = get(),
             getCoinsListUseCase = get(),
             getPriceTargetsThatHaveNotBeenHitUseCase = get(),
+            priceDisplayUtils = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN))
         )

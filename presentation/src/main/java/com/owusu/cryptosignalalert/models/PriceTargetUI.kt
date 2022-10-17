@@ -16,6 +16,7 @@ data class PriceTargetUI(
     val atlDate: String? = null,
     val circulatingSupply: Double? = null,
     val currentPrice: Double? = null,
+    val currentPriceDisplay: String? = null,
     val fullyDilutedValuation: Double? = null,
     val high24h: Double? = null,
     val image: String? = null,
@@ -24,7 +25,7 @@ data class PriceTargetUI(
     val marketCap: Double? = null,
     val marketCapChange24h: Double? = null,
     val marketCapChangePercentage24h: Double? = null,
-    val marketCapRank: Double? = null,
+    val marketCapRank: Int? = null,
     val maxSupply: Double? = null,
     val name: String? = null,
     val priceChange24h: Double? = null,
@@ -33,7 +34,9 @@ data class PriceTargetUI(
     val totalSupply: Double? = null,
     val totalVolume: Double? = null,
     val userPriceTarget: Double? = null,
+    val userPriceTargetDisplay: String? = null,
     val hasPriceTargetBeenHit: Boolean = false,
     val hasUserBeenAlerted: Boolean = false,
-    val priceTargetDirection: PriceTargetDirectionUI = PriceTargetDirectionUI.NOT_SET
+    val priceTargetDirection: PriceTargetDirectionUI = PriceTargetDirectionUI.NOT_SET,
+    val progress: Float = 0f,
 ): Parcelable

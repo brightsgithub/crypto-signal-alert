@@ -4,12 +4,16 @@ import androidx.compose.runtime.mutableStateOf
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.models.CoinUI
+import com.owusu.cryptosignalalert.util.PriceDisplayUtils
 import com.owusu.cryptosignalalert.util.PriceUtils
 import java.math.BigDecimal
 
-class CoinDomainToUIMapper {
+class CoinDomainToUIMapper(private val priceDisplayUtils: PriceDisplayUtils) {
 
-    fun mapDomainToUI(coinDomain: CoinDomain, priceTargetsMap: Map<String,PriceTargetDomain>): CoinUI {
+    fun mapDomainToUI(
+        coinDomain: CoinDomain,
+        priceTargetsMap: Map<String,PriceTargetDomain>
+    ): CoinUI {
 
         val priceTargetDomain = priceTargetsMap[coinDomain.id]
 
@@ -23,7 +27,7 @@ class CoinDomainToUIMapper {
                 atlDate = atlDate,
                 circulatingSupply = circulatingSupply,
                 currentPrice = currentPrice,
-                currentPriceStr = convertPriceToString(currentPrice),
+                currentPriceStr = priceDisplayUtils.convertPriceToString(currentPrice),
                 fullyDilutedValuation = fullyDilutedValuation,
                 high24h = high24h,
                 id = id,
@@ -31,34 +35,24 @@ class CoinDomainToUIMapper {
                 lastUpdated = lastUpdated,
                 low24h = low24h,
                 marketCap = marketCap,
-                marketCapStr = convertPriceToString(marketCap),
+                marketCapStr = priceDisplayUtils.convertPriceToString(marketCap),
                 marketCapChange24h = marketCapChange24h,
                 marketCapChangePercentage24h = marketCapChangePercentage24h,
                 marketCapRank = marketCapRank?.toInt(),
                 maxSupply = maxSupply,
                 name = name,
                 priceChange24h = priceChange24h,
-                priceChangePercentage24h = convertToDecimalPlace(priceChangePercentage24h, 2),
-                priceChangePercentage24hStr = applySymbols(convertToDecimalPlace(priceChangePercentage24h, 2)),
+                priceChangePercentage24h = priceDisplayUtils.convertToDecimalPlace(priceChangePercentage24h, 2),
+                priceChangePercentage24hStr = applySymbols(priceDisplayUtils.convertToDecimalPlace(priceChangePercentage24h, 2)),
                 is24HrPriceChangePositive = isPricePositive(priceChange24h),
                 symbol = symbol,
                 totalSupply = totalSupply,
                 totalVolume = totalVolume,
                 hasPriceTarget = mutableStateOf(priceTargetDomain != null),
                 userPriceTarget = priceTargetDomain?.userPriceTarget,
-                userPriceTargetDisplay = convertPriceToString(priceTargetDomain?.userPriceTarget)
+                userPriceTargetDisplay = priceDisplayUtils.convertPriceToString(priceTargetDomain?.userPriceTarget)
             )
         }
-    }
-
-    fun convertPriceToString(price: Double?): String? {
-        if (price == null) return ""
-        return PriceUtils.numberFormatter("USD", price.toString())
-    }
-
-    private fun convertPriceToDouble(price: String?): Double? {
-        if (price == null) return 0.0
-        return price.toDouble()
     }
 
     private fun applySymbols(number: Double?): String? {
@@ -79,11 +73,5 @@ class CoinDomainToUIMapper {
             return false
         }
         return number > 0
-    }
-
-    private fun convertToDecimalPlace(price: Double?, decimalPlaces: Int): Double? {
-        if (price == null) return price
-        val a = BigDecimal(price)
-        return a.setScale(decimalPlaces, BigDecimal.ROUND_HALF_EVEN).toDouble()
     }
 }

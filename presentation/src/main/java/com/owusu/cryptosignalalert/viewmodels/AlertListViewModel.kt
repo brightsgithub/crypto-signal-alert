@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -29,7 +30,7 @@ class AlertListViewModel(
     var workInfoLiveData: LiveData<List<WorkInfo>> // <-- ADD THIS
     private val workManager: WorkManager = WorkManager.getInstance(app)
 
-    private val _state = MutableSharedFlow<AlertListViewState>() // for emitting
+    private val _state = MutableStateFlow(AlertListViewState()) // for emitting
     val viewState: Flow<AlertListViewState> = _state // for clients to listen to
 
     // WorkManager in AndroidViewModel https://developer.android.com/codelabs/android-adv-workmanager#3
@@ -47,22 +48,20 @@ class AlertListViewModel(
         }
     }
 
-    private suspend fun showLoadingState() {
-        withContext(dispatcherMain) {
-            _state.emit(AlertListViewState.ShowLoadingState)
-        }
+    fun deletePriceTarget(priceTargetUI: PriceTargetUI) {
+
     }
 
-    private suspend fun hideLoadingState() {
-        withContext(dispatcherMain) {
-            _state.emit(AlertListViewState.HideLoadingState)
-        }
+    private fun showLoadingState() {
+        _state.value = _state.value.copy(isLoading = true)
     }
 
-    private suspend fun handleAlertList(priceTargetsDomainList: List<PriceTargetDomain>) {
-        withContext(dispatcherMain) {
-            val alertListUIWrapper = priceTargetsMapper.mapDomainListToUIList(priceTargetsDomainList)
-            _state.emit(AlertListViewState.AlertListDataSuccess(alertListUIWrapper))
-        }
+    private fun hideLoadingState() {
+        _state.value = _state.value.copy(isLoading = false)
+    }
+
+    private fun handleAlertList(priceTargetsDomainList: List<PriceTargetDomain>) {
+        val priceTargets = priceTargetsMapper.mapDomainListToUIList(priceTargetsDomainList)
+        _state.value = _state.value.copy(priceTargets = priceTargets)
     }
 }

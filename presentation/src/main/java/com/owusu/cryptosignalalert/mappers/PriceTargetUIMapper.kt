@@ -3,8 +3,10 @@ package com.owusu.cryptosignalalert.mappers
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.models.PriceTargetUI
+import com.owusu.cryptosignalalert.util.PriceDisplayUtils
+import java.math.BigDecimal
 
-class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
+class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMapper<PriceTargetDomain, PriceTargetUI> {
     override fun mapDomainListToUIList(domainList: List<PriceTargetDomain>): List<PriceTargetUI> {
         val list = arrayListOf<PriceTargetUI>()
 
@@ -22,6 +24,7 @@ class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
                         atlDate = atlDate,
                         circulatingSupply = circulatingSupply,
                         currentPrice = currentPrice,
+                        currentPriceDisplay = priceDisplayUtils.convertPriceToString(currentPrice),
                         fullyDilutedValuation = fullyDilutedValuation,
                         high24h = high24h,
                         image = image,
@@ -30,7 +33,7 @@ class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
                         marketCap = marketCap,
                         marketCapChange24h = marketCapChange24h,
                         marketCapChangePercentage24h = marketCapChangePercentage24h,
-                        marketCapRank = marketCapRank,
+                        marketCapRank = marketCapRank?.toInt(),
                         maxSupply = maxSupply,
                         name = name,
                         priceChange24h = priceChange24h,
@@ -39,8 +42,11 @@ class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
                         totalSupply = totalSupply,
                         totalVolume = totalVolume,
                         userPriceTarget = userPriceTarget,
+                        userPriceTargetDisplay = priceDisplayUtils.convertPriceToString(userPriceTarget),
                         hasPriceTargetBeenHit = hasPriceTargetBeenHit,
-                        priceTargetDirection = mapPriceDirectionToUI(priceTargetDirection)
+                        hasUserBeenAlerted = hasUserBeenAlerted,
+                        priceTargetDirection = mapPriceDirectionToUI(priceTargetDirection),
+                        progress = calculateProgress(currentPrice, userPriceTarget, priceTargetDirection)
                     )
                 )
             }
@@ -73,7 +79,7 @@ class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
                         marketCap = marketCap,
                         marketCapChange24h = marketCapChange24h,
                         marketCapChangePercentage24h = marketCapChangePercentage24h,
-                        marketCapRank = marketCapRank,
+                        marketCapRank = marketCapRank?.toDouble(),
                         maxSupply = maxSupply,
                         name = name,
                         priceChange24h = priceChange24h,
@@ -83,8 +89,8 @@ class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
                         totalVolume = totalVolume,
                         userPriceTarget = userPriceTarget,
                         hasPriceTargetBeenHit = hasPriceTargetBeenHit,
+                        hasUserBeenAlerted = hasUserBeenAlerted,
                         priceTargetDirection = mapPriceDirectionToDomain(priceTargetDirection)
-
                     )
                 )
             }
@@ -114,6 +120,29 @@ class PriceTargetUIMapper:UIMapper<PriceTargetDomain, PriceTargetUI> {
 
     override fun mapUIToDomain(uiObj: PriceTargetUI): PriceTargetDomain {
         TODO("Not yet implemented")
+    }
+
+    private fun calculateProgress(currentPrice: Double?, userPriceTarget: Double?,
+                                  priceTargetDirDomain: PriceTargetDirection) : Float {
+
+        if (currentPrice == null || userPriceTarget == null) return 0f
+
+        if (currentPrice <=0 || userPriceTarget <=0) return 0f
+
+        return when (priceTargetDirDomain) {
+            PriceTargetDirection.ABOVE -> {
+                val result = (currentPrice / userPriceTarget) //* 100
+                if (result > 1) return 1f
+                result.toFloat()
+            }
+            PriceTargetDirection.BELOW -> {
+                val result = (userPriceTarget / currentPrice) //* 100
+                if (result > 1) return 1f
+                result.toFloat()
+            }
+            PriceTargetDirection.NOT_SET -> 0f
+        }
+
     }
 }
 

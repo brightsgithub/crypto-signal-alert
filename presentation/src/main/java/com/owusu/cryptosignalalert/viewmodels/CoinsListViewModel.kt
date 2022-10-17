@@ -10,6 +10,7 @@ import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsThatHaveNotBeen
 import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.CoinsListUiState
+import com.owusu.cryptosignalalert.util.PriceDisplayUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ class CoinsListViewModel(
     private val coinDomainToUIMapper: CoinDomainToUIMapper,
     private val getCoinsListUseCase: GetCoinsListUseCase,
     private val getPriceTargetsThatHaveNotBeenHitUseCase: GetPriceTargetsThatHaveNotBeenHitUseCase,
+    private val priceDisplayUtils: PriceDisplayUtils,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher
 ): ViewModel() {
@@ -43,7 +45,7 @@ class CoinsListViewModel(
                         // The list ui wont update on these two, since compose does not observe these.
                         // See CoinUI for more details
                         userPriceTarget = priceTarget?.userPriceTarget
-                        userPriceTargetDisplay = coinDomainToUIMapper.convertPriceToString(priceTarget?.userPriceTarget)
+                        userPriceTargetDisplay = priceDisplayUtils.convertPriceToString(priceTarget?.userPriceTarget)
 
                         // compose is observing this however.
                         hasPriceTarget.value = priceTarget != null // mutableState only update UI when changed.

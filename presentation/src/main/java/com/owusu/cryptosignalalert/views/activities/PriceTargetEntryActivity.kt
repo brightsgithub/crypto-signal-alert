@@ -87,7 +87,6 @@ class PriceTargetEntryActivity : ComponentActivity(), KoinComponent {
                 when (it) {
                     is PriceEntryScreenEvents.SavePriceTargetSuccess -> {
                         startActivity(PriceTargetsActivity.getIntent(this@PriceTargetEntryActivity))
-                        finish()
                     }
                     is PriceEntryScreenEvents.SavePriceTargetSuccess -> {
                         Toast.makeText(this@PriceTargetEntryActivity, "could not save", Toast.LENGTH_SHORT).show()
@@ -222,7 +221,6 @@ private fun PriceTargetEntryScreen(coinUI: CoinUI, onSaveClicked:(target: String
             }.fillMaxWidth(),
             onClick = {
                 context.startActivity(PriceTargetsActivity.getIntent(context))
-                activity.finish()
             }
         ) {
             Text("View Targets")

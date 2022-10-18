@@ -19,10 +19,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -132,13 +134,12 @@ private fun ShowPriceTargets(priceTargets: List<PriceTargetUI>) {
 private fun PriceTargetCard(priceTarget: PriceTargetUI,
                             onDeleteClicked:(target: PriceTargetUI) -> Unit) {
 
-    //val progress = rememberSaveable { mutableStateOf(priceTarget.progress) }
+    val showPopup = rememberSaveable { mutableStateOf(false) }
 
     Card(
         backgroundColor = colorResource(id = R.color.dark_coin_row),
         modifier = Modifier
-            .padding(vertical = 4.dp, horizontal = 8.dp)
-            .clickable { onDeleteClicked(priceTarget) },
+            .padding(vertical = 4.dp, horizontal = 8.dp),
         elevation = 10.dp
     ) {
         ConstraintLayout(modifier = Modifier
@@ -154,9 +155,12 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 targetPriceLabel,
                 coinName,
                 progressBar,
-                alertWhenLabel,
-                _24HrChangeLabel,
-                alertImage
+                deletePriceTarget,
+                alertImage,
+                upArrow,
+                downArrow,
+                targetPriceLabel2,
+                percentageProgressDisplay
             ) = createRefs()
 
             Text(text = priceTarget!!.marketCapRank.toString(),
@@ -182,12 +186,12 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                     start.linkTo(currentPriceLabel.end, margin = 16.dp)
                 }, fontWeight = FontWeight.Bold)
 
-            Text(text = "Price target:", modifier = Modifier.constrainAs(targetPriceLabel) {
+            Text(text = "Price target", modifier = Modifier.constrainAs(targetPriceLabel) {
                 start.linkTo(coinImage.start)
                 top.linkTo(coinImage.bottom, margin = 16.dp)
             })
 
-            Text(text = "Current price:", modifier = Modifier.constrainAs(currentPriceLabel) {
+            Text(text = "Current price", modifier = Modifier.constrainAs(currentPriceLabel) {
                 start.linkTo(targetPriceLabel.start)
                 top.linkTo(targetPriceLabel.bottom)
             }, fontSize = 14.sp)
@@ -202,39 +206,114 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 top.linkTo(currentPriceLabel.top)
             }, fontSize = 14.sp)
 
-            Text(text = "Alert when Current Price is "+priceTarget.priceTargetDirection.name+" Price Target",
-                modifier = Modifier
-                    .constrainAs(alertWhenLabel) {
-                start.linkTo(currentPriceLabel.start)
-                top.linkTo(currentPriceLabel.bottom, margin = 16.dp)
-            }, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            if (priceTarget.priceTargetDirection.name == PriceTargetDirectionUI.BELOW.name) {
 
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .width(300.dp)
-                    .padding(top = 16.dp, bottom = 16.dp)
-                    .constrainAs(progressBar) {
-                        start.linkTo(alertWhenLabel.start)
-                        top.linkTo(alertWhenLabel.bottom)
-                        //end.linkTo(alertImage.start)
-                    },
-                backgroundColor = Color.White,
-                progress = priceTarget.progress,
-                color = getProgressColor(priceTarget)
-            )
+
+                Text(text = priceTarget.progressPercentageDisplay!!,
+                    modifier = Modifier.constrainAs(percentageProgressDisplay) {
+                        top.linkTo(progressBar.top)
+                        start.linkTo(currentPriceLabel.start)
+                    },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
+
+
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .rotate(180f)
+                        .width(250.dp)
+                        .height(12.dp)
+                        //.padding(bottom = 16.dp)
+                        .constrainAs(progressBar) {
+                            start.linkTo(percentageProgressDisplay.end, margin = 4.dp)
+                            top.linkTo(currentPriceLabel.bottom, margin = 16.dp)
+                            //end.linkTo(alertImage.start)
+                        },
+                    backgroundColor = Color.White,
+                    progress = priceTarget.progress,
+                    color = getProgressColor(priceTarget)
+                )
+
+                Image(
+                    painter = rememberImagePainter(R.drawable.ic_baseline_arrow_upward_24),
+                    contentDescription = stringResource(R.string.alert_icon),
+                    modifier = Modifier
+                        .size(25.dp)
+                        .constrainAs(upArrow) {
+                            start.linkTo(progressBar.start, margin = -12.5.dp)
+                            top.linkTo(progressBar.bottom)
+
+                        }
+                )
+
+                Text(text = "Target\n" + priceTarget.userPriceTargetDisplay, modifier = Modifier.constrainAs(targetPriceLabel2) {
+                    start.linkTo(progressBar.start)
+                    top.linkTo(upArrow.bottom)
+                },fontSize = 12.sp, textAlign = TextAlign.Center)
+
+            } else {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .width(250.dp)
+                        .height(12.dp)
+                        //.padding(top = 16.dp)
+                        .constrainAs(progressBar) {
+                            start.linkTo(currentPriceLabel.start)
+                            top.linkTo(currentPriceLabel.bottom, margin = 16.dp)
+                            //end.linkTo(alertImage.start)
+                        },
+                    backgroundColor = Color.White,
+                    progress = priceTarget.progress,
+                    color = getProgressColor(priceTarget),
+                )
+
+                Image(
+                    painter = rememberImagePainter(R.drawable.ic_baseline_arrow_upward_24),
+                    contentDescription = stringResource(R.string.alert_icon),
+                    modifier = Modifier
+                        .size(25.dp)
+                        .constrainAs(upArrow) {
+                            end.linkTo(progressBar.end, margin = -12.5.dp)
+                            top.linkTo(progressBar.bottom)
+
+                        }
+                )
+
+                Text(text = "Target\n" + priceTarget.userPriceTargetDisplay, modifier = Modifier.constrainAs(targetPriceLabel2) {
+                    top.linkTo(upArrow.bottom)
+                    centerHorizontallyTo(upArrow)
+                },fontSize = 12.sp, textAlign = TextAlign.Center)
+
+                Text(text = priceTarget.progressPercentageDisplay!!,
+                    modifier = Modifier.constrainAs(percentageProgressDisplay) {
+                    top.linkTo(progressBar.top)
+                    start.linkTo(progressBar.end, 4.dp)
+                },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
+            }
 
             Image(
-                painter = rememberImagePainter(if (priceTarget.hasUserBeenAlerted) R.drawable.ic_alart_set else R.drawable.ic_alert_not_set),
+                painter = rememberImagePainter(R.drawable.ic_baseline_delete_24),
                 contentDescription = stringResource(R.string.alert_icon),
                 modifier = Modifier
                     .size(25.dp)
-                    .constrainAs(alertImage){
+                    .constrainAs(deletePriceTarget) {
                         end.linkTo(parent.end)
-                        top.linkTo(progressBar.top)
+                        top.linkTo(coinName.top, margin = 4.dp)
+                    }
+                    .clickable {
+                        onDeleteClicked(priceTarget)
                     }
             )
         }
     }
+}
+
+
+
+@Composable
+fun SimpleAlertDialog() {
+    AlertDialog(
+        confirmButton = { },
+        onDismissRequest = { },
+    )
 }
 
 @Composable

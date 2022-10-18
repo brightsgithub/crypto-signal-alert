@@ -54,6 +54,7 @@ val uiModule = module() {
         AlertListViewModel(
             priceTargetsMapper = get(named(PriceTargetUIMapper::class.java.name)),
             getPriceTargetsUseCase = get(),
+            deletePriceTargetsUseCase = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN)),
             workerTag = Constants.SYNC_PRICES_WORKER_TAG,

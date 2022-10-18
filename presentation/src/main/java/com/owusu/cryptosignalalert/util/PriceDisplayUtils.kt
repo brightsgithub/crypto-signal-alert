@@ -10,6 +10,12 @@ class PriceDisplayUtils(private val priceUtils: PriceUtils) {
         return a.setScale(decimalPlaces, BigDecimal.ROUND_HALF_EVEN).toDouble()
     }
 
+    fun convertToDecimalPlace(price: Float?, decimalPlaces: Int): Float? {
+        if (price == null) return price
+        val a = BigDecimal(price.toDouble())
+        return a.setScale(decimalPlaces, BigDecimal.ROUND_HALF_EVEN).toFloat()
+    }
+
     fun convertPriceToString(price: Double?): String? {
         if (price == null) return ""
         return PriceUtils.numberFormatter("USD", price.toString())

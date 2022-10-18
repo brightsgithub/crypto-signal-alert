@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.usecase.DeletePriceTargetsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
@@ -22,6 +23,7 @@ import kotlinx.coroutines.withContext
 class AlertListViewModel(
     private val priceTargetsMapper: UIMapper<PriceTargetDomain, PriceTargetUI>,
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
+    private val deletePriceTargetsUseCase: DeletePriceTargetsUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher,
     private val workerTag: String,
@@ -49,7 +51,11 @@ class AlertListViewModel(
     }
 
     fun deletePriceTarget(priceTargetUI: PriceTargetUI) {
-
+        viewModelScope.launch(dispatcherBackground) {
+            val targets = priceTargetsMapper.mapUIListToDomainList(listOf(priceTargetUI))
+            deletePriceTargetsUseCase.invoke(DeletePriceTargetsUseCase.Params(targets))
+            loadAlertList()
+        }
     }
 
     private fun showLoadingState() {

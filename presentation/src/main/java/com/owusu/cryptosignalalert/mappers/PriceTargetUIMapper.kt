@@ -46,7 +46,8 @@ class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMa
                         hasPriceTargetBeenHit = hasPriceTargetBeenHit,
                         hasUserBeenAlerted = hasUserBeenAlerted,
                         priceTargetDirection = mapPriceDirectionToUI(priceTargetDirection),
-                        progress = calculateProgress(currentPrice, userPriceTarget, priceTargetDirection)
+                        progress = calculateProgress(currentPrice, userPriceTarget, priceTargetDirection),
+                        progressPercentageDisplay = getProgressPercentageDisplay(currentPrice, userPriceTarget, priceTargetDirection)
                     )
                 )
             }
@@ -143,6 +144,27 @@ class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMa
             PriceTargetDirection.NOT_SET -> 0f
         }
 
+    }
+
+    private fun getProgressPercentageDisplay(currentPrice: Double?, userPriceTarget: Double?,
+                                             priceTargetDirDomain: PriceTargetDirection) : String {
+        if (currentPrice == null || userPriceTarget == null) return "0%"
+
+        if (currentPrice <=0 || userPriceTarget <=0) return "0%"
+
+        return when (priceTargetDirDomain) {
+            PriceTargetDirection.ABOVE -> {
+                val result = (currentPrice / userPriceTarget) * 100
+                if (result > 100) return "100%"
+                priceDisplayUtils.convertToDecimalPlace(result, 2).toString() +"%"
+            }
+            PriceTargetDirection.BELOW -> {
+                val result = (userPriceTarget / currentPrice) * 100
+                if (result > 100) return "100%"
+                priceDisplayUtils.convertToDecimalPlace(result, 2).toString() +"%"
+            }
+            PriceTargetDirection.NOT_SET -> "0%"
+        }
     }
 }
 

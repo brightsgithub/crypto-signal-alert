@@ -8,6 +8,7 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinsListUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsThatHaveNotBeenHitUseCase
 import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
+import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.CoinsListUiState
 import com.owusu.cryptosignalalert.util.PriceDisplayUtils
@@ -26,9 +27,13 @@ class CoinsListViewModel(
 
     private val _state = MutableStateFlow(CoinsListUiState()) // for emitting
     val viewState: Flow<CoinsListUiState> = _state // for clients to listen to
-    val coinsListFlow = fetchCoinsList()
+
     private var currentPage = -1
     private val entireLoadedCoinMap = mutableListOf<CoinUI>()
+
+    private val _isRefreshing = MutableStateFlow(false)
+
+    val coinsListFlow = fetchCoinsList()
 
     init {
         listenForPriceTargetsUpdates()
@@ -73,7 +78,6 @@ class CoinsListViewModel(
                     val priceTargetsList = getPriceTargetsThatHaveNotBeenHitUseCase().first()
                     priceTargetsList.associateByTo(priceTargetsMap) { it.id }
                 }
-
                 val coinUI = coinDomainToUIMapper.mapDomainToUI(coinDomain, priceTargetsMap)
                 entireLoadedCoinMap.add(coinUI)
                 coinUI

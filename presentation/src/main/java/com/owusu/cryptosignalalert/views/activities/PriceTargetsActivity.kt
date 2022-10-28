@@ -156,14 +156,14 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 coinName,
                 progressBar,
                 deletePriceTarget,
-                alertImage,
+                lastUpdated,
                 upArrow,
-                downArrow,
+                lastUpdatedLabel,
                 targetPriceLabel2,
                 percentageProgressDisplay
             ) = createRefs()
 
-            Text(text = priceTarget!!.marketCapRank.toString(),
+            Text(text = "",
                 modifier = Modifier.constrainAs(marketRank) {
                     top.linkTo(parent.top, margin = 4.dp)
                 }, fontSize = 12.sp)
@@ -196,6 +196,16 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 top.linkTo(targetPriceLabel.bottom)
             }, fontSize = 14.sp)
 
+            Text(text = "Last updated", modifier = Modifier.constrainAs(lastUpdatedLabel) {
+                start.linkTo(currentPriceLabel.start)
+                top.linkTo(currentPriceLabel.bottom)
+            }, fontSize = 14.sp)
+
+            Text(text = priceTarget.lastUpdated!!, modifier = Modifier.constrainAs(lastUpdated) {
+                start.linkTo(coinName.start)
+                top.linkTo(lastUpdatedLabel.top)
+            }, fontSize = 14.sp)
+
             Text(text = priceTarget.userPriceTargetDisplay!!, modifier = Modifier.constrainAs(targetPrice) {
                 start.linkTo(coinName.start)
                 top.linkTo(targetPriceLabel.top)
@@ -212,7 +222,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 Text(text = priceTarget.progressPercentageDisplay!!,
                     modifier = Modifier.constrainAs(percentageProgressDisplay) {
                         top.linkTo(progressBar.top)
-                        start.linkTo(currentPriceLabel.start)
+                        start.linkTo(lastUpdatedLabel.start)
                     },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
 
 
@@ -224,7 +234,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                         //.padding(bottom = 16.dp)
                         .constrainAs(progressBar) {
                             start.linkTo(percentageProgressDisplay.end, margin = 4.dp)
-                            top.linkTo(currentPriceLabel.bottom, margin = 16.dp)
+                            top.linkTo(lastUpdatedLabel.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
                     backgroundColor = Color.White,
@@ -245,7 +255,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 )
 
                 Text(text = "Target\n" + priceTarget.userPriceTargetDisplay, modifier = Modifier.constrainAs(targetPriceLabel2) {
-                    start.linkTo(progressBar.start)
+                    centerHorizontallyTo(upArrow)
                     top.linkTo(upArrow.bottom)
                 },fontSize = 12.sp, textAlign = TextAlign.Center)
 
@@ -256,8 +266,8 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                         .height(12.dp)
                         //.padding(top = 16.dp)
                         .constrainAs(progressBar) {
-                            start.linkTo(currentPriceLabel.start)
-                            top.linkTo(currentPriceLabel.bottom, margin = 16.dp)
+                            start.linkTo(lastUpdatedLabel.start)
+                            top.linkTo(lastUpdatedLabel.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
                     backgroundColor = Color.White,

@@ -2,9 +2,11 @@ package com.owusu.cryptosignalalert.mappers
 
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.models.CoinUI
+import java.util.*
 
-class CoinUIToPriceTargetDomainMapper {
+class CoinUIToPriceTargetDomainMapper(private val dateUtils: CryptoDateUtils) {
 
     fun mapUIToDomain(coinUI: CoinUI, newUserPriceTarget: String): PriceTargetDomain {
         coinUI.apply {
@@ -22,7 +24,7 @@ class CoinUIToPriceTargetDomainMapper {
                 high24h = high24h,
                 id = id,
                 image = image,
-                lastUpdated = lastUpdated,
+                lastUpdated = dateUtils.convertDateToFormattedStringWithTime(Calendar.getInstance().timeInMillis),
                 low24h = low24h,
                 marketCap = marketCap,
                 marketCapChange24h = marketCapChange24h,

@@ -46,6 +46,14 @@ class CoinsSource(
     }
 
     override fun getRefreshKey(state: PagingState<Int, CoinDomain>): Int? {
-        return state.anchorPosition
+        // For refresh used in swipe to refresh on this list, don't use the below
+        // since on the very first refresh without scrolling down, but just doing a swipe to refresh,
+        // it will return anchorPosition as a count of the number of visable items on screen.
+        // if the visible items are 5, then that would be used above in the load(), where
+        // params.key = 5, where it thinks its on page 5 and we get odd behaviour and multiple api
+        // calls are made. just set it to 1
+        //return state.anchorPosition
+
+        return 1
     }
 }

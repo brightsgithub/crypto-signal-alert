@@ -47,7 +47,7 @@ val uiModule = module() {
     }
 
     factory {
-        CoinUIToPriceTargetDomainMapper()
+        CoinUIToPriceTargetDomainMapper(dateUtils = get())
     }
 
     viewModel {

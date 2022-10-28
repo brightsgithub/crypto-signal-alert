@@ -46,8 +46,8 @@ class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMa
                         hasPriceTargetBeenHit = hasPriceTargetBeenHit,
                         hasUserBeenAlerted = hasUserBeenAlerted,
                         priceTargetDirection = mapPriceDirectionToUI(priceTargetDirection),
-                        progress = calculateProgress(currentPrice, userPriceTarget, priceTargetDirection),
-                        progressPercentageDisplay = getProgressPercentageDisplay(currentPrice, userPriceTarget, priceTargetDirection)
+                        progress = calculateProgress(this),
+                        progressPercentageDisplay = getProgressPercentageDisplay(this)
                     )
                 )
             }
@@ -123,14 +123,19 @@ class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMa
         TODO("Not yet implemented")
     }
 
-    private fun calculateProgress(currentPrice: Double?, userPriceTarget: Double?,
-                                  priceTargetDirDomain: PriceTargetDirection) : Float {
+    private fun calculateProgress(priceTargetDomain: PriceTargetDomain) : Float {
+
+        val currentPrice = priceTargetDomain.currentPrice
+        val userPriceTarget = priceTargetDomain.userPriceTarget
+        val priceTargetDir = priceTargetDomain.priceTargetDirection
 
         if (currentPrice == null || userPriceTarget == null) return 0f
 
         if (currentPrice <=0 || userPriceTarget <=0) return 0f
 
-        return when (priceTargetDirDomain) {
+        if (priceTargetDomain.hasPriceTargetBeenHit && priceTargetDomain.hasUserBeenAlerted) return 1f
+
+        return when (priceTargetDir) {
             PriceTargetDirection.ABOVE -> {
                 val result = (currentPrice / userPriceTarget) //* 100
                 if (result > 1) return 1f
@@ -146,13 +151,19 @@ class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMa
 
     }
 
-    private fun getProgressPercentageDisplay(currentPrice: Double?, userPriceTarget: Double?,
-                                             priceTargetDirDomain: PriceTargetDirection) : String {
+    private fun getProgressPercentageDisplay(priceTargetDomain: PriceTargetDomain) : String {
+
+        val currentPrice = priceTargetDomain.currentPrice
+        val userPriceTarget = priceTargetDomain.userPriceTarget
+        val priceTargetDir = priceTargetDomain.priceTargetDirection
+
         if (currentPrice == null || userPriceTarget == null) return "0%"
 
         if (currentPrice <=0 || userPriceTarget <=0) return "0%"
 
-        return when (priceTargetDirDomain) {
+        if (priceTargetDomain.hasPriceTargetBeenHit && priceTargetDomain.hasUserBeenAlerted) return "Completed"
+
+        return when (priceTargetDir) {
             PriceTargetDirection.ABOVE -> {
                 val result = (currentPrice / userPriceTarget) * 100
                 if (result > 100) return "100%"

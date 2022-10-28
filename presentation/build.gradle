@@ -5,8 +5,16 @@ plugins {
     id 'kotlin-parcelize'
 }
 
+/**
+ * GIT OVERWRITE MASTER
+ * git checkout seotweaks
+ * git merge -s ours master
+ * git checkout master
+ * git merge seotweaks
+ */
+
 android {
-    compileSdk 32
+    compileSdk 33
 
     //testBuildType "release"
 
@@ -119,4 +127,7 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
     implementation "androidx.paging:paging-compose:1.0.0-alpha15"
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+
+    // Swipe Refresh layout for Jetpack Compose
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.27.0"
 }

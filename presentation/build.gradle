@@ -7,10 +7,10 @@ plugins {
 
 /**
  * GIT OVERWRITE MASTER
- * git checkout seotweaks
+ * git checkout using_compose
  * git merge -s ours master
  * git checkout master
- * git merge seotweaks
+ * git merge using_compose
  */
 
 android {

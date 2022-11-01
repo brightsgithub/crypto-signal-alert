@@ -28,14 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:launchMode="singleInstance"
-            android:name=".views.activities.PriceTargetEntryActivity"
-            />
-        <activity
-            android:launchMode="singleInstance"
-            android:name=".views.activities.PriceTargetsActivity"
-            />
 
 <!--        <receiver android:name="com.owusu.cryptosignalalert.receivers.BootCompletedReceiver"-->
 <!--            android:enabled="true"-->

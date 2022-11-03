@@ -1,4 +1,4 @@
-package com.owusu.cryptosignalalert.views.activities
+package com.owusu.cryptosignalalert.views.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -39,19 +39,20 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
+import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 import org.koin.androidx.compose.getViewModel
 
 // https://developer.android.com/codelabs/jetpack-compose-state?continue=https%3A%2F%2Fdeveloper.android.com%2Fcourses%2Fpathways%2Fjetpack-compose-for-android-developers-1%23codelab-https%3A%2F%2Fdeveloper.android.com%2Fcodelabs%2Fjetpack-compose-state#9
 @Composable
-fun CoinsListScreen() {
+fun CoinsListScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
     Surface(color = MaterialTheme.colors.background) {
-        ShowCoinsList()
+        ShowCoinsList(sharedViewModel, navigateToPriceTargetEntryScreen)
     }
 }
 
 @Composable
-private fun ShowCoinsList() {
+private fun ShowCoinsList(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
     val viewModel = getViewModel<CoinsListViewModel>()
     val lazyPagingItems = viewModel.coinsListFlow.collectAsLazyPagingItems()
 
@@ -75,7 +76,7 @@ private fun ShowCoinsList() {
             modifier = Modifier.padding(vertical = 4.dp),
         ) {
             items(lazyPagingItems) { coin ->
-                CoinItem(coin)
+                CoinItem(coin, navigateToPriceTargetEntryScreen = navigateToPriceTargetEntryScreen)
             }
 
             lazyPagingItems.apply {
@@ -104,7 +105,7 @@ private fun ShowCoinsList() {
 }
 
 @Composable
-private fun CoinItem(coin: CoinUI?) {
+private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
 
     val context = LocalContext.current
     val expanded = rememberSaveable { mutableStateOf(false) }
@@ -167,7 +168,7 @@ private fun CoinItem(coin: CoinUI?) {
                         top.linkTo(coinName.top)
                     }
                     .clickable {
-                        context.startActivity(PriceTargetEntryActivity.getIntent(context, coin))
+                        navigateToPriceTargetEntryScreen(coin)
                     }
             )
 
@@ -239,26 +240,5 @@ private fun getPercentageColor(is24HrPriceChangePositive: Boolean) : Color {
         colorResource(R.color.percentage_gain_green)
     } else {
         colorResource(R.color.red)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    CryptoSignalAlertTheme {
-        CoinItem(
-            CoinUI(
-                id = "bitcoin",
-                name = "Bitcoin",
-                currentPriceStr = "19000.0",
-                marketCapStr = "20000000.0",
-                marketCapRank = 1,
-                image = "",
-                priceChangePercentage24hStr = "25.0",
-                marketCapChangePercentage24h = 10.0,
-                is24HrPriceChangePositive = true,
-                hasPriceTarget = mutableStateOf(false)
-            )
-        )
     }
 }

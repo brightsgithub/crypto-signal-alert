@@ -16,6 +16,7 @@ import com.owusu.cryptosignalalert.util.PriceUtils
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
+import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.workmanager.Constants
 import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
 import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter
@@ -80,6 +81,10 @@ val uiModule = module() {
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN))
         )
+    }
+
+    viewModel {
+        SharedViewModel()
     }
 
     single {

@@ -1,5 +1,8 @@
 package com.owusu.cryptosignalalert.views.screens
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,14 +10,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +25,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkInfo
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
@@ -30,15 +37,75 @@ import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
+import com.owusu.cryptosignalalert.workmanager.Constants
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
+
+
+private var workManagerJob: Job? = null
+
+fun observeWorkManagerStatus(activity: ComponentActivity, viewModel: AlertListViewModel) {
+    workManagerJob = activity.lifecycleScope.launch {
+        viewModel.workInfoLiveData.observe(activity) { workInfoList ->
+            Log.v("My_Sync_FragAlertList", "START")
+
+            if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.RUNNING)) {
+                Log.v("My_Sync_FragAlertList", "show spinner")
+            } else if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.ENQUEUED)) {
+                val workInfo =workInfoList.first()
+                Log.v("My_Sync_FragAlertList", "state" + workInfo.state.toString())
+                val myOutputData = workInfo.outputData.getString(Constants.KEY_PRICE_TARGET_UPDATED_STATUS)
+                //if (myOutputData == DISPLAY_LATEST_DATA) { // only seems to work with one time req. maybe for chained workers?
+                Log.v("My_Sync_FragAlertList", Constants.DISPLAY_LATEST_DATA)
+                // When a sync has occurred, refresh the screen
+                viewModel.loadAlertList()
+                // }
+            }
+            Log.v("My_Sync_FragAlertList", "END")
+        }
+    }
+}
+
+fun stopObservingWorkManagerStatus() {
+    workManagerJob?.cancel()
+}
 
 @Composable
 fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
     CryptoSignalAlertTheme {
+
         val viewModel = getViewModel<AlertListViewModel>()
+        val activity = LocalContext.current as Activity
+        val lifecycleOwner = LocalLifecycleOwner.current
+
+
         viewModel.viewState.collectAsState(initial = AlertListViewState()).value.let {
             Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
                 ShowPriceTargets(it.priceTargets)
+            }
+        }
+
+        // Only executed once, not on every recomposition
+        // https://www.youtube.com/watch?v=gxWcfz3V2QE&t=298s
+        DisposableEffect(key1 = true) {
+
+            val observer = LifecycleEventObserver {_, event ->
+                Log.v("The_current_life", event.toString())
+
+                if(event == Lifecycle.Event.ON_CREATE) {
+                    // only observe when in onCreate() has been called
+                    observeWorkManagerStatus(activity as ComponentActivity, viewModel)
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            // compose is done so the below is called
+            onDispose {
+                Log.v("The_current_life", "onDispose() called")
+                stopObservingWorkManagerStatus()
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
     }

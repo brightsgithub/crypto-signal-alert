@@ -28,7 +28,6 @@ import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import com.owusu.cryptosignalalert.views.activities.PriceTargetsActivity
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 import org.koin.androidx.compose.getViewModel
 
@@ -162,7 +161,7 @@ private fun ShowPriceTargetEntryScreen(coinUI: CoinUI, onSaveClicked:(target: St
                 }
                 .fillMaxWidth(),
             onClick = {
-                context.startActivity(PriceTargetsActivity.getIntent(context))
+                //context.startActivity(PriceTargetsActivity.getIntent(context))
             }
         ) {
             Text("View Targets")

@@ -32,7 +32,7 @@ import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-private fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel) {
+fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel) {
 
     CryptoSignalAlertTheme {
         val coinUI = sharedViewModel.selectedCoinUI

@@ -13,6 +13,7 @@ import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.views.screens.CoinsListScreen
 import com.owusu.cryptosignalalert.views.screens.PriceTargetEntryScreen
 import com.owusu.cryptosignalalert.views.screens.PriceTargetsScreen
+import com.owusu.cryptosignalalert.views.screens.PurchaseScreen
 import org.koin.androidx.compose.getViewModel
 
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
@@ -39,6 +40,12 @@ fun HomeNavGraph(navHostController: NavHostController) {
             PriceTargetsScreen(sharedViewModel)
         }
 
+        composable(NavigationItem.Purchase.route) {
+            PurchaseScreen()
+        }
+
+
+
         // nested graph
         targetsEntryGraph(navHostController, sharedViewModel)
     }
@@ -47,4 +54,5 @@ fun HomeNavGraph(navHostController: NavHostController) {
 sealed class NavigationItem(var route: String, var icon: Int, var title: String) {
     object Home : NavigationItem("home_screen", R.drawable.ic_baseline_home_24, "Home")
     object PriceTargets : NavigationItem("price_targets_screen", R.drawable.ic_baseline_notifications_active_24, "Targets")
+    object Purchase : NavigationItem("purchase_screen", R.drawable.ic_baseline_shop_24, "Shop")
 }

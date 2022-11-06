@@ -32,7 +32,7 @@ import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel) {
+fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel, navigateToTargetsList:() -> Unit) {
 
     CryptoSignalAlertTheme {
         val coinUI = sharedViewModel.selectedCoinUI
@@ -42,6 +42,7 @@ fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel) {
                 coinUI,
                 onSaveClicked = { userPriceTarget ->
                     viewModel.saveNewPriceTarget(coinUI, userPriceTarget)
+                    navigateToTargetsList()
                 }
             )
         }
@@ -151,20 +152,6 @@ private fun ShowPriceTargetEntryScreen(coinUI: CoinUI, onSaveClicked:(target: St
             }
         ) {
             Text("Save")
-        }
-
-        Button(
-            modifier = Modifier
-                .constrainAs(viewTargetsBtn) {
-                    top.linkTo(saveBtn.bottom, margin = 24.dp)
-                    centerHorizontallyTo(parent)
-                }
-                .fillMaxWidth(),
-            onClick = {
-                //context.startActivity(PriceTargetsActivity.getIntent(context))
-            }
-        ) {
-            Text("View Targets")
         }
     }
 }

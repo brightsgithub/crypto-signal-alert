@@ -1,11 +1,14 @@
 package com.owusu.cryptosignalalert.views.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -36,7 +39,20 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         bottomBar = { BottomNavigationBar(navController) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
-                HomeNavGraph(navHostController = navController)
+                if (1 > 0) {
+                    HomeNavGraph(navHostController = navController)
+                } else {
+                    Column() {
+                        Row(modifier = Modifier.weight(0.9f)) {
+                            HomeNavGraph(navHostController = navController)
+                        }
+                        Row(modifier = Modifier.weight(0.1f)) {
+                            Box() {
+                                Text(text = "Ads Banner", modifier = Modifier.align(Alignment.Center))
+                            }
+                        }
+                    }
+                }
             }
         },
         backgroundColor = colorResource(R.color.colorPrimary) // Set background color to avoid the white flashing when you switch between screens

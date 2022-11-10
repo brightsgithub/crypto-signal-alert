@@ -60,6 +60,7 @@ dependencies {
     var room_version = "2.4.3"
     def koinVersion = "2.0.1"
     def koinComposeVersion = "3.2.0"
+    def billing_version = "4.1.0"
     
     kapt "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
     implementation "androidx.room:room-common:$room_version"
@@ -104,4 +105,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
 
     implementation "androidx.paging:paging-compose:1.0.0-alpha15"
+
+    // Google billing
+    implementation "com.android.billingclient:billing-ktx:$billing_version"
 }

@@ -6,6 +6,13 @@ plugins {
 
 }
 
+def localProperties = new Properties()
+try {
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+} catch (Exception e) {
+    logger.warn("No Local Properties File Found!")
+}
+
 // ./gradlew data:connectedMockServerDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=com.owusu.cryptosignalalert.data
 
 android {
@@ -20,6 +27,7 @@ android {
         testInstrumentationRunner "com.owusu.cryptosignalalert.data.MyTestRunner"
         consumerProguardFiles "consumer-rules.pro"
         //multiDexEnabled true
+        buildConfigField("String", "BASE64_ENCODED_PUBLIC_KEY", "\"" + localProperties['base64EncodedPublicKey'] + "\"")
     }
 
     buildTypes {

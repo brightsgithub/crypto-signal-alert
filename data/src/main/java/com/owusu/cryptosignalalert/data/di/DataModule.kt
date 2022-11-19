@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.data.di
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import com.google.gson.GsonBuilder
@@ -19,9 +20,13 @@ import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 import com.owusu.cryptosignalalert.data.repository.PriceTargetsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.CoinsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.PriceInfoRepositoryImpl
+import com.owusu.cryptosignalalert.data.repository.billing.BillingDataSource
+import com.owusu.cryptosignalalert.data.repository.billing.GoogleBillingRepository
+import com.owusu.cryptosignalalert.data.repository.billing.GoogleBillingRepository.Companion.INAPP_SKUS
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.PriceWrapperDomain
+import com.owusu.cryptosignalalert.domain.repository.BillingRepository
 import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
 import com.owusu.cryptosignalalert.domain.repository.PriceInfoRepository
@@ -32,8 +37,10 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.observer.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.GlobalScope
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.lang.Exception
@@ -91,6 +98,28 @@ open class DataModuleWrapper(private val context: Context) {
 
         single<PriceTargetsDataSource> {
             PriceTargetsDataSourceImpl(get(), get(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)))
+        }
+
+        single<BillingRepository> {
+            GoogleBillingRepository(
+                billingDataSource = get(),
+                defaultScope = GlobalScope,
+                skuMapper = get()
+            )
+        }
+
+        single {
+            BillingDataSource.getInstance(
+                application = context as Application,
+                defaultScope = GlobalScope,
+                knownInappSKUs = INAPP_SKUS,
+                knownSubscriptionSKUs = null,
+                autoConsumeSKUs = null
+            )
+        }
+
+        factory {
+            SkuMapper()
         }
 
         single {

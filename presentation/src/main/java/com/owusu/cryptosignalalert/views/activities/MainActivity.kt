@@ -33,17 +33,26 @@ import com.owusu.cryptosignalalert.views.helpers.PriceTargetsHelper
 import com.owusu.cryptosignalalert.views.screens.CoinsListScreen
 import com.owusu.cryptosignalalert.views.screens.PriceTargetsScreen
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
+import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 // The Compose application is designed to be used in a single-activity architecture with no fragments.
 // https://stackoverflow.com/questions/68962458/how-are-android-activities-handled-with-jetpack-compose-and-compose-navigation
 class MainActivity : ComponentActivity(), KoinComponent {
 
+    //private val priceNotificationHelper: PriceNotificationHelper by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
+
+            val sharedViewModel = getViewModel<SharedViewModel>()
+            sharedViewModel.getSkuDetails()
+
             CryptoSignalAlertTheme {
                 RootNavigationGraph(navHostController = rememberNavController())
             }

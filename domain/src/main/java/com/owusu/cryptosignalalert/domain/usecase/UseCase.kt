@@ -12,6 +12,10 @@ interface SuspendedUseCase<in Params, out ReturnType> {
     suspend operator fun invoke(params: Params): ReturnType
 }
 
+interface SuspendedUseCaseNullable<in Params, out ReturnType> {
+    suspend operator fun invoke(params: Params? = null): ReturnType
+}
+
 interface SuspendedUseCaseUnit<out ReturnType> {
     suspend operator fun invoke(): ReturnType
 }

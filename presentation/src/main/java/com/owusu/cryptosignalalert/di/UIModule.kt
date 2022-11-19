@@ -84,7 +84,7 @@ val uiModule = module() {
     }
 
     viewModel {
-        SharedViewModel()
+        SharedViewModel(getSkuDetailsUseCase = get())
     }
 
     single {

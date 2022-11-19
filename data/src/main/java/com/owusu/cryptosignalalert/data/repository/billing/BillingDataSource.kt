@@ -39,18 +39,9 @@ import com.android.billingclient.api.acknowledgePurchase
 import com.android.billingclient.api.consumePurchase
 import com.android.billingclient.api.queryPurchasesAsync
 import com.android.billingclient.api.querySkuDetails
+import com.owusu.cryptosignalalert.domain.models.states.BillingReadyState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.LinkedList
 import kotlin.math.min
@@ -131,6 +122,9 @@ class BillingDataSource private constructor(
     private val newPurchaseFlow = MutableSharedFlow<List<String>>(extraBufferCapacity = 1)
     private val purchaseConsumedFlow = MutableSharedFlow<List<String>>()
     private val billingFlowInProcess = MutableStateFlow(false)
+
+    private val _billingReadyStateFlow = MutableStateFlow<BillingReadyState>(BillingReadyState.NotReady)
+    private val billingReadyStateFlow: Flow<BillingReadyState> = _billingReadyStateFlow
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
         val responseCode = billingResult.responseCode
@@ -288,6 +282,9 @@ class BillingDataSource private constructor(
             BillingClient.BillingResponseCode.OK -> {
                 Log.i(TAG, "onSkuDetailsResponse: $responseCode $debugMessage")
                 if (skuDetailsList == null || skuDetailsList.isEmpty()) {
+
+                    publishNoSkusExist()
+
                     Log.e(
                             TAG,
                             "onSkuDetailsResponse: " +
@@ -302,6 +299,9 @@ class BillingDataSource private constructor(
                         detailsMutableFlow?.tryEmit(skuDetails)
                                 ?: Log.e(TAG, "Unknown sku: $sku")
                     }
+
+                    publishBillingReady()
+
                 }
             }
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
@@ -324,6 +324,20 @@ class BillingDataSource private constructor(
         } else {
             skuDetailsResponseTime = -SKU_DETAILS_REQUERY_TIME
         }
+    }
+
+    fun observeBillingReadyStateFlow() = billingReadyStateFlow
+
+    private fun publishNoSkusExist() {
+        _billingReadyStateFlow.value = BillingReadyState.NoSkusExist
+    }
+
+    private fun publishBillingReady() {
+        _billingReadyStateFlow.value = BillingReadyState.Ready
+    }
+
+    private fun publishBillingNotReady() {
+        _billingReadyStateFlow.value = BillingReadyState.NotReady
     }
 
     /**

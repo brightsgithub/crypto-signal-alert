@@ -49,4 +49,8 @@ val domainModule = module() {
     single {
         SyncForPriceTargetsUseCase(get(), get(), get(), get(), get())
     }
+
+    factory {
+        GetSkuDetailsUseCase(billingRepository = get())
+    }
 }

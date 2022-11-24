@@ -5,6 +5,8 @@ import android.util.Log
 import com.android.billingclient.api.SkuDetails
 import com.owusu.cryptosignalalert.data.mappers.DataMapper
 import com.owusu.cryptosignalalert.data.mappers.SkuMapper
+import com.owusu.cryptosignalalert.data.models.skus.Skus
+import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
 import com.owusu.cryptosignalalert.domain.models.states.BillingReadyState
@@ -31,7 +33,9 @@ class GoogleBillingRepository(
         // Since both are tied to application lifecycle, we can launch this scope to collect
         // consumed purchases from the billing data source while the app process is alive.
         defaultScope.launch {
-            billingDataSource.getConsumedPurchases().collect { }
+            billingDataSource.getConsumedPurchases().collect {
+                Log.d(TAG, "getConsumedPurchases() -> " +it)
+            }
         }
     }
 
@@ -56,10 +60,11 @@ class GoogleBillingRepository(
             skDetailsDomainList.add(
                 billingDataSource.getSkuDetails(sku)
                     .zip(isPurchased(sku)) { skuDetails, isPurchased->
-                        skuMapper.transform(skuDetails!!, isPurchased)
+                        skuMapper.transform(skuDetails!!, isPurchased, Skus)
                     }.first())
         }
 
+        skDetailsDomainList.sortBy { it.pos }
         return skDetailsDomainList
     }
 
@@ -111,10 +116,5 @@ class GoogleBillingRepository(
 
     companion object {
         val TAG = "BillingRepository"
-
-        private val SKU_UNLOCK_ALL = "com.owusu.cryptosignalalert.unlock_all"
-        private val SKU_UNLIMITED_ALERTS = "com.owusu.cryptosignalalert.unlimted_alerts"
-        private val SKU_REMOVE_ADS = "com.owusu.cryptosignalalert.remove_ads"
-        val INAPP_SKUS = arrayOf(SKU_UNLOCK_ALL, SKU_UNLIMITED_ALERTS, SKU_REMOVE_ADS)
     }
 }

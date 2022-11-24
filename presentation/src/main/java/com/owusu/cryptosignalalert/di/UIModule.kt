@@ -6,17 +6,11 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.usecase.SaveNewPriceTargetsUseCase
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
-import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
-import com.owusu.cryptosignalalert.mappers.CoinUIToPriceTargetDomainMapper
-import com.owusu.cryptosignalalert.mappers.PriceTargetUIMapper
-import com.owusu.cryptosignalalert.mappers.UIMapper
+import com.owusu.cryptosignalalert.mappers.*
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.util.PriceDisplayUtils
 import com.owusu.cryptosignalalert.util.PriceUtils
-import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
-import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
-import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
-import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.*
 import com.owusu.cryptosignalalert.workmanager.Constants
 import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
 import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter
@@ -51,6 +45,8 @@ val uiModule = module() {
         CoinUIToPriceTargetDomainMapper(dateUtils = get())
     }
 
+    factory { SkuDetailsDomainToUIMapper() }
+
     viewModel {
         AlertListViewModel(
             priceTargetsMapper = get(named(PriceTargetUIMapper::class.java.name)),
@@ -84,7 +80,11 @@ val uiModule = module() {
     }
 
     viewModel {
-        SharedViewModel(getSkuDetailsUseCase = get())
+        SharedViewModel()
+    }
+
+    viewModel {
+        PurchaseViewModel(getSkuDetailsUseCase = get(), skuDetailsDomainToUIMapper = get())
     }
 
     single {

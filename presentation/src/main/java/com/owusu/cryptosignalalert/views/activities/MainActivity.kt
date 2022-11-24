@@ -50,9 +50,6 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
         setContent {
 
-            val sharedViewModel = getViewModel<SharedViewModel>()
-            sharedViewModel.getSkuDetails()
-
             CryptoSignalAlertTheme {
                 RootNavigationGraph(navHostController = rememberNavController())
             }

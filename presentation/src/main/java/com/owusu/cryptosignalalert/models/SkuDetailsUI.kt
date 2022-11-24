@@ -1,7 +1,6 @@
-package com.owusu.cryptosignalalert.domain.models
+package com.owusu.cryptosignalalert.models
 
-data class SkuDetailsDomain(
-    val pos: Int,
+data class SkuDetailsUI(
     val sku: String,
     val title: String,
     val subTitle: String,

@@ -17,12 +17,12 @@ import com.owusu.cryptosignalalert.data.mappers.*
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
 import com.owusu.cryptosignalalert.data.models.api.PriceAPIWrapper
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
+import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS
 import com.owusu.cryptosignalalert.data.repository.PriceTargetsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.CoinsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.PriceInfoRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.billing.BillingDataSource
 import com.owusu.cryptosignalalert.data.repository.billing.GoogleBillingRepository
-import com.owusu.cryptosignalalert.data.repository.billing.GoogleBillingRepository.Companion.INAPP_SKUS
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.PriceWrapperDomain

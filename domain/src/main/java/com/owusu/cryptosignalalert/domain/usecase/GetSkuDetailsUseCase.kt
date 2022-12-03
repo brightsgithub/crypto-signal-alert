@@ -20,7 +20,7 @@ class GetSkuDetailsUseCase(
             billingRepository.observeBillingReadyStateFlow().collect { billingReadyState ->
                 delay(5000)
                 when(billingReadyState) {
-                    is BillingReadyState.NoSkusExist ->  state.emit(SkuDetailsState.Ready)
+                    is BillingReadyState.NoSkusExist -> state.emit(SkuDetailsState.NoSkusExist)
                     is BillingReadyState.NotReady -> state.emit(SkuDetailsState.NotReady)
                     is BillingReadyState.Ready -> {
                         val result = billingRepository.getSkuDetails()

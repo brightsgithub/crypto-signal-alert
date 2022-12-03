@@ -99,7 +99,6 @@ fun BottomNavigationBar(navController: NavHostController) {
                 icon = { Icon(painterResource(id = screen.icon), contentDescription = screen.title) },
                 label = { Text(text = screen.title) },
                 selectedContentColor = Color.White,
-                unselectedContentColor = Color.White.copy(0.4f),
                 alwaysShowLabel = true,
                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = {

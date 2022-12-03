@@ -1,16 +1,20 @@
 package com.owusu.cryptosignalalert.views.screens
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,14 +24,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
-import com.owusu.cryptosignalalert.models.PriceTargetUI
+import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.models.PurchaseViewState
 import com.owusu.cryptosignalalert.models.SkuDetailsUI
 import com.owusu.cryptosignalalert.viewmodels.PurchaseViewModel
-import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.views.screens.widgets.LoadingWidget
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
-import kotlinx.coroutines.NonDisposableHandle
-import kotlinx.coroutines.NonDisposableHandle.parent
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -36,16 +38,31 @@ fun PurchaseScreen() {
 
         val purchaseViewModel = getViewModel<PurchaseViewModel>()
         purchaseViewModel.loadSkuDetails()
-
         purchaseViewModel.viewState.collectAsState(initial = PurchaseViewState()).value.let {
             Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
                 ShowPriceList(it.skuDetailsList)
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(text = "Purchase", modifier = Modifier.align(Alignment.Center))
-        }
+        LoadingWidget2(boxModifier = Modifier.fillMaxSize())
+    }
+}
+
+@Composable
+fun LoadingWidget2(boxModifier: Modifier? = null){
+    val purchaseViewModel = getViewModel<PurchaseViewModel>()
+
+    val modifier = boxModifier ?: Modifier
+        .fillMaxWidth()
+
+    val alpha = if (purchaseViewModel.loadingState.collectAsState(initial = false).value) 1.0f else 0.0f
+
+    Box(modifier = modifier.padding(16.dp).alpha(alpha)) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .padding(12.dp)
+                .align(Alignment.Center)
+        )
     }
 }
 
@@ -53,12 +70,12 @@ fun PurchaseScreen() {
 fun ShowPriceList(skuDetailsList: List<SkuDetailsUI>) {
 
     val purchaseViewModel = getViewModel<PurchaseViewModel>()
-
+    val screenProxy = LocalContext.current as ScreenProxy
 
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(items = skuDetailsList) { skuDetails ->
             PurchaseItem(skuDetails, onBuyClicked = { sku ->
-                purchaseViewModel.buyProduct(sku)
+                purchaseViewModel.buyProduct(screenProxy, sku.sku)
             })
         }
     }
@@ -118,13 +135,15 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
             })
 
             Button(
-                onClick = { /*TODO*/ },
-                Modifier.constrainAs(buyBtn) {
-                    start.linkTo(description.start)
-                    top.linkTo(description.bottom, margin = 24.dp)
-                    bottom.linkTo(parent.bottom, margin = 24.dp)
-                    end.linkTo(parent.end)
-                }.fillMaxWidth()
+                onClick = { onBuyClicked(skuDetails) },
+                Modifier
+                    .constrainAs(buyBtn) {
+                        start.linkTo(description.start)
+                        top.linkTo(description.bottom, margin = 24.dp)
+                        bottom.linkTo(parent.bottom, margin = 24.dp)
+                        end.linkTo(parent.end)
+                    }
+                    .fillMaxWidth()
 
             ) {
                 Text(text = "Buy "+skuDetails.price, fontWeight = FontWeight.Bold)

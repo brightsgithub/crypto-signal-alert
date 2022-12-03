@@ -7,6 +7,9 @@ import com.owusu.cryptosignalalert.data.mappers.DataMapper
 import com.owusu.cryptosignalalert.data.mappers.SkuMapper
 import com.owusu.cryptosignalalert.data.models.skus.Skus
 import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS
+import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_REMOVE_ADS
+import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_UNLIMITED_ALERTS
+import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_UNLOCK_ALL
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
 import com.owusu.cryptosignalalert.domain.models.states.BillingReadyState
@@ -101,9 +104,9 @@ class GoogleBillingRepository(
                     // TODO: Handle multi-line purchases better
                     for ( sku in skuList ) {
                         when (sku) {
-//                            SKU_UNLOCK_ALL -> newPurchase.emit(R.string.message_more_gas_acquired)
-//                            SKU_UNLIMITED_ALERTS -> gameMessages.emit(R.string.message_premium)
-//                            SKU_REMOVE_ADS -> gameMessages.emit(R.string.message_premium)
+                            SKU_UNLOCK_ALL -> Log.d(TAG, "SKU_UNLOCK_ALL Purchased")
+                            SKU_UNLIMITED_ALERTS -> Log.d(TAG, "SKU_UNLIMITED_ALERTS Purchased")
+                            SKU_REMOVE_ADS -> Log.d(TAG, "SKU_REMOVE_ADS Purchased")
                         }
                     }
                 }

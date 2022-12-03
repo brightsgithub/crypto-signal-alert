@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.navigation.NavigationItem
 import com.owusu.cryptosignalalert.navigation.RootNavigationGraph
 import com.owusu.cryptosignalalert.navigation.Routes
@@ -41,7 +42,7 @@ import org.koin.core.component.inject
 
 // The Compose application is designed to be used in a single-activity architecture with no fragments.
 // https://stackoverflow.com/questions/68962458/how-are-android-activities-handled-with-jetpack-compose-and-compose-navigation
-class MainActivity : ComponentActivity(), KoinComponent {
+class MainActivity : ComponentActivity(), KoinComponent, ScreenProxy {
 
     //private val priceNotificationHelper: PriceNotificationHelper by inject()
 

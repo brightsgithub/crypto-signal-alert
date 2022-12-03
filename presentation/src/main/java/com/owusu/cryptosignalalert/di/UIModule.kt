@@ -84,7 +84,11 @@ val uiModule = module() {
     }
 
     viewModel {
-        PurchaseViewModel(getSkuDetailsUseCase = get(), skuDetailsDomainToUIMapper = get())
+        PurchaseViewModel(
+            getSkuDetailsUseCase = get(),
+            buySkyUseCase = get(),
+            skuDetailsDomainToUIMapper = get()
+        )
     }
 
     single {

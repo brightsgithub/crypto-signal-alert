@@ -2,6 +2,8 @@ package com.owusu.cryptosignalalert.views.screens
 
 import android.app.Activity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -25,6 +28,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
+import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
+import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.models.PurchaseViewState
 import com.owusu.cryptosignalalert.models.SkuDetailsUI
 import com.owusu.cryptosignalalert.viewmodels.PurchaseViewModel
@@ -57,7 +62,9 @@ fun LoadingWidget2(boxModifier: Modifier? = null){
 
     val alpha = if (purchaseViewModel.loadingState.collectAsState(initial = false).value) 1.0f else 0.0f
 
-    Box(modifier = modifier.padding(16.dp).alpha(alpha)) {
+    Box(modifier = modifier
+        .padding(16.dp)
+        .alpha(alpha)) {
         CircularProgressIndicator(
             modifier = Modifier
                 .padding(12.dp)
@@ -143,14 +150,28 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
                         bottom.linkTo(parent.bottom, margin = 24.dp)
                         end.linkTo(parent.end)
                     }
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                    //.background(getProgressColor(skuDetailsUI = skuDetails)),
+                enabled = !skuDetails.isPurchased
 
             ) {
-                Text(text = "Buy "+skuDetails.price, fontWeight = FontWeight.Bold)
+                if (!skuDetails.isPurchased) {
+                    Text(text = "Buy "+skuDetails.price, fontWeight = FontWeight.Bold)
+                } else {
+                    Text(text = "Purchased", fontWeight = FontWeight.Bold)
+                }
+
             }
         }
+    }
+}
 
-
+@Composable
+private fun getProgressColor(skuDetailsUI: SkuDetailsUI) : Color {
+    return if (skuDetailsUI.isPurchased) {
+        colorResource(R.color.percentage_gain_green)
+    } else {
+        colorResource(R.color.white)
     }
 }
 

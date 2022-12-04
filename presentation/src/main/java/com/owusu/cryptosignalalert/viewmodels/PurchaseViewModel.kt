@@ -11,14 +11,18 @@ import com.owusu.cryptosignalalert.domain.usecase.GetSkuDetailsUseCase
 import com.owusu.cryptosignalalert.mappers.SkuDetailsDomainToUIMapper
 import com.owusu.cryptosignalalert.models.PurchaseViewState
 import com.owusu.cryptosignalalert.models.SkuDetailsUI
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PurchaseViewModel(
     private val getSkuDetailsUseCase: GetSkuDetailsUseCase,
     private val buySkyUseCase: BuySkyUseCase,
-    private val skuDetailsDomainToUIMapper: SkuDetailsDomainToUIMapper
+    private val skuDetailsDomainToUIMapper: SkuDetailsDomainToUIMapper,
+    private val dispatcherBackground: CoroutineDispatcher,
+    private val dispatcherMain: CoroutineDispatcher
 ): ViewModel() {
 
     init {
@@ -32,7 +36,7 @@ class PurchaseViewModel(
     val loadingState: Flow<Boolean> = _loadingState // for clients to listen to
 
     fun loadSkuDetails() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherBackground) {
             getSkuDetailsUseCase.invoke(this).collect {
                 when(it) {
                     is SkuDetailsState.NotReady -> handleNotReadyYet()
@@ -43,20 +47,26 @@ class PurchaseViewModel(
         }
     }
 
-    private fun noSkusExist() {
-        Log.v("PurchaseViewModel", "handleReady()")
-        hideLoading()
+    private suspend fun noSkusExist() {
+        withContext(dispatcherMain) {
+            Log.v("PurchaseViewModel", "handleReady()")
+            hideLoading()
+        }
     }
 
-    private fun handleNotReadyYet() {
-        Log.v("PurchaseViewModel", "handleNotReadyYet()")
-        showLoading()
+    private suspend fun handleNotReadyYet() {
+        withContext(dispatcherMain) {
+            Log.v("PurchaseViewModel", "handleNotReadyYet()")
+            showLoading()
+        }
     }
 
-    private fun handleSkusList(skuList: List<SkuDetailsDomain>) {
-        hideLoading()
-        val skuUIList = skuDetailsDomainToUIMapper.mapToUI(skuList)
-        _state.value = _state.value.copy(skuDetailsList = skuUIList)
+    private suspend fun handleSkusList(skuList: List<SkuDetailsDomain>) {
+        withContext(dispatcherMain) {
+            hideLoading()
+            val skuUIList = skuDetailsDomainToUIMapper.mapToUI(skuList)
+            _state.value = _state.value.copy(skuDetailsList = skuUIList)
+        }
     }
 
     fun buyProduct(screenProxy: ScreenProxy, sku: String) {

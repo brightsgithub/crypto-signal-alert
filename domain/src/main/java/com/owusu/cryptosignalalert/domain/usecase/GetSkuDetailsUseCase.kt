@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
+import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
 import com.owusu.cryptosignalalert.domain.models.states.BillingReadyState
 import com.owusu.cryptosignalalert.domain.models.states.SkuDetailsState
 import com.owusu.cryptosignalalert.domain.repository.BillingRepository
@@ -18,18 +19,37 @@ class GetSkuDetailsUseCase(
     override fun invoke(scope: CoroutineScope): Flow<SkuDetailsState> {
         scope.launch {
             billingRepository.observeBillingReadyStateFlow().collect { billingReadyState ->
-                delay(5000)
                 when(billingReadyState) {
                     is BillingReadyState.NoSkusExist -> state.emit(SkuDetailsState.NoSkusExist)
                     is BillingReadyState.NotReady -> state.emit(SkuDetailsState.NotReady)
                     is BillingReadyState.Ready -> {
-                        val result = billingRepository.getSkuDetails()
-                        state.emit(SkuDetailsState.Success(result))
+                        val skuList = billingRepository.getSkuDetails()
+                        processAnyBundlePurchases(skuList)
+                        state.emit(SkuDetailsState.Success(skuList))
                     }
                 }
             }
         }
         return state
+    }
+
+    private fun processAnyBundlePurchases(skuList: List<SkuDetailsDomain>) {
+        val skuBundleBuyAll = skuList.find { it.isBundleBuyAll }
+            skuBundleBuyAll?.let {
+                if (it.isPurchased) {
+                    // make everything else true.
+                    skuList.forEach { it.isPurchased = true }
+                } else {
+                    // When all purchased skus are purchased, make the bundle purchased.
+                    val nonBundleSkuList = skuList.filter { sku -> !sku.isBundleBuyAll }
+                    val sizeOfNonPurchasedSkus = nonBundleSkuList.size
+                    val sizeOfPurchasedSkus = nonBundleSkuList.filter { nonBundleSku -> nonBundleSku.isPurchased }.size
+                    val hasAllNonBundleSkusBenPurchased = sizeOfNonPurchasedSkus == sizeOfPurchasedSkus
+                    if (hasAllNonBundleSkusBenPurchased) {
+                        skuBundleBuyAll.isPurchased = true
+                    }
+                }
+        }
     }
 }
 

@@ -7,5 +7,6 @@ data class SkuDetailsDomain(
     val subTitle: String,
     val description: String,
     val price: String,
-    val isPurchased: Boolean = false
+    var isPurchased: Boolean = false,
+    val isBundleBuyAll: Boolean
 )

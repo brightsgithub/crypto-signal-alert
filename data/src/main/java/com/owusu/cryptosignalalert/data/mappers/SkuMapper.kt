@@ -8,12 +8,12 @@ class SkuMapper {
     fun transform(skuDetails: SkuDetails, isPurchased: Boolean, skus: Skus): SkuDetailsDomain {
         skuDetails.let {
             it.apply {
-                return createSkuDetailsDomain(skuDetails, skus)
+                return createSkuDetailsDomain(skuDetails, skus, isPurchased)
             }
         }
     }
 
-    private fun createSkuDetailsDomain(skuDetails: SkuDetails, skus: Skus): SkuDetailsDomain {
+    private fun createSkuDetailsDomain(skuDetails: SkuDetails, skus: Skus, isPurchased: Boolean): SkuDetailsDomain {
         return when (skuDetails.sku) {
             skus.SKU_UNLIMITED_ALERTS -> {
                 SkuDetailsDomain(
@@ -23,7 +23,8 @@ class SkuMapper {
                     subTitle = "Unlimited alerts",
                     description = skuDetails.description,
                     price = skuDetails.price,
-                    isPurchased = false
+                    isPurchased = isPurchased,
+                    isBundleBuyAll = false
                 )
             }
             skus.SKU_REMOVE_ADS -> {
@@ -34,7 +35,8 @@ class SkuMapper {
                     subTitle = "Remove those annoying ads",
                     description = skuDetails.description,
                     price = skuDetails.price,
-                    isPurchased = false
+                    isPurchased = isPurchased,
+                    isBundleBuyAll = false
                 )
             }
             else -> {
@@ -45,7 +47,8 @@ class SkuMapper {
                     subTitle = "Purchase all discount",
                     description = skuDetails.description,
                     price = skuDetails.price,
-                    isPurchased = false
+                    isPurchased = isPurchased,
+                    isBundleBuyAll = true
                 )
             }
         }

@@ -1,15 +1,31 @@
 package com.owusu.cryptosignalalert.data.mappers
 
 import com.android.billingclient.api.SkuDetails
+import com.owusu.cryptosignalalert.data.models.SkuWrapper
 import com.owusu.cryptosignalalert.data.models.skus.Skus
 import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
+import com.owusu.cryptosignalalert.domain.models.states.NewPurchasesState
 
 class SkuMapper {
-    fun transform(skuDetails: SkuDetails, isPurchased: Boolean, skus: Skus): SkuDetailsDomain {
+    fun transform(skuWrapper: SkuWrapper, isPurchased: Boolean, skus: Skus): SkuDetailsDomain {
+        val skuDetails = skuWrapper.skuDetails
+
+        val currentPurchasedState = getCurrentPurchasedState(skuWrapper, isPurchased)
         skuDetails.let {
             it.apply {
-                return createSkuDetailsDomain(skuDetails, skus, isPurchased)
+                return createSkuDetailsDomain(skuDetails, skus, currentPurchasedState)
             }
+        }
+    }
+
+    private fun getCurrentPurchasedState(skuWrapper: SkuWrapper, isPurchased: Boolean): Boolean {
+        val newPurchasedSku = skuWrapper.newPurchasedSku
+        return if (newPurchasedSku == null) {
+            isPurchased
+        } else if (newPurchasedSku!!.equals(skuWrapper.skuDetails.sku)) {
+            true // it means there has just been a purchase
+        } else  {
+            return isPurchased
         }
     }
 

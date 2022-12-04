@@ -5,6 +5,7 @@ import android.util.Log
 import com.android.billingclient.api.SkuDetails
 import com.owusu.cryptosignalalert.data.mappers.DataMapper
 import com.owusu.cryptosignalalert.data.mappers.SkuMapper
+import com.owusu.cryptosignalalert.data.models.SkuWrapper
 import com.owusu.cryptosignalalert.data.models.skus.Skus
 import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS
 import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_REMOVE_ADS
@@ -13,8 +14,10 @@ import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_UNLOCK_ALL
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
 import com.owusu.cryptosignalalert.domain.models.states.BillingReadyState
+import com.owusu.cryptosignalalert.domain.models.states.NewPurchasesState
 import com.owusu.cryptosignalalert.domain.repository.BillingRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -24,8 +27,8 @@ class GoogleBillingRepository(
     private val skuMapper: SkuMapper
 ): BillingRepository {
 
-    private val _skuDetailsFlow = MutableStateFlow<SkuDetailsDomain?>(null)
-    private val skuDetailsFlow: Flow<SkuDetailsDomain?> = _skuDetailsFlow
+    private val _newPurchasesFlow = MutableStateFlow<String?>(null)
+    private val newPurchasesFlow: Flow<String?> = _newPurchasesFlow
 
     override val billingFlowInProcess: Flow<Boolean>
         get() = billingDataSource.getBillingFlowInProcess()
@@ -40,6 +43,10 @@ class GoogleBillingRepository(
                 Log.d(TAG, "getConsumedPurchases() -> " +it)
             }
         }
+    }
+
+    private fun observeNewPurchases(): Flow<String?> {
+        return newPurchasesFlow
     }
 
     /**
@@ -59,16 +66,31 @@ class GoogleBillingRepository(
     override suspend fun getSkuDetails(skus: List<String>?): List<SkuDetailsDomain> {
         val skuList = skus ?: INAPP_SKUS.toList()
         val skDetailsDomainList = mutableListOf<SkuDetailsDomain>()
+
         for(sku: String in skuList) {
             skDetailsDomainList.add(
                 billingDataSource.getSkuDetails(sku)
+                    .map { skuDet -> SkuWrapper(skuDet!!) }
+                    .combine(observeNewPurchases()) { skuDetailsWrapper, newPurchasedSku ->
+                        skuDetailsWrapper.copy(newPurchasedSku = newPurchasedSku)
+                    }
                     .zip(isPurchased(sku)) { skuDetails, isPurchased->
-                        skuMapper.transform(skuDetails!!, isPurchased, Skus)
+                        skuMapper.transform(skuDetails, isPurchased, Skus)
                     }.first())
         }
 
         skDetailsDomainList.sortBy { it.pos }
+        //testChangePurchasedState()
+        //_newPurchasesFlow.emit(SKU_UNLIMITED_ALERTS)
         return skDetailsDomainList
+    }
+
+    private fun testChangePurchasedState() {
+        defaultScope.launch {
+            delay(10000)
+            Log.v(TAG, "testChangePurchasedState called")
+            _newPurchasesFlow.emit(SKU_UNLIMITED_ALERTS)
+        }
     }
 
     /**
@@ -104,9 +126,18 @@ class GoogleBillingRepository(
                     // TODO: Handle multi-line purchases better
                     for ( sku in skuList ) {
                         when (sku) {
-                            SKU_UNLOCK_ALL -> Log.d(TAG, "SKU_UNLOCK_ALL Purchased")
-                            SKU_UNLIMITED_ALERTS -> Log.d(TAG, "SKU_UNLIMITED_ALERTS Purchased")
-                            SKU_REMOVE_ADS -> Log.d(TAG, "SKU_REMOVE_ADS Purchased")
+                            SKU_UNLOCK_ALL -> {
+                                Log.d(TAG, "Just purchased " + sku)
+                                _newPurchasesFlow.emit(sku)
+                            }
+                            SKU_UNLIMITED_ALERTS -> {
+                                Log.d(TAG, "Just purchased " + sku)
+                                _newPurchasesFlow.emit(sku)
+                            }
+                            SKU_REMOVE_ADS -> {
+                                Log.d(TAG, "Just purchased " + sku)
+                                _newPurchasesFlow.emit(sku)
+                            }
                         }
                     }
                 }

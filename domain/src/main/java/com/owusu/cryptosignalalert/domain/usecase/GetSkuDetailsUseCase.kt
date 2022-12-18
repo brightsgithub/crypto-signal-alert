@@ -23,14 +23,21 @@ class GetSkuDetailsUseCase(
                     is BillingReadyState.NoSkusExist -> state.emit(SkuDetailsState.NoSkusExist)
                     is BillingReadyState.NotReady -> state.emit(SkuDetailsState.NotReady)
                     is BillingReadyState.Ready -> {
-                        val skuList = billingRepository.getSkuDetails()
-                        processAnyBundlePurchases(skuList)
-                        state.emit(SkuDetailsState.Success(skuList))
+                        processNewSkus()
+                    }
+                    is BillingReadyState.NewPurchasesAvailable -> {
+                        processNewSkus()
                     }
                 }
             }
         }
         return state
+    }
+
+    private suspend fun processNewSkus() {
+        val skuList = billingRepository.getSkuDetails()
+        processAnyBundlePurchases(skuList)
+        state.emit(SkuDetailsState.Success(skuList))
     }
 
     private fun processAnyBundlePurchases(skuList: List<SkuDetailsDomain>) {

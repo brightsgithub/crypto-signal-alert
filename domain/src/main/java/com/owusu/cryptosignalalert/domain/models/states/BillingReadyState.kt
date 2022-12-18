@@ -5,4 +5,5 @@ sealed class BillingReadyState {
     object Ready: BillingReadyState()
     object NotReady: BillingReadyState()
     object NoSkusExist: BillingReadyState()
+    object NewPurchasesAvailable: BillingReadyState()
 }

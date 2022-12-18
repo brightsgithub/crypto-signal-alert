@@ -80,8 +80,6 @@ class GoogleBillingRepository(
         }
 
         skDetailsDomainList.sortBy { it.pos }
-        //testChangePurchasedState()
-        //_newPurchasesFlow.emit(SKU_UNLIMITED_ALERTS)
         return skDetailsDomainList
     }
 
@@ -89,7 +87,7 @@ class GoogleBillingRepository(
         defaultScope.launch {
             delay(10000)
             Log.v(TAG, "testChangePurchasedState called")
-            _newPurchasesFlow.emit(SKU_UNLIMITED_ALERTS)
+            billingDataSource.publishReloadSkuData()
         }
     }
 
@@ -124,22 +122,8 @@ class GoogleBillingRepository(
             try {
                 billingDataSource.getNewPurchases().collect { skuList ->
                     // TODO: Handle multi-line purchases better
-                    for ( sku in skuList ) {
-                        when (sku) {
-                            SKU_UNLOCK_ALL -> {
-                                Log.d(TAG, "Just purchased " + sku)
-                                _newPurchasesFlow.emit(sku)
-                            }
-                            SKU_UNLIMITED_ALERTS -> {
-                                Log.d(TAG, "Just purchased " + sku)
-                                _newPurchasesFlow.emit(sku)
-                            }
-                            SKU_REMOVE_ADS -> {
-                                Log.d(TAG, "Just purchased " + sku)
-                                _newPurchasesFlow.emit(sku)
-                            }
-                        }
-                    }
+                    Log.d(TAG, "postMessagesFromBillingFlow()!!!!!")
+                    billingDataSource.publishReloadSkuData()
                 }
             } catch (e: Throwable) {
                 Log.d(TAG, "Collection complete")

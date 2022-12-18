@@ -340,6 +340,10 @@ class BillingDataSource private constructor(
         _billingReadyStateFlow.value = BillingReadyState.NotReady
     }
 
+    fun publishReloadSkuData() {
+        _billingReadyStateFlow.value = BillingReadyState.NewPurchasesAvailable
+    }
+
     /**
      * Calls the billing client functions to query sku details for both the inapp and subscription
      * SKUs. SKU details are useful for displaying item names and price lists to the user, and are

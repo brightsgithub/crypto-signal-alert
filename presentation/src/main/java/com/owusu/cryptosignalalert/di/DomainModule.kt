@@ -51,7 +51,15 @@ val domainModule = module() {
     }
 
     factory {
-        GetSkuDetailsUseCase(billingRepository = get())
+        GetSkuDetailsUseCase(billingRepository = get(), refreshSkuDetailsUseCase = get())
+    }
+
+    factory {
+        RefreshSkuDetailsUseCase(billingRepository = get())
+    }
+
+    factory {
+        StartupBillingUseCase(billingRepository = get(), refreshSkuDetailsUseCase = get())
     }
 
     factory {

@@ -8,10 +8,12 @@ import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
 import com.owusu.cryptosignalalert.domain.models.states.SkuDetailsState
 import com.owusu.cryptosignalalert.domain.usecase.BuySkyUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetSkuDetailsUseCase
+import com.owusu.cryptosignalalert.domain.usecase.RefreshSkuDetailsUseCase
 import com.owusu.cryptosignalalert.mappers.SkuDetailsDomainToUIMapper
 import com.owusu.cryptosignalalert.models.PurchaseViewState
 import com.owusu.cryptosignalalert.models.SkuDetailsUI
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -19,6 +21,7 @@ import kotlinx.coroutines.withContext
 
 class PurchaseViewModel(
     private val getSkuDetailsUseCase: GetSkuDetailsUseCase,
+    private val refreshSkuDetailsUseCase: RefreshSkuDetailsUseCase,
     private val buySkyUseCase: BuySkyUseCase,
     private val skuDetailsDomainToUIMapper: SkuDetailsDomainToUIMapper,
     private val dispatcherBackground: CoroutineDispatcher,
@@ -36,6 +39,7 @@ class PurchaseViewModel(
     val loadingState: Flow<Boolean> = _loadingState // for clients to listen to
 
     fun loadSkuDetails() {
+
         viewModelScope.launch(dispatcherBackground) {
             getSkuDetailsUseCase.invoke(this).collect {
                 when(it) {

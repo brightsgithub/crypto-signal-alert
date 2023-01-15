@@ -63,6 +63,10 @@ class GoogleBillingRepository(
         return billingDataSource.observeBillingReadyStateFlow()
     }
 
+    override suspend fun refresh() {
+        billingDataSource.refresh()
+    }
+
     override suspend fun getSkuDetails(skus: List<String>?): List<SkuDetailsDomain> {
         val skuList = skus ?: INAPP_SKUS.toList()
         val skDetailsDomainList = mutableListOf<SkuDetailsDomain>()

@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.di
 
+import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
@@ -48,6 +49,7 @@ val uiModule = module() {
     factory { SkuDetailsDomainToUIMapper() }
 
     viewModel {
+        val appContext = androidApplication()
         AlertListViewModel(
             priceTargetsMapper = get(named(PriceTargetUIMapper::class.java.name)),
             getPriceTargetsUseCase = get(),
@@ -55,7 +57,8 @@ val uiModule = module() {
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN)),
             workerTag = Constants.SYNC_PRICES_WORKER_TAG,
-            app = androidApplication()
+            app = appContext,
+            WorkManager.getInstance(appContext)
         )
     }
 
@@ -80,12 +83,13 @@ val uiModule = module() {
     }
 
     viewModel {
-        SharedViewModel()
+        SharedViewModel(startupBillingUseCase = get())
     }
 
     viewModel {
         PurchaseViewModel(
             getSkuDetailsUseCase = get(),
+            refreshSkuDetailsUseCase = get(),
             buySkyUseCase = get(),
             skuDetailsDomainToUIMapper = get(),
             dispatcherBackground = get(named(IO)),

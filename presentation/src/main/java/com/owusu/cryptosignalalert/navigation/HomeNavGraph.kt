@@ -1,19 +1,22 @@
 package com.owusu.cryptosignalalert.navigation
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavGraphBuilder
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import com.owusu.cryptosignalalert.views.screens.CoinsListScreen
-import com.owusu.cryptosignalalert.views.screens.PriceTargetEntryScreen
-import com.owusu.cryptosignalalert.views.screens.PriceTargetsScreen
-import com.owusu.cryptosignalalert.views.screens.PurchaseScreen
+import com.owusu.cryptosignalalert.views.screens.*
 import org.koin.androidx.compose.getViewModel
 
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
@@ -22,6 +25,8 @@ import org.koin.androidx.compose.getViewModel
 fun HomeNavGraph(navHostController: NavHostController) {
 
     val sharedViewModel = getViewModel<SharedViewModel>()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    initBilling(sharedViewModel, lifecycleOwner)
 
     NavHost(
         navController = navHostController,
@@ -48,6 +53,34 @@ fun HomeNavGraph(navHostController: NavHostController) {
 
         // nested graph
         targetsEntryGraph(navHostController, sharedViewModel)
+    }
+}
+
+@Composable
+private fun initBilling(
+    sharedViewModel: SharedViewModel,
+    lifecycleOwner: LifecycleOwner
+) {
+    // Only executed once, not on every recomposition
+    // https://www.youtube.com/watch?v=gxWcfz3V2QE&t=298s
+    DisposableEffect(key1 = true) {
+
+        val observer = LifecycleEventObserver { _, event ->
+            Log.v("The_current_life", event.toString())
+
+            if (event == Lifecycle.Event.ON_CREATE) {
+                // only observe when in onCreate() has been called
+                sharedViewModel.initApp()
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // compose is done so the below is called
+        onDispose {
+            Log.v("The_current_life", "onDispose() called")
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 }
 

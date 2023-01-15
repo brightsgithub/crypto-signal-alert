@@ -27,10 +27,10 @@ class AlertListViewModel(
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher,
     private val workerTag: String,
-    private val app: Application): AndroidViewModel(app) {
+    private val app: Application,
+    private val workManager: WorkManager): AndroidViewModel(app) {
 
     var workInfoLiveData: LiveData<List<WorkInfo>> // <-- ADD THIS
-    private val workManager: WorkManager = WorkManager.getInstance(app)
 
     private val _state = MutableStateFlow(AlertListViewState()) // for emitting
     val viewState: Flow<AlertListViewState> = _state // for clients to listen to

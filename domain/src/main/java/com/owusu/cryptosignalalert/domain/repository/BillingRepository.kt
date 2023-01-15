@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface BillingRepository {
     fun observeBillingReadyStateFlow(): Flow<BillingReadyState>
     suspend fun getSkuDetails(skuList: List<String>? = null): List<SkuDetailsDomain>
+    suspend fun refresh()
     fun buySku(screenProxy: ScreenProxy, sku: String)
     val billingFlowInProcess: Flow<Boolean>
 }

@@ -123,7 +123,7 @@ class BillingDataSource private constructor(
     private val purchaseConsumedFlow = MutableSharedFlow<List<String>>()
     private val billingFlowInProcess = MutableStateFlow(false)
 
-    private val _billingReadyStateFlow = MutableStateFlow<BillingReadyState>(BillingReadyState.NotReady)
+    private val _billingReadyStateFlow = MutableSharedFlow<BillingReadyState>()
     private val billingReadyStateFlow: Flow<BillingReadyState> = _billingReadyStateFlow
 
     override fun onBillingSetupFinished(billingResult: BillingResult) {
@@ -137,12 +137,17 @@ class BillingDataSource private constructor(
                 // means that you have a connection to the Billing service.
                 reconnectMilliseconds = RECONNECT_TIMER_START_MILLISECONDS
                 defaultScope.launch {
-                    querySkuDetailsAsync()
-                    refreshPurchases()
+                    refresh()
                 }
             }
             else -> retryBillingServiceConnectionWithExponentialBackoff()
         }
+    }
+
+    suspend fun refresh() {
+        Log.d(TAG, "Calling REFRESH!")
+        querySkuDetailsAsync()
+        refreshPurchases()
     }
 
     /**
@@ -329,19 +334,27 @@ class BillingDataSource private constructor(
     fun observeBillingReadyStateFlow() = billingReadyStateFlow
 
     private fun publishNoSkusExist() {
-        _billingReadyStateFlow.value = BillingReadyState.NoSkusExist
+        defaultScope.launch {
+            _billingReadyStateFlow.emit(BillingReadyState.NoSkusExist)
+        }
     }
 
     private fun publishBillingReady() {
-        _billingReadyStateFlow.value = BillingReadyState.Ready
+        defaultScope.launch {
+            _billingReadyStateFlow.emit(BillingReadyState.Ready)
+        }
     }
 
     private fun publishBillingNotReady() {
-        _billingReadyStateFlow.value = BillingReadyState.NotReady
+        defaultScope.launch {
+            _billingReadyStateFlow.emit(BillingReadyState.NotReady)
+        }
     }
 
     fun publishReloadSkuData() {
-        _billingReadyStateFlow.value = BillingReadyState.NewPurchasesAvailable
+        defaultScope.launch {
+            _billingReadyStateFlow.emit(BillingReadyState.NewPurchasesAvailable)
+        }
     }
 
     /**
@@ -376,6 +389,7 @@ class BillingDataSource private constructor(
      */
     suspend fun refreshPurchases() {
         Log.d(TAG, "Refreshing purchases.")
+        //publishBillingNotReady()
         var purchasesResult = billingClient.queryPurchasesAsync(BillingClient.SkuType.INAPP)
         var billingResult = purchasesResult.billingResult
         if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
@@ -750,7 +764,7 @@ class BillingDataSource private constructor(
     }
 
     companion object {
-        private val TAG = "TrivialDrive:" + BillingDataSource::class.java.simpleName
+        private val TAG = "Crypto:" + BillingDataSource::class.java.simpleName
 
         @Volatile
         private var sInstance: BillingDataSource? = null
@@ -783,6 +797,7 @@ class BillingDataSource private constructor(
      * @param knownSubscriptionSKUs SKUs of subscriptions the source should know about
      */
     init {
+        publishBillingNotReady()
         this.knownInappSKUs = if (knownInappSKUs == null) {
             ArrayList()
         } else {

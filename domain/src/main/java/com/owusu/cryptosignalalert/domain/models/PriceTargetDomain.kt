@@ -30,7 +30,8 @@ data class PriceTargetDomain(
     val userPriceTarget: Double? = null,
     val hasPriceTargetBeenHit: Boolean = false,
     val hasUserBeenAlerted: Boolean = false,
-    val priceTargetDirection: PriceTargetDirection = PriceTargetDirection.NOT_SET
+    val priceTargetDirection: PriceTargetDirection = PriceTargetDirection.NOT_SET,
+    val completedOnDate: String? = null
 )
 
 enum class PriceTargetDirection {

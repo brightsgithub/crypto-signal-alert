@@ -40,4 +40,5 @@ data class PriceTargetUI(
     val priceTargetDirection: PriceTargetDirectionUI = PriceTargetDirectionUI.NOT_SET,
     val progress: Float = 0f,
     val progressPercentageDisplay: String? = null,
+    val completedOnDate: String? = null
 ): Parcelable

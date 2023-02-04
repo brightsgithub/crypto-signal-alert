@@ -22,8 +22,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -130,6 +132,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                             onDeleteClicked:(target: PriceTargetUI) -> Unit) {
 
     val showPopup = rememberSaveable { mutableStateOf(false) }
+    var anchorFromCompletedOnOrLastUpdated: ConstrainedLayoutReference
 
     Card(
         backgroundColor = colorResource(id = R.color.dark_coin_row),
@@ -154,6 +157,8 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 lastUpdated,
                 upArrow,
                 lastUpdatedLabel,
+                completedOnLabel,
+                completedOnDate,
                 targetPriceLabel2,
                 percentageProgressDisplay
             ) = createRefs()
@@ -191,15 +196,31 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 top.linkTo(targetPriceLabel.bottom)
             }, fontSize = 14.sp)
 
-            Text(text = "Last updated", modifier = Modifier.constrainAs(lastUpdatedLabel) {
-                start.linkTo(currentPriceLabel.start)
-                top.linkTo(currentPriceLabel.bottom)
-            }, fontSize = 14.sp)
+            if (priceTarget.completedOnDate == null) {
+                anchorFromCompletedOnOrLastUpdated = lastUpdatedLabel
+                Text(text = "Last updated", modifier = Modifier.constrainAs(lastUpdatedLabel) {
+                    start.linkTo(currentPriceLabel.start)
+                    top.linkTo(currentPriceLabel.bottom)
+                }, fontSize = 14.sp)
 
-            Text(text = priceTarget.lastUpdated!!, modifier = Modifier.constrainAs(lastUpdated) {
-                start.linkTo(coinName.start)
-                top.linkTo(lastUpdatedLabel.top)
-            }, fontSize = 14.sp)
+                Text(text = priceTarget.lastUpdated!!, modifier = Modifier.constrainAs(lastUpdated) {
+                    start.linkTo(coinName.start)
+                    top.linkTo(lastUpdatedLabel.top)
+                }, fontSize = 14.sp)
+            } else {
+                anchorFromCompletedOnOrLastUpdated = completedOnLabel
+                Text(text = "Completed on", modifier = Modifier.constrainAs(completedOnLabel) {
+                    start.linkTo(currentPriceLabel.start)
+                    top.linkTo(currentPriceLabel.bottom)
+                }, fontSize = 14.sp)
+
+                Text(text = priceTarget.completedOnDate!!, modifier = Modifier.constrainAs(completedOnDate) {
+                    start.linkTo(coinName.start)
+                    top.linkTo(completedOnLabel.top)
+                }, fontSize = 14.sp)
+            }
+
+
 
             Text(text = priceTarget.userPriceTargetDisplay!!, modifier = Modifier.constrainAs(targetPrice) {
                 start.linkTo(coinName.start)
@@ -217,7 +238,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 Text(text = priceTarget.progressPercentageDisplay!!,
                     modifier = Modifier.constrainAs(percentageProgressDisplay) {
                         top.linkTo(progressBar.top)
-                        start.linkTo(lastUpdatedLabel.start)
+                        start.linkTo(anchorFromCompletedOnOrLastUpdated.start)
                     },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
 
 
@@ -229,7 +250,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                         //.padding(bottom = 16.dp)
                         .constrainAs(progressBar) {
                             start.linkTo(percentageProgressDisplay.end, margin = 4.dp)
-                            top.linkTo(lastUpdatedLabel.bottom, margin = 16.dp)
+                            top.linkTo(anchorFromCompletedOnOrLastUpdated.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
                     backgroundColor = Color.White,
@@ -261,8 +282,8 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                         .height(12.dp)
                         //.padding(top = 16.dp)
                         .constrainAs(progressBar) {
-                            start.linkTo(lastUpdatedLabel.start)
-                            top.linkTo(lastUpdatedLabel.bottom, margin = 16.dp)
+                            start.linkTo(anchorFromCompletedOnOrLastUpdated.start)
+                            top.linkTo(anchorFromCompletedOnOrLastUpdated.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
                     backgroundColor = Color.White,
@@ -336,4 +357,48 @@ private fun getGreaterOrLessThanSymbol(priceTarget: PriceTargetUI) : String {
         PriceTargetDirectionUI.BELOW -> "<"
         PriceTargetDirectionUI.NOT_SET -> ""
     }
+}
+
+@Preview
+@Composable
+fun PriceTargetCardPreview() {
+    val target = PriceTargetUI(
+        localPrimeId = 0,
+        id = "bitcoin",
+        name = "Bitcoin",
+        symbol = "BTC",
+        lastUpdated = "sat feb 4",
+        userPriceTargetDisplay = "US$17,000",
+        currentPriceDisplay = "US$17,000",
+        priceTargetDirection = PriceTargetDirectionUI.ABOVE,
+        progress = 0.5f,
+        progressPercentageDisplay = "50%",
+        completedOnDate = "Mon Jan 4"
+
+    )
+   PriceTargetCard(priceTarget = target, onDeleteClicked = { userPriceTarget ->
+
+   })
+}
+
+@Preview
+@Composable
+fun PriceTargetCardPreviewNoCompletedOn() {
+    val target = PriceTargetUI(
+        localPrimeId = 0,
+        id = "bitcoin",
+        name = "Bitcoin",
+        symbol = "BTC",
+        lastUpdated = "sat feb 4",
+        userPriceTargetDisplay = "US$17,000",
+        currentPriceDisplay = "US$17,000",
+        priceTargetDirection = PriceTargetDirectionUI.ABOVE,
+        progress = 0.5f,
+        progressPercentageDisplay = "50%",
+        completedOnDate = null
+
+    )
+    PriceTargetCard(priceTarget = target, onDeleteClicked = { userPriceTarget ->
+
+    })
 }

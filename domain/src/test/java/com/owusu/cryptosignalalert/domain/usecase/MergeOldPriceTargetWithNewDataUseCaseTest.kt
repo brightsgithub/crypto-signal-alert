@@ -19,6 +19,54 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
     }
 
     @Test
+    fun `completedOnDate should equal lastUpdated when new price target meets the users price target`() {
+        runTest {
+
+            val currentPriceTargets = getMockedCurrentPriceTargetsDomain()
+
+            val mockListOfLatestCoins =  listOf(
+                CoinDomain(id = "bitcoin", currentPrice = 19000.0),
+                CoinDomain(id = "ethereum", currentPrice = 2100.0)
+            )
+
+            val params = MergeOldPriceTargetWithNewDataUseCase.Params(
+                coinsList = mockListOfLatestCoins,
+                priceTargets = currentPriceTargets,
+                lastUpdated = "01/01/2022"
+            )
+            val newlyMergedPriceTargets = cut.invoke(params)
+
+            assert(newlyMergedPriceTargets[0].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[1].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[1].completedOnDate == newlyMergedPriceTargets[1].lastUpdated)
+        }
+    }
+
+    @Test
+    fun  `completedOnDate should equal null when new price target does not meet the users price target`() {
+        runTest {
+
+            val currentPriceTargets = getMockedCurrentPriceTargetsDomain()
+
+            val mockListOfLatestCoins =  listOf(
+                CoinDomain(id = "bitcoin", currentPrice = 30000.0),
+                CoinDomain(id = "ethereum", currentPrice = 500.0)
+            )
+
+            val params = MergeOldPriceTargetWithNewDataUseCase.Params(
+                coinsList = mockListOfLatestCoins,
+                priceTargets = currentPriceTargets,
+                lastUpdated = "01/01/2022"
+            )
+            val newlyMergedPriceTargets = cut.invoke(params)
+
+            assert(!newlyMergedPriceTargets[0].hasPriceTargetBeenHit)
+            assert(!newlyMergedPriceTargets[1].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[1].completedOnDate == null)
+        }
+    }
+
+    @Test
     fun `hasTargetBeenHit should return true when new price target meets the users price target`() {
         runTest {
 
@@ -94,6 +142,37 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
         }
     }
 
+    @Test
+    fun `completedOnDate should return the same completedOnDate if hasPriceTargetBeenHit has been previously true`() {
+        runTest {
+
+            val currentPriceTargets = getMockedPriceTargetsAlreadyHitWithCompletedBy()
+
+            val mockListOfLatestCoins =  listOf(
+                CoinDomain(id = "bitcoin", currentPrice = 30000.0),
+                CoinDomain(id = "ethereum", currentPrice = 500.0)
+            )
+
+            val params = MergeOldPriceTargetWithNewDataUseCase.Params(
+                coinsList = mockListOfLatestCoins,
+                priceTargets = currentPriceTargets,
+                lastUpdated = "01/01/2022"
+            )
+            val newlyMergedPriceTargets = cut.invoke(params)
+
+            // We have previously met our price target, but on this sync
+            // the new prices have not, but we don't care. We wont change it since hasPriceTargetBeenHit
+            // was previously true and the user is about to be notified
+            // (when hasUserBeenAlerted will eventually be set to true during send notification process.
+            // If notification fails at least on the next sync hasPriceTargetBeenHit will remain true
+            // so attempting to send notification can be retried)
+            // or hasUserBeenAlerted is already true which means the user has been notified
+            assert(newlyMergedPriceTargets[0].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[1].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[1].completedOnDate == currentPriceTargets[1].completedOnDate)
+        }
+    }
+
     // Hierarchical mocking
     private fun getMockedCurrentPriceTargetsDomain(): List<PriceTargetDomain> {
         return listOf<PriceTargetDomain>(
@@ -107,6 +186,7 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { hasPriceTargetBeenHit } returns false
                 every { hasUserBeenAlerted } returns false
                 every { priceTargetDirection } returns PriceTargetDirection.BELOW
+                every { completedOnDate } returns null
             },
             mockk {
                 every { localPrimeId } returns 1
@@ -118,6 +198,7 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { hasPriceTargetBeenHit } returns false
                 every { hasUserBeenAlerted } returns false
                 every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+                every { completedOnDate } returns null
             },
         )
     }
@@ -134,6 +215,7 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { hasPriceTargetBeenHit } returns true
                 every { hasUserBeenAlerted } returns false
                 every { priceTargetDirection } returns PriceTargetDirection.BELOW
+                every { completedOnDate } returns null
             },
             mockk {
                 every { localPrimeId } returns 1
@@ -145,6 +227,36 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { hasPriceTargetBeenHit } returns true
                 every { hasUserBeenAlerted } returns false
                 every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+                every { completedOnDate } returns null
+            },
+        )
+    }
+
+    private fun getMockedPriceTargetsAlreadyHitWithCompletedBy(): List<PriceTargetDomain> {
+        return listOf<PriceTargetDomain>(
+            mockk {
+                every { localPrimeId } returns 0
+                every { id } returns "bitcoin"
+                every { name } returns "Bitcoin"
+                every { currentPrice } returns 21518.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 20000.0
+                every { hasPriceTargetBeenHit } returns true
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.BELOW
+                every { completedOnDate } returns "Jan 1"
+            },
+            mockk {
+                every { localPrimeId } returns 1
+                every { id } returns "ethereum"
+                every { name } returns "Ethereum"
+                every { currentPrice } returns 1500.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 2000.0
+                every { hasPriceTargetBeenHit } returns true
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+                every { completedOnDate } returns "Jan 1"
             },
         )
     }

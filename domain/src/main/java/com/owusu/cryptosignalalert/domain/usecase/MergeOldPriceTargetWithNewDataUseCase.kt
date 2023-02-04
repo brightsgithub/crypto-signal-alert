@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.domain.usecase
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 
 class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
         MergeOldPriceTargetWithNewDataUseCase.Params, List<PriceTargetDomain>> {
@@ -39,14 +40,22 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
                 val hasUserBeenAlerted = it.hasUserBeenAlerted
                 val userPriceTarget = it.userPriceTarget
                 val priceTargetDirection = it.priceTargetDirection
+                var completedOnDate = it.completedOnDate
 
                 // has the target been hit
                 val hasPriceTargetBeenHit = if (!it.hasPriceTargetBeenHit) {
-                    checkIfPriceTargetBeenHit(
+                    val hasBeenHit = checkIfPriceTargetBeenHit(
                         coinDomain.currentPrice,
                         it.userPriceTarget,
                         it.priceTargetDirection
                     )
+
+                    // if the price target has just been hit, lets store this as our completed date
+                    if (hasBeenHit) {
+                        completedOnDate = lastUpdated
+                    }
+
+                    hasBeenHit
                 } else {
                     true // it has already been hit, so keep the same value
                 }
@@ -61,7 +70,8 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
                     userPriceTarget,
                     priceTargetDirection,
                     hasPriceTargetBeenHit,
-                    lastUpdated
+                    lastUpdated,
+                    completedOnDate
                 )
 
                 updatedPriceTargetDomainList.add(updatedPriceTargetDomain)
@@ -78,7 +88,8 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
         userPriceTarget: Double,
         priceTargetDirection: PriceTargetDirection,
         hasPriceTargetBeenHit: Boolean,
-        lastUpdated: String
+        lastUpdated: String,
+        completedOnDate: String?
     ): PriceTargetDomain {
         coinDomain.apply {
             return PriceTargetDomain(
@@ -111,8 +122,8 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
                 userPriceTarget = userPriceTarget,
                 hasPriceTargetBeenHit = hasPriceTargetBeenHit,
                 hasUserBeenAlerted = hasUserBeenAlerted,
-                priceTargetDirection = priceTargetDirection
-
+                priceTargetDirection = priceTargetDirection,
+                completedOnDate = completedOnDate
             )
         }
     }

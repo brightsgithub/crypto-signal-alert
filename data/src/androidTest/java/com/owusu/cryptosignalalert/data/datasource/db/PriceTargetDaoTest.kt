@@ -63,6 +63,7 @@ class PriceTargetDaoTest : KoinComponent {
         assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
         assertTrue(coinsListFromDb.size == numOfCoins)
         assertTrue(coinsToBeAddedToBb[0].priceTargetDirection == coinsListFromDb[0].priceTargetDirection)
+        assertTrue(coinsToBeAddedToBb[0].completedOnDate == coinsListFromDb[0].completedOnDate)
     }
 
     @Test
@@ -89,6 +90,7 @@ class PriceTargetDaoTest : KoinComponent {
         // ensure the prices are different
         Assert.assertTrue(coinsToBeAddedToBb[0].userPriceTarget != updatedCoinsListFromDb[0].userPriceTarget)
         Assert.assertTrue(coinsListFromDb.size == numOfCoins)
+        assertTrue(coinsToBeAddedToBb[0].completedOnDate == coinsListFromDb[0].completedOnDate)
     }
 
 
@@ -112,6 +114,7 @@ class PriceTargetDaoTest : KoinComponent {
         // Now delete the contact that was added
         val numOfCoinsDeleted = priceTargetDao.deletePriceTargets(coinsListFromDb)
         Assert.assertTrue(numOfCoinsDeleted == numOfCoins)
+        assertTrue(coinsToBeAddedToBb[0].completedOnDate == coinsListFromDb[0].completedOnDate)
     }
 
     @Test
@@ -127,6 +130,7 @@ class PriceTargetDaoTest : KoinComponent {
 
         Assert.assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
         Assert.assertTrue(coinsListFromDb.size == numOfCoins)
+        assertTrue(coinsToBeAddedToBb[0].completedOnDate == coinsListFromDb[0].completedOnDate)
     }
 
     @Test
@@ -143,6 +147,7 @@ class PriceTargetDaoTest : KoinComponent {
         Assert.assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
         Assert.assertTrue(!coinsToBeAddedToBb[0].hasPriceTargetBeenHit)
         Assert.assertTrue(coinsListFromDb.size == numOfCoins)
+        assertTrue(coinsToBeAddedToBb[0].completedOnDate == coinsListFromDb[0].completedOnDate)
     }
 
     @Test
@@ -165,6 +170,7 @@ class PriceTargetDaoTest : KoinComponent {
         // Now delete the contact that was added
         val numOfCoinsDeleted = priceTargetDao.deletePriceTargets(coinsListFromDb)
         Assert.assertTrue(numOfCoinsDeleted == numOfCoins)
+        assertTrue(coinsToBeAddedToBb[0].completedOnDate == coinsListFromDb[0].completedOnDate)
     }
 
 
@@ -216,7 +222,8 @@ class PriceTargetDaoTest : KoinComponent {
             userPriceTarget = userPriceTarget,
             hasPriceTargetBeenHit = hasPriceTargetBeenHit,
             hasUserBeenAlerted = hasUserBeenAlerted,
-            priceTargetDirection = PriceTargetDirection.NOT_SET
+            priceTargetDirection = PriceTargetDirection.NOT_SET,
+            completedOnDate = "Jan 1"
         )
     }
 }

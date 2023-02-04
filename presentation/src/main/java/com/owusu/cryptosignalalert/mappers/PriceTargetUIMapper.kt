@@ -47,7 +47,8 @@ class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMa
                         hasUserBeenAlerted = hasUserBeenAlerted,
                         priceTargetDirection = mapPriceDirectionToUI(priceTargetDirection),
                         progress = calculateProgress(this),
-                        progressPercentageDisplay = getProgressPercentageDisplay(this)
+                        progressPercentageDisplay = getProgressPercentageDisplay(this),
+                        completedOnDate = completedOnDate
                     )
                 )
             }
@@ -91,7 +92,8 @@ class PriceTargetUIMapper(private val priceDisplayUtils: PriceDisplayUtils):UIMa
                         userPriceTarget = userPriceTarget,
                         hasPriceTargetBeenHit = hasPriceTargetBeenHit,
                         hasUserBeenAlerted = hasUserBeenAlerted,
-                        priceTargetDirection = mapPriceDirectionToDomain(priceTargetDirection)
+                        priceTargetDirection = mapPriceDirectionToDomain(priceTargetDirection),
+                        completedOnDate = completedOnDate
                     )
                 )
             }

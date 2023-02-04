@@ -40,7 +40,8 @@ class PriceTargetEntityToPriceTargetDomainMapper: DataAPIListMapper<PriceTargetE
                         hasPriceTargetBeenHit = hasPriceTargetBeenHit,
                         hasUserBeenAlerted = hasUserBeenAlerted,
                         userPriceTarget = userPriceTarget,
-                        priceTargetDirection = priceTargetDirection
+                        priceTargetDirection = priceTargetDirection,
+                        completedOnDate = completedOnDate
                     )
                 )
             }
@@ -83,7 +84,8 @@ class PriceTargetEntityToPriceTargetDomainMapper: DataAPIListMapper<PriceTargetE
                         hasPriceTargetBeenHit = hasPriceTargetBeenHit,
                         hasUserBeenAlerted = hasUserBeenAlerted,
                         userPriceTarget = userPriceTarget,
-                        priceTargetDirection = priceTargetDirection
+                        priceTargetDirection = priceTargetDirection,
+                        completedOnDate = completedOnDate
                     )
                 )
             }

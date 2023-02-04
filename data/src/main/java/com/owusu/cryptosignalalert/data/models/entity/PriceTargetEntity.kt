@@ -75,5 +75,7 @@ data class PriceTargetEntity(
     @ColumnInfo(name = "has_user_been_alerted")
     var hasUserBeenAlerted: Boolean = false,
     @ColumnInfo(name = "price_target_direction")
-    var priceTargetDirection: PriceTargetDirection
+    var priceTargetDirection: PriceTargetDirection,
+    @ColumnInfo(name="completed_on_date")
+    val completedOnDate: String? = null
 )

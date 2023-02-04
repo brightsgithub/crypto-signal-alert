@@ -114,7 +114,9 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
 
     Surface(
         color = colorResource(id = R.color.dark_coin_row),
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).clickable {
+            navigateToPriceTargetEntryScreen(coin!!)
+        }
     ) {
 
         ConstraintLayout(modifier = Modifier

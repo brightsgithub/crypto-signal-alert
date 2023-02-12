@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.owusu.cryptosignalalert.data.models.entity.CoinIdEntity
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 
 /**
  * Created by Bright Owusu-Amankwaa on 2019-09-05.
  */
-@Database(entities = [PriceTargetEntity::class], version = 2)
+@Database(entities = [PriceTargetEntity::class, CoinIdEntity::class], version = 3)
 abstract class CryptoSignalAlertDB : RoomDatabase() {
 
     abstract fun priceTargetDao(): PriceTargetDao
@@ -28,7 +29,7 @@ abstract class CryptoSignalAlertDB : RoomDatabase() {
         private fun buildDatabase(appContext: Context) : CryptoSignalAlertDB {
             return Room.databaseBuilder(appContext.applicationContext,
                 CryptoSignalAlertDB::class.java, "csa_database.db")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
         }
 
@@ -40,5 +41,12 @@ abstract class CryptoSignalAlertDB : RoomDatabase() {
 
             }
         }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `coin_id_table` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `symbol` TEXT NOT NULL, `localPrimeId` INTEGER NOT NULL, PRIMARY KEY(`localPrimeId`))")
+            }
+        }
+
     }
 }

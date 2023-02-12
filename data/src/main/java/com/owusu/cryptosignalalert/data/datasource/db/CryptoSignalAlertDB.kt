@@ -15,6 +15,7 @@ import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 abstract class CryptoSignalAlertDB : RoomDatabase() {
 
     abstract fun priceTargetDao(): PriceTargetDao
+    abstract fun coinIdsDao(): CoinIdsDao
 
     companion object {
         @Volatile private var instance: CryptoSignalAlertDB? = null

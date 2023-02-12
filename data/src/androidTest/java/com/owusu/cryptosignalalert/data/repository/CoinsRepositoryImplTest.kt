@@ -116,6 +116,20 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         assert(solana.currentPrice != null)
     }
 
+    @Test
+    fun getCoinIdsFromRemoteTest() = runBlocking {
+
+        initDispatcher(getResponseMapForCoinIds(R.raw.get_all_coin_ids))
+
+        val coinsList = coinsRepository.getAllCoinIds()
+
+        assert(coinsList.isNotEmpty())
+
+        assert(coinsList[0].id != null)
+        assert(coinsList[0].name != null)
+        assert(coinsList[0].symbol != null)
+    }
+
     private fun getResponseMapForCoinsListWithMarketData(page: Int,
                                                          recordsPerPage: Int,
                                                          currencies: String,
@@ -139,10 +153,30 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
 
 
         val requestUrl = request.toString()
+        val response = getDefaultHeader(mockResIdFile)
+        return mapOf(requestUrl to response)
+    }
+
+    private fun getResponseMapForCoinIds(mockResIdFile: Int): Map<String, MockResponse> {
+
+        val hostName = endPoints.getHostName()
+
+        // This is a get request, so be sure to include the query string
+        val request = StringBuilder()
+        request.append(hostName)
+        request.append(endPoints.getAllCoinsIdListPath())
+        request.append("?", "include_platform", "=", false.toString())
+
+
+        val requestUrl = request.toString()
+        val response = getDefaultHeader(mockResIdFile)
+        return mapOf(requestUrl to response)
+    }
+
+    private fun getDefaultHeader(mockResIdFile: Int): MockResponse {
         val response = getMockedResponse(OK, mockResIdFile)
         // also mock critical RESPONSE headers!
         response.addHeader("content-type", "application/json; charset=utf-8") // critical!
-        response.addHeader("cache-control", "public,max-age=300") // optional
-        return mapOf(requestUrl to response)
+        return response
     }
 }

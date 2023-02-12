@@ -83,7 +83,7 @@ val uiModule = module() {
     }
 
     viewModel {
-        SharedViewModel(startupBillingUseCase = get())
+        SharedViewModel(startupBillingUseCase = get(), populateCoinIdsUseCase = get())
     }
 
     viewModel {

@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.data.datasource.coingecko
 import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
+import com.owusu.cryptosignalalert.data.models.api.CoinIdAPI
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -36,5 +37,16 @@ class CoinGeckoCoinsListDataSourceImpl(
 
         }.body()
         return coinApiListStr
+    }
+
+    override suspend fun getAllCoinIds(): List<CoinIdAPI> {
+        val result: List<CoinIdAPI> = httpClient.get(endPoints.getAllCoinsIdListPath()) {
+            accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            url {
+                parameters.append("include_platform", false.toString())
+            }
+        }.body()
+        return result
     }
 }

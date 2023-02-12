@@ -4,17 +4,14 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import com.google.gson.GsonBuilder
-import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
-import com.owusu.cryptosignalalert.data.datasource.PriceTargetsDataSource
-import com.owusu.cryptosignalalert.data.datasource.PricesDataSource
+import com.owusu.cryptosignalalert.data.datasource.*
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoCoinsListDataSourceImpl
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoPricesDataSourceImpl
-import com.owusu.cryptosignalalert.data.datasource.db.CryptoSignalAlertDB
-import com.owusu.cryptosignalalert.data.datasource.db.PriceTargetDao
-import com.owusu.cryptosignalalert.data.datasource.db.PriceTargetsDataSourceImpl
+import com.owusu.cryptosignalalert.data.datasource.db.*
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.mappers.*
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
+import com.owusu.cryptosignalalert.data.models.api.CoinIdAPI
 import com.owusu.cryptosignalalert.data.models.api.PriceAPIWrapper
 import com.owusu.cryptosignalalert.data.models.entity.PriceTargetEntity
 import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS
@@ -24,6 +21,7 @@ import com.owusu.cryptosignalalert.data.repository.PriceInfoRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.billing.BillingDataSource
 import com.owusu.cryptosignalalert.data.repository.billing.GoogleBillingRepository
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
+import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.PriceWrapperDomain
 import com.owusu.cryptosignalalert.domain.repository.BillingRepository
@@ -61,7 +59,13 @@ open class DataModuleWrapper(private val context: Context) {
         }
 
         single<CoinsRepository> {
-            CoinsRepositoryImpl(get(), get(named(NAMED_CoinsAPIMapper)))
+            CoinsRepositoryImpl(
+                get(),
+                get(named(NAMED_CoinsAPIMapper)),
+                coinIdAPIMapper = get(),
+                coinIdsLocalDataSource = get(),
+                appPreferences = get()
+            )
         }
 
         single<PriceInfoRepository> {
@@ -72,6 +76,7 @@ open class DataModuleWrapper(private val context: Context) {
         // en up overriding i.e. using the latest declared DataMapper<>. so use named
         factory<DataAPIListMapper<CoinAPI, CoinDomain>>(named(NAMED_CoinsAPIMapper)){ CoinsAPIMapper() }
         factory<DataAPIListMapper<PriceTargetEntity, PriceTargetDomain>>(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)) { PriceTargetEntityToPriceTargetDomainMapper() }
+        factory { CoinIdAPIToDomainIdMapper() }
         factory<DataMapper<PriceAPIWrapper, PriceWrapperDomain>>(named(NAMED_PriceAPIMapper)){ PriceAPIMapper() }
 
         factory(named(PRICE_GSON_ADAPTOR)) {
@@ -92,6 +97,14 @@ open class DataModuleWrapper(private val context: Context) {
             get<CryptoSignalAlertDB>().priceTargetDao()
         }
 
+        single<CoinIdsLocalDataSource> {
+            CoinIdsLocalDataSourceImpl(coinIdsDao = get())
+        }
+
+        single<CoinIdsDao> {
+            get<CryptoSignalAlertDB>().coinIdsDao()
+        }
+
         single<CryptoSignalAlertDB> {
             CryptoSignalAlertDB.invoke(context)
         }
@@ -99,6 +112,8 @@ open class DataModuleWrapper(private val context: Context) {
         single<PriceTargetsDataSource> {
             PriceTargetsDataSourceImpl(get(), get(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)))
         }
+
+        single { AppPreferences(context) }
 
         single<BillingRepository> {
             GoogleBillingRepository(

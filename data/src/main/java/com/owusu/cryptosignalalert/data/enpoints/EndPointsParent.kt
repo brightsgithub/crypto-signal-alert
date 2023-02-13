@@ -18,4 +18,8 @@ abstract class EndPointsParent {
     fun getAllCoinsIdListPath(): String {
         return "/api/v3/coins/list"
     }
+
+    fun getCoinDetail(): String {
+        return "/api/v3/coins/"
+    }
 }

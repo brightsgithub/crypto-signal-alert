@@ -2,6 +2,7 @@ package com.owusu.cryptosignalalert.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.owusu.cryptosignalalert.domain.usecase.GetCoinDetailUseCase
 import com.owusu.cryptosignalalert.domain.usecase.SaveNewPriceTargetsUseCase
 import com.owusu.cryptosignalalert.mappers.CoinUIToPriceTargetDomainMapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 class PriceTargetEntryViewModel(
     private val coinUIToPriceTargetDomainMapper: CoinUIToPriceTargetDomainMapper,
     private val saveNewPriceTargetsUseCase: SaveNewPriceTargetsUseCase,
+    private val getCoinDetailUseCase: GetCoinDetailUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher
 ): ViewModel() {

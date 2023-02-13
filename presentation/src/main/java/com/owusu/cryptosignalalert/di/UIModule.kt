@@ -77,6 +77,7 @@ val uiModule = module() {
         PriceTargetEntryViewModel(
             coinUIToPriceTargetDomainMapper = get(),
             saveNewPriceTargetsUseCase = get(),
+            getCoinDetailUseCase = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN))
         )

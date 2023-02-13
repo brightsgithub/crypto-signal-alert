@@ -4,6 +4,7 @@ import com.owusu.cryptosignalalert.data.test.R
 import com.owusu.cryptosignalalert.data.BaseCoreTest
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
+import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import org.junit.After
@@ -130,6 +131,29 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         assert(coinsList[0].symbol != null)
     }
 
+    @Test
+    fun getCoinDetailTest() = runBlocking {
+
+        val coinId = "bitcoin"
+        initDispatcher(getResponseForCoinDetail(R.raw.get_coin_detail, coinId))
+
+        val coinDetail = coinsRepository.getCoinDetail(coinId)
+
+
+        assert(coinDetail.id == coinId)
+        assert(coinDetail.coingeckoRank ==1)
+        assert(coinDetail.marketCapRank ==1)
+        assert(coinDetail.symbol == "btc")
+        assert(coinDetail.name == "Bitcoin")
+        assertNotNull(coinDetail.description)
+        assertNotNull(coinDetail.lastUpdated)
+        assertNotNull(coinDetail.lastUpdated)
+        assertNotNull(coinDetail.image?.thumb)
+        assertNotNull(coinDetail.image?.small)
+        assertNotNull(coinDetail.image?.large)
+        assertNotNull(coinDetail.blockTimeInMinutes)
+    }
+
     private fun getResponseMapForCoinsListWithMarketData(page: Int,
                                                          recordsPerPage: Int,
                                                          currencies: String,
@@ -167,6 +191,26 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         request.append(endPoints.getAllCoinsIdListPath())
         request.append("?", "include_platform", "=", false.toString())
 
+
+        val requestUrl = request.toString()
+        val response = getDefaultHeader(mockResIdFile)
+        return mapOf(requestUrl to response)
+    }
+
+    private fun getResponseForCoinDetail(mockResIdFile: Int, coinId: String): Map<String, MockResponse> {
+
+        val hostName = endPoints.getHostName()
+
+        // This is a get request, so be sure to include the query string
+        val request = StringBuilder()
+        request.append(hostName)
+        request.append(endPoints.getCoinDetail(), coinId)
+        request.append("?", "localization", "=", false.toString())
+        request.append("&", "tickers", "=", false.toString())
+        request.append("&", "market_data", "=", false.toString())
+        request.append("&", "community_data", "=", false.toString())
+        request.append("&", "developer_data", "=", false.toString())
+        request.append("&", "sparkline", "=", false.toString())
 
         val requestUrl = request.toString()
         val response = getDefaultHeader(mockResIdFile)

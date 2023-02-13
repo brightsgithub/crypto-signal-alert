@@ -3,10 +3,12 @@ package com.owusu.cryptosignalalert.data.repository
 import com.owusu.cryptosignalalert.data.datasource.AppPreferences
 import com.owusu.cryptosignalalert.data.datasource.CoinIdsLocalDataSource
 import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
+import com.owusu.cryptosignalalert.data.mappers.CoinDetailAPIToDomainMapper
 import com.owusu.cryptosignalalert.data.mappers.CoinIdAPIToDomainIdMapper
 import com.owusu.cryptosignalalert.data.mappers.DataAPIListMapper
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
 import com.owusu.cryptosignalalert.data.models.api.CoinIdAPI
+import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
@@ -16,7 +18,8 @@ class CoinsRepositoryImpl(
     private val dataAPIListMapper: DataAPIListMapper<CoinAPI, CoinDomain>,
     private val coinIdAPIMapper: CoinIdAPIToDomainIdMapper,
     private val coinIdsLocalDataSource: CoinIdsLocalDataSource,
-    private val appPreferences: AppPreferences
+    private val appPreferences: AppPreferences,
+    private val coinDetailAPIToDomainMapper: CoinDetailAPIToDomainMapper
 ): CoinsRepository {
     override suspend fun getCoinsList(
         page: Int,
@@ -51,5 +54,10 @@ class CoinsRepositoryImpl(
     override suspend fun nukeCoinIdsData() {
         coinIdsLocalDataSource.nukeCoinIdsData()
         appPreferences.coinIdsHaveNotBeenPopulated()
+    }
+
+    override suspend fun getCoinDetail(coinId: String): CoinDetailDomain {
+        val coinDetail = coinsDataSource.getCoinDetail(coinId)
+        return coinDetailAPIToDomainMapper.mapToDomain(coinDetail)
     }
 }

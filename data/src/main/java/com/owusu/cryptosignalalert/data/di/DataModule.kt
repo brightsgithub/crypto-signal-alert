@@ -64,7 +64,8 @@ open class DataModuleWrapper(private val context: Context) {
                 get(named(NAMED_CoinsAPIMapper)),
                 coinIdAPIMapper = get(),
                 coinIdsLocalDataSource = get(),
-                appPreferences = get()
+                appPreferences = get(),
+                coinDetailAPIToDomainMapper = get()
             )
         }
 
@@ -77,6 +78,7 @@ open class DataModuleWrapper(private val context: Context) {
         factory<DataAPIListMapper<CoinAPI, CoinDomain>>(named(NAMED_CoinsAPIMapper)){ CoinsAPIMapper() }
         factory<DataAPIListMapper<PriceTargetEntity, PriceTargetDomain>>(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)) { PriceTargetEntityToPriceTargetDomainMapper() }
         factory { CoinIdAPIToDomainIdMapper() }
+        factory { CoinDetailAPIToDomainMapper() }
         factory<DataMapper<PriceAPIWrapper, PriceWrapperDomain>>(named(NAMED_PriceAPIMapper)){ PriceAPIMapper() }
 
         factory(named(PRICE_GSON_ADAPTOR)) {

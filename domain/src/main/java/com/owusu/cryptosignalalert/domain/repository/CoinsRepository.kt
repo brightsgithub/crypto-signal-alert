@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.domain.repository
 
+import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
 
@@ -15,4 +16,5 @@ interface CoinsRepository {
     suspend fun searchCoinIds(searchStr: String): List<CoinIdDomain>
     fun hasCoinIdsBeenPopulated(): Boolean
     suspend fun nukeCoinIdsData()
+    suspend fun getCoinDetail(coinId: String): CoinDetailDomain
 }

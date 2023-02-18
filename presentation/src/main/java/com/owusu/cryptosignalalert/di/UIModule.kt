@@ -48,6 +48,8 @@ val uiModule = module() {
 
     factory { SkuDetailsDomainToUIMapper() }
 
+    factory { CoinDetailToUIMapper() }
+
     viewModel {
         val appContext = androidApplication()
         AlertListViewModel(
@@ -78,6 +80,7 @@ val uiModule = module() {
             coinUIToPriceTargetDomainMapper = get(),
             saveNewPriceTargetsUseCase = get(),
             getCoinDetailUseCase = get(),
+            coinDetailToUIMapper = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN))
         )

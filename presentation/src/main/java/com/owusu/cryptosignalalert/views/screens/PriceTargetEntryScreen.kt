@@ -1,14 +1,13 @@
 package com.owusu.cryptosignalalert.views.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -16,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.CoinDetailUI
@@ -45,7 +46,10 @@ fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel, navigateToTargetsLi
         val coinUI = sharedViewModel.selectedCoinUI
         val viewModel = getViewModel<PriceTargetEntryViewModel>()
         val viewState = viewModel.viewState.collectAsState(initial = PriceTargetEntryViewState())
-        viewModel.getCoinDetails(coinUI = coinUI)
+
+        LaunchedEffect(viewModel) {
+            viewModel.getCoinDetails(coinUI = coinUI)
+        }
 
         Surface(color = MaterialTheme.colors.background) {
             
@@ -107,7 +111,8 @@ private fun ShowPriceTargetEntryScreen(
             saveBtn,
             viewTargetsBtn,
             loadingDescView,
-            descView
+            descView,
+            infoView
         ) = createRefs()
 
         Image(
@@ -190,7 +195,7 @@ private fun ShowPriceTargetEntryScreen(
                 onSaveClicked(userPriceTarget)
             }
         ) {
-            Text("Save")
+            Text("Save Price Target")
         }
 
         if (viewState.value.isLoading) {
@@ -212,16 +217,33 @@ private fun ShowPriceTargetEntryScreen(
         }
 
         viewState.value.coinDetailUI?.description?.let {
+
+            Text(text="Information", modifier = Modifier.constrainAs(infoView){
+                top.linkTo(saveBtn.bottom, margin = 16.dp)
+            })
+
             Box(
                 modifier = Modifier
                     .constrainAs(descView) {
-                        top.linkTo(saveBtn.bottom, margin = 16.dp)
+                        top.linkTo(infoView.bottom, margin = 16.dp)
                         bottom.linkTo(parent.bottom)
+                        height = Dimension.fillToConstraints
                     }
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
+                    .border(width = 1.dp,
+                        color = Color.White,
+                        shape = RoundedCornerShape(8.dp)
+                    )
             ) {
-                Text(text = it, modifier = Modifier.fillMaxSize())
+
+                SelectionContainer() {
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
             }
         }
     }

@@ -2,6 +2,7 @@ package com.owusu.cryptosignalalert.data.datasource.db
 
 import com.owusu.cryptosignalalert.data.datasource.CoinIdsLocalDataSource
 import com.owusu.cryptosignalalert.data.models.entity.CoinIdEntity
+import kotlinx.coroutines.flow.Flow
 
 class CoinIdsLocalDataSourceImpl(
     private val coinIdsDao: CoinIdsDao
@@ -11,7 +12,7 @@ class CoinIdsLocalDataSourceImpl(
         coinIdsDao.insertCoinIds(coinIdList)
     }
 
-    override suspend fun searchCoinIds(searchStr: String): List<CoinIdEntity> {
+    override fun searchCoinIds(searchStr: String): Flow<List<CoinIdEntity>> {
         return coinIdsDao.searchCoinIds(searchStr)
     }
 

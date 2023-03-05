@@ -5,6 +5,7 @@ import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.usecase.SaveNewPriceTargetsUseCase
+import com.owusu.cryptosignalalert.domain.usecase.SearchCoinIdsUseCase
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.mappers.*
@@ -49,6 +50,8 @@ val uiModule = module() {
     factory { SkuDetailsDomainToUIMapper() }
 
     factory { CoinDetailToUIMapper() }
+
+    factory { CoinIdToUIMapper() }
 
     viewModel {
         val appContext = androidApplication()
@@ -96,6 +99,15 @@ val uiModule = module() {
             refreshSkuDetailsUseCase = get(),
             buySkyUseCase = get(),
             skuDetailsDomainToUIMapper = get(),
+            dispatcherBackground = get(named(IO)),
+            dispatcherMain = get(named(MAIN))
+        )
+    }
+
+    viewModel {
+        CoinSearchViewModel(
+            searchCoinIdsUseCase = get(),
+            coinIdToUIMapper = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN))
         )

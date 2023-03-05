@@ -69,4 +69,6 @@ val domainModule = module() {
     factory { PopulateCoinIdsUseCase(coinsRepository = get()) }
 
     factory { GetCoinDetailUseCase(coinsRepository = get()) }
+
+    factory { SearchCoinIdsUseCase(coinsRepository = get()) }
 }

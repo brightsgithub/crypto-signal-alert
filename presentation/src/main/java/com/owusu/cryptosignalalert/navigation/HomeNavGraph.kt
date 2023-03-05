@@ -53,6 +53,8 @@ fun HomeNavGraph(navHostController: NavHostController) {
 
         // nested graph
         targetsEntryGraph(navHostController, sharedViewModel)
+
+        coinSearchNavGraph(navHostController, sharedViewModel)
     }
 }
 

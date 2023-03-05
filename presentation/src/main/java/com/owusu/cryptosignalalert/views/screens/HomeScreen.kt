@@ -1,20 +1,35 @@
 package com.owusu.cryptosignalalert.views.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -35,7 +50,9 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun HomeScreen(navController: NavHostController = rememberNavController()) {
     Scaffold(
-        topBar = { TopBar() },
+        topBar = { TopBar(onSearchBarClick = {
+            navController.navigate(route = Graphs.SEARCH_NAV_GRAPH)
+        }) },
         bottomBar = { BottomNavigationBar(navController) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
@@ -58,20 +75,31 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         backgroundColor = colorResource(R.color.colorPrimary) // Set background color to avoid the white flashing when you switch between screens
     )
 }
-
+// https://johncodeos.com/how-to-add-search-in-list-with-jetpack-compose/
+// https://www.devbitsandbytes.com/configuring-searchview-in-jetpack-compose/
 @Composable
-fun TopBar() {
+fun TopBar(onSearchBarClick: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
         backgroundColor = colorResource(id = R.color.colorPrimary),
-        contentColor = Color.White
+        contentColor = Color.White,
+        actions = {
+            IconButton(
+                modifier = Modifier,
+                onClick = { onSearchBarClick() }) {
+                Icon(
+                    Icons.Filled.Search,
+                    contentDescription = stringResource(id = R.string.icn_search_view_demo_app_bar_search)
+                )
+            }
+        }
     )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun TopBarPreview() {
-    TopBar()
+    TopBar(onSearchBarClick = {})
 }
 
 @Composable
@@ -132,4 +160,5 @@ fun BottomNavigationBar(navController: NavHostController) {
         }
     }
 }
+
 

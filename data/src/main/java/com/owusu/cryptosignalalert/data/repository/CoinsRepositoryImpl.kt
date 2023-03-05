@@ -12,6 +12,8 @@ import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class CoinsRepositoryImpl(
     private val coinsDataSource: CoinsListDataSource,
@@ -42,9 +44,11 @@ class CoinsRepositoryImpl(
         appPreferences.coinIdsHaveBeenPopulated()
     }
 
-    override suspend fun searchCoinIds(searchStr: String): List<CoinIdDomain> {
+    override fun searchCoinIds(searchStr: String): Flow<List<CoinIdDomain>> {
         val entityList = coinIdsLocalDataSource.searchCoinIds(searchStr)
-        return coinIdAPIMapper.entityToDomain(entityList)
+        return entityList.map {
+            coinIdAPIMapper.entityToDomain(it)
+        }
     }
 
     override fun hasCoinIdsBeenPopulated(): Boolean {

@@ -28,4 +28,5 @@ object Graphs {
     const val MAIN_ROOT_GRAPH = "MAIN_ROOT_GRAPH"
     const val HOME_NAV_GRAPH = "HOME_NAV_GRAPH"
     const val TARGETS_ENTRY_GRAPH = "TARGETS_ENTRY_GRAPH"
+    const val SEARCH_NAV_GRAPH = "SEARCH_NAV_GRAPH"
 }

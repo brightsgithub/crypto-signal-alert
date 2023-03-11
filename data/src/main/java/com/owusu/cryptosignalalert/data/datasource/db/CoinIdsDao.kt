@@ -10,7 +10,6 @@ interface CoinIdsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCoinIds(coinIds: List<CoinIdEntity>)
 
-    //@Query("SELECT * FROM coin_id_table WHERE id LIKE '%' || :searchStr || '%' OR name LIKE '%' || :searchStr || '%' OR symbol LIKE '%' || :searchStr || '%'")
     @Query("SELECT * FROM coin_id_table WHERE LOWER(id) LIKE '%' || LOWER(:searchStr) || '%' OR LOWER(name) LIKE '%' || LOWER(:searchStr) || '%' OR LOWER(symbol) LIKE '%' || LOWER(:searchStr) || '%'")
     fun searchCoinIds(searchStr: String): Flow<List<CoinIdEntity>>
 

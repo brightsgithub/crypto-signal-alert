@@ -36,6 +36,7 @@ fun SearchBarUI(
     onClearClick: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     matchesFound: Boolean,
+    resultsSize: Int = 0,
     results: @Composable () -> Unit = {}
 ) {
 
@@ -54,7 +55,7 @@ fun SearchBarUI(
             )
 
             if (matchesFound) {
-                Text("Results", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
+                Text("Results $resultsSize", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
                 results()
             } else {
                 if (searchText.isNotEmpty()) {

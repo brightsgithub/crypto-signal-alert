@@ -3,20 +3,21 @@ package com.owusu.cryptosignalalert.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinDetailUseCase
+import com.owusu.cryptosignalalert.domain.usecase.GetCoinsListUseCase
 import com.owusu.cryptosignalalert.domain.usecase.SearchCoinIdsUseCase
 import com.owusu.cryptosignalalert.mappers.CoinDetailToUIMapper
+import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
 import com.owusu.cryptosignalalert.mappers.CoinIdToUIMapper
-import com.owusu.cryptosignalalert.models.CoinIdUI
-import com.owusu.cryptosignalalert.models.CoinSearchState
+import com.owusu.cryptosignalalert.models.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase,
+                          private val getCoinsListUseCase: GetCoinsListUseCase,
+                          private val coinDomainToUIMapper: CoinDomainToUIMapper,
                           private val coinIdToUIMapper: CoinIdToUIMapper,
                           private val dispatcherBackground: CoroutineDispatcher,
                           private val dispatcherMain: CoroutineDispatcher
@@ -26,18 +27,25 @@ class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase
     private val searchText: MutableStateFlow<String> = MutableStateFlow("")
     private var showProgressBar: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var matchedCoinIds: MutableStateFlow<List<CoinIdUI>> = MutableStateFlow(arrayListOf())
+    private var resultSize: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    private val _coinSearchStateEvents: MutableStateFlow<CoinSearchStateEvents> = MutableStateFlow(CoinSearchStateEvents.NOTHING)
+    val coinSearchStateEvents: Flow<CoinSearchStateEvents> = _coinSearchStateEvents
+
     private var searchJob: Job? = null
 
     val coinIdSearchModelState = combine(
         searchText,
         matchedCoinIds,
-        showProgressBar
-    ) { text, matchedIds, showProgress ->
+        showProgressBar,
+        resultSize
+    ) { text, matchedIds, showProgress, resultSize ->
 
         CoinSearchState(
             searchStr = text,
             coinIds = matchedIds,
-            showProgress
+            showProgressBar = showProgress,
+            resultSize = resultSize
         )
     }
 
@@ -49,12 +57,29 @@ class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase
             matchedCoinIds.value = emptyList()
             return
         }
-
+        showProgressBar.value = true
         searchJob?.cancel() // Cancel the previous search job if it's still running
         searchJob = scope.launch {
-            searchCoinIdsUseCase.invoke(SearchCoinIdsUseCase.Params(changedSearchText)).map { coinIdDomain ->
-                matchedCoinIds.value = coinIdToUIMapper.map(coinIdDomain)
+            searchCoinIdsUseCase.invoke(SearchCoinIdsUseCase.Params(changedSearchText)).collect { coinIdList ->
+                resultSize.value = coinIdList.size
+                matchedCoinIds.value = coinIdToUIMapper.map(coinIdList)
             }
+            showProgressBar.value = false
+        }
+    }
+
+    fun onSearchItemSelected(
+        coinIdUI: CoinIdUI,
+        scope: CoroutineScope = viewModelScope,
+    ) {
+        scope.launch {
+            showProgressBar.value = true
+            val params = GetCoinsListUseCase.Params(ids = coinIdUI.id)
+            getCoinsListUseCase.invoke(params).firstOrNull()?.let {
+                val coinDomainUI = coinDomainToUIMapper.mapDomainToUI(it)
+                _coinSearchStateEvents.value = CoinSearchStateEvents.NavigateToPriceTargetEntryScreen(coinDomainUI)
+            }
+            showProgressBar.value = false
         }
     }
 

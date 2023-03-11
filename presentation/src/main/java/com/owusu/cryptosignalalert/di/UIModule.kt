@@ -107,6 +107,8 @@ val uiModule = module() {
     viewModel {
         CoinSearchViewModel(
             searchCoinIdsUseCase = get(),
+            getCoinsListUseCase = get(),
+            coinDomainToUIMapper = get(),
             coinIdToUIMapper = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN))

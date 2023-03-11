@@ -12,7 +12,7 @@ class CoinDomainToUIMapper(private val priceDisplayUtils: PriceDisplayUtils) {
 
     fun mapDomainToUI(
         coinDomain: CoinDomain,
-        priceTargetsMap: Map<String,PriceTargetDomain>
+        priceTargetsMap: Map<String,PriceTargetDomain> = emptyMap()
     ): CoinUI {
 
         val priceTargetDomain = priceTargetsMap[coinDomain.id]

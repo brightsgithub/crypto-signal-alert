@@ -8,9 +8,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,15 +29,27 @@ import org.koin.androidx.compose.getViewModel
 //@ExperimentalAnimationApi
 @Composable
 fun CoinSearchScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
-
-
     val searchViewModel = getViewModel<CoinSearchViewModel>()
+
     val coinSearchState = searchViewModel.coinIdSearchModelState.collectAsState(initial = CoinSearchState.Empty)
-    searchViewModel.coinSearchStateEvents.collectAsState(initial = CoinSearchStateEvents.NOTHING).value.let {
-        when(it) {
-            is CoinSearchStateEvents.NOTHING -> {}
-            is CoinSearchStateEvents.NavigateToPriceTargetEntryScreen -> {
-                navigateToPriceTargetEntryScreen(it.coinUI)
+
+    /*
+     * https://www.droidcon.com/2022/05/20/a-cleaner-way-to-interact-between-composable-and-viewmodel-in-jetpack-compose/
+     * https://github.com/aqua30/FormValidation
+     *
+     * When listening for EVENTS from the viewModel do NOT use collect AS State, since when using this
+     * kept calling NavigateToPriceTargetEntryScreen and opening the targets screen multiple times ina loop.
+     * maybe I could use collectAsState inside LaunchedEffect? but decided to go with above example and
+     * stick with the usual collect and listen for events
+     */
+    val context = LocalContext.current
+    LaunchedEffect(key1 = context) {
+        searchViewModel.coinSearchStateEvents.collect {
+            when (it) {
+                is CoinSearchStateEvents.NOTHING -> {}
+                is CoinSearchStateEvents.NavigateToPriceTargetEntryScreen -> {
+                    navigateToPriceTargetEntryScreen(it.coinUI)
+                }
             }
         }
     }

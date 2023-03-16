@@ -43,7 +43,9 @@ val domainModule = module() {
     }
 
     factory {
-        MergeOldPriceTargetWithNewDataUseCase()
+        MergeOldPriceTargetWithNewDataUseCase(
+            getHistoricalPriceUseCase = get()
+        )
     }
 
     single {
@@ -71,4 +73,6 @@ val domainModule = module() {
     factory { GetCoinDetailUseCase(coinsRepository = get()) }
 
     factory { SearchCoinIdsUseCase(coinsRepository = get()) }
+
+    factory { GetHistoricalPriceUseCase(coinsRepository = get()) }
 }

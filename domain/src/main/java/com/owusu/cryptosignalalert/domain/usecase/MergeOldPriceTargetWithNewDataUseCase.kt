@@ -1,11 +1,10 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
-import com.owusu.cryptosignalalert.domain.models.CoinDomain
-import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
-import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
-import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
+import com.owusu.cryptosignalalert.domain.models.*
+import java.util.*
 
-class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
+class MergeOldPriceTargetWithNewDataUseCase(
+    private val getHistoricalPriceUseCase: GetHistoricalPriceUseCase): SuspendedUseCase<
         MergeOldPriceTargetWithNewDataUseCase.Params, List<PriceTargetDomain>> {
 
     override suspend fun invoke(params: Params): List<PriceTargetDomain> {
@@ -14,7 +13,7 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
         }
     }
 
-    private fun getUpdatedPriceTargets(
+    private suspend fun getUpdatedPriceTargets(
         coinsList: List<CoinDomain>,
         priceTargets: List<PriceTargetDomain>,
         lastUpdated: String): List<PriceTargetDomain> {
@@ -47,7 +46,8 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
                     val hasBeenHit = checkIfPriceTargetBeenHit(
                         coinDomain.currentPrice,
                         it.userPriceTarget,
-                        it.priceTargetDirection
+                        it.priceTargetDirection,
+                        coinDomain.id
                     )
 
                     // if the price target has just been hit, lets store this as our completed date
@@ -136,16 +136,81 @@ class MergeOldPriceTargetWithNewDataUseCase: SuspendedUseCase<
      *
      * This method will simply check at the interval of 5 mins, if the price target has been hit at that time.
      */
-    private fun checkIfPriceTargetBeenHit(
+    private suspend fun checkIfPriceTargetBeenHit(
         currentPrice: Double,
         userPriceTarget: Double,
-        priceTargetDirection: PriceTargetDirection): Boolean {
+        priceTargetDirection: PriceTargetDirection,
+        coinId: String
+    ): Boolean {
 
-        return when (priceTargetDirection) {
-            PriceTargetDirection.ABOVE -> { currentPrice >= userPriceTarget }
-            PriceTargetDirection.BELOW -> { currentPrice <= userPriceTarget }
-            else -> { false }
+
+        val historicalPriceData = getHistoricalPriceUseCase.invoke(GetHistoricalPriceUseCase.Params(coinId))
+
+        val fifteenMinutesAgo = getHistoricalTimestamp(20)
+        val filteredHistoricPriceDomains = onlyAddPricesFrom15MinutesAgo(fifteenMinutesAgo, historicalPriceData, currentPrice)
+
+
+        filteredHistoricPriceDomains.forEach {
+            val priceToCheck = it.price
+            val hasTargetBeenHit = when (priceTargetDirection) {
+                PriceTargetDirection.ABOVE -> { priceToCheck >= userPriceTarget }
+                PriceTargetDirection.BELOW -> { priceToCheck <= userPriceTarget }
+                else -> { false }
+            }
+
+            if (hasTargetBeenHit) {
+                return true
+            }
         }
+
+        return false
+    }
+
+    private fun getHistoricalTimestamp(timeInMinutesToSubtract: Int): Long {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MINUTE, -timeInMinutesToSubtract)
+        return calendar.timeInMillis
+    }
+
+    /**
+     * Since we check every 15 mins to see if the target has been met, when we get a list of all
+     * historic prices (which is returned from the beginning of the day, for the price on a 5 min interval)
+     * we only grab the last 15 mins
+     */
+    private fun onlyAddPricesFrom15MinutesAgo(
+        timestamp15MinutesAgo: Long,
+        historicalPriceData: HistoricPriceWrapperDomain,
+        currentPrice: Double):
+            List<HistoricPriceDomain> {
+
+        val filteredHistoricPriceDomains = arrayListOf<HistoricPriceDomain>()
+
+        for(priceApi:  HistoricPriceDomain in historicalPriceData.prices) {
+            val cal1 = Calendar.getInstance()
+            val cal2 = Calendar.getInstance()
+
+            val previousTimestamp = priceApi.timestamp
+
+            cal1.timeInMillis = previousTimestamp
+            cal2.timeInMillis = timestamp15MinutesAgo
+
+            val comparison = cal1.compareTo(cal2)
+
+            // When the previous timestamp is greater or equal to 15 mins ago, add it to our filtered
+            // list for later analysis
+            if (comparison >= 0) {
+                filteredHistoricPriceDomains.add(priceApi)
+            }
+        }
+
+        // add the current price as a HistoricPriceDomain
+        filteredHistoricPriceDomains.add(
+            HistoricPriceDomain(
+                Calendar.getInstance().timeInMillis,
+                currentPrice
+            ))
+
+        return filteredHistoricPriceDomains
     }
 
     data class Params(val coinsList: List<CoinDomain>,

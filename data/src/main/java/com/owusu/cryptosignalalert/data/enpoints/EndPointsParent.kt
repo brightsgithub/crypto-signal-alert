@@ -22,4 +22,8 @@ abstract class EndPointsParent {
     fun getCoinDetail(): String {
         return "/api/v3/coins/"
     }
+
+    fun getHistoricalPriceData(): String {
+        return "/api/v3/coins/"
+    }
 }

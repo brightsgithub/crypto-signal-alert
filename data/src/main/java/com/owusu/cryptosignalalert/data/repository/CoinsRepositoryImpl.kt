@@ -6,11 +6,12 @@ import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
 import com.owusu.cryptosignalalert.data.mappers.CoinDetailAPIToDomainMapper
 import com.owusu.cryptosignalalert.data.mappers.CoinIdAPIToDomainIdMapper
 import com.owusu.cryptosignalalert.data.mappers.DataAPIListMapper
+import com.owusu.cryptosignalalert.data.mappers.HistoricalPriceAPIToDomainMapper
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
-import com.owusu.cryptosignalalert.data.models.api.CoinIdAPI
 import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
+import com.owusu.cryptosignalalert.domain.models.HistoricPriceWrapperDomain
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,8 +22,10 @@ class CoinsRepositoryImpl(
     private val coinIdAPIMapper: CoinIdAPIToDomainIdMapper,
     private val coinIdsLocalDataSource: CoinIdsLocalDataSource,
     private val appPreferences: AppPreferences,
-    private val coinDetailAPIToDomainMapper: CoinDetailAPIToDomainMapper
-): CoinsRepository {
+    private val coinDetailAPIToDomainMapper: CoinDetailAPIToDomainMapper,
+    private val historicalPriceAPIToDomainMapper: HistoricalPriceAPIToDomainMapper,
+
+    ): CoinsRepository {
     override suspend fun getCoinsList(
         page: Int,
         recordsPerPage: Int,
@@ -63,5 +66,10 @@ class CoinsRepositoryImpl(
     override suspend fun getCoinDetail(coinId: String): CoinDetailDomain {
         val coinDetail = coinsDataSource.getCoinDetail(coinId)
         return coinDetailAPIToDomainMapper.mapToDomain(coinDetail)
+    }
+
+    override suspend fun getHistoricalPriceData(coinId: String, currency: String): HistoricPriceWrapperDomain {
+        val result = coinsDataSource.getHistoricalPriceData(coinId, currency)
+        return historicalPriceAPIToDomainMapper.mapToDomain(result)
     }
 }

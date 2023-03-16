@@ -25,6 +25,7 @@ fun NavGraphBuilder.coinSearchNavGraph(
                         popUpTo(route = Graphs.SEARCH_NAV_GRAPH) {
                             inclusive = true
                         }
+                        launchSingleTop = true
                     }
                 })
             }

@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.domain.repository
 import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
+import com.owusu.cryptosignalalert.domain.models.HistoricPriceWrapperDomain
 import kotlinx.coroutines.flow.Flow
 
 interface CoinsRepository {
@@ -18,4 +19,5 @@ interface CoinsRepository {
     fun hasCoinIdsBeenPopulated(): Boolean
     suspend fun nukeCoinIdsData()
     suspend fun getCoinDetail(coinId: String): CoinDetailDomain
+    suspend fun getHistoricalPriceData(coinId: String, currency: String): HistoricPriceWrapperDomain
 }

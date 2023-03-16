@@ -25,6 +25,7 @@ fun NavGraphBuilder.targetsEntryGraph(
                         popUpTo(route = Graphs.TARGETS_ENTRY_GRAPH) {
                             inclusive = true
                         }
+                        launchSingleTop = true
                     }
                 })
             }

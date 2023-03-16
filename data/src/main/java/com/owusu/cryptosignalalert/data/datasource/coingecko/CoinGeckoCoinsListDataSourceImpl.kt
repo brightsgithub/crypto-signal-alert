@@ -5,6 +5,7 @@ import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
 import com.owusu.cryptosignalalert.data.models.api.CoinIdAPI
 import com.owusu.cryptosignalalert.data.models.api.coindetail.CoinDetailAPI
+import com.owusu.cryptosignalalert.data.models.api.historic.HistoricPriceAPI
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -63,6 +64,21 @@ class CoinGeckoCoinsListDataSourceImpl(
                 parameters.append("community_data", false.toString())
                 parameters.append("developer_data", false.toString())
                 parameters.append("sparkline", false.toString())
+            }
+
+        }.body()
+        return result
+    }
+
+    override suspend fun getHistoricalPriceData(coinId: String, currency: String): HistoricPriceAPI {
+
+        val result: HistoricPriceAPI = httpClient.get(endPoints.getHistoricalPriceData() + coinId + "/market_chart") {
+            accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            url {
+                parameters.append("vs_currency", currency)
+                parameters.append("days", "1")
+                parameters.append("interval", "daily")
             }
 
         }.body()

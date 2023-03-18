@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinDetailUseCase
 import com.owusu.cryptosignalalert.domain.usecase.SaveNewPriceTargetsUseCase
+import com.owusu.cryptosignalalert.domain.usecase.SaveNewPriceTargetsWithLimitUseCase
 import com.owusu.cryptosignalalert.mappers.CoinDetailToUIMapper
 import com.owusu.cryptosignalalert.mappers.CoinUIToPriceTargetDomainMapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class PriceTargetEntryViewModel(
     private val coinUIToPriceTargetDomainMapper: CoinUIToPriceTargetDomainMapper,
-    private val saveNewPriceTargetsUseCase: SaveNewPriceTargetsUseCase,
+    private val saveNewPriceTargetsWithLimitUseCase: SaveNewPriceTargetsWithLimitUseCase,
     private val getCoinDetailUseCase: GetCoinDetailUseCase,
     private val coinDetailToUIMapper: CoinDetailToUIMapper,
     private val dispatcherBackground: CoroutineDispatcher,
@@ -47,8 +48,8 @@ class PriceTargetEntryViewModel(
         viewModelScope.launch {
             val priceTargetDomain = coinUIToPriceTargetDomainMapper.mapUIToDomain(coinUI, userPriceTarget)
             val priceTargetDomainList = listOf(priceTargetDomain)
-            val params = SaveNewPriceTargetsUseCase.Params(priceTargetDomainList)
-            val wasPriceTargetSaved = saveNewPriceTargetsUseCase.invoke(params = params)
+            val params = SaveNewPriceTargetsWithLimitUseCase.Params(priceTargetDomainList)
+            val wasPriceTargetSaved = saveNewPriceTargetsWithLimitUseCase.invoke(params = params)
             publishSaveStatus(wasPriceTargetSaved)
         }
     }

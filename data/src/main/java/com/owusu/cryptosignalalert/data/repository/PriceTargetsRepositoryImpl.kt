@@ -33,6 +33,10 @@ class PriceTargetsRepositoryImpl(
         priceTargetsDataSource.deletePriceTargets(priceTargets)
     }
 
+    override suspend fun getPriceTargetsCount(): Int {
+        return priceTargetsDataSource.getPriceTargetsCount()
+    }
+
     override suspend fun nukeAll() {
         priceTargetsDataSource.nukeAll()
     }

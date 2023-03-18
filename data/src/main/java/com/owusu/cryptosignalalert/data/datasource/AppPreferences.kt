@@ -2,8 +2,9 @@ package com.owusu.cryptosignalalert.data.datasource
 
 
 import android.content.Context
+import com.owusu.cryptosignalalert.domain.repository.AppPreferencesRepository
 
-class AppPreferences constructor(val context: Context) {
+class AppPreferences constructor(val context: Context): AppPreferencesRepository {
 
     private val myPref = "asdsdsdddddddddsxccxdsdsd"
     private val isShakeTorchEnabled = "asdasdasdadasda"
@@ -14,6 +15,8 @@ class AppPreferences constructor(val context: Context) {
     private val isAdvSettingsPurchased = "bldussdssdsdsdssssss"
     private val autoOffDuration = "zjgllvvcjfzhlln"
     private val isAppFree = "xxxxxxxxxssssadsjksfhksfjkdhfkdsjfh"
+    private val isAdsFree = "ccccxxxkjghyyrtrrtrthhrtfrgtdfgdgf"
+    private val isPriceTargetLimitFree = "ccccxzzzzxxkjghyyrtrrtrthhrtfrgtdfgdgf"
     private val isVibrate = "vibraedssddsdsddsddsds"
     private val coinIdPopulated = "dfdfdgghfghfghgfhhfgdxxxx"
 
@@ -69,27 +72,51 @@ class AppPreferences constructor(val context: Context) {
         return getBoolean(isOnBoadingScrCompleted, false)
     }
 
-    fun isAppFree(): Boolean {
+    override fun isPriceTargetLimitPurchased(): Boolean {
+        return getBoolean(isPriceTargetLimitFree, false)
+    }
+
+    override fun makePriceTargetLimitFree() {
+        putBoolean(isPriceTargetLimitFree, true)
+    }
+
+    override fun makePriceTargetLimitPurchasable() {
+        putBoolean(isPriceTargetLimitFree, false)
+    }
+
+    override fun isAdsPurchased(): Boolean {
+        return getBoolean(isAdsFree, false)
+    }
+
+    override fun makeAdsFree() {
+        putBoolean(isAdsFree, true)
+    }
+
+    override fun makeAdsPurchasable() {
+        putBoolean(isAdsFree, false)
+    }
+
+    override fun isAppFree(): Boolean {
         return getBoolean(isAppFree, false)
     }
 
-    fun makeAppFree() {
+    override fun makeAppFree() {
         putBoolean(isAppFree, true)
     }
 
-    fun makeAppPurchaseable() {
+    override fun makeAppPurchasable() {
         putBoolean(isAppFree, false)
     }
 
-    fun hasCoinIdsBeenPopulated(): Boolean {
+    override fun hasCoinIdsBeenPopulated(): Boolean {
         return getBoolean(coinIdPopulated, false)
     }
 
-    fun coinIdsHaveBeenPopulated() {
+    override fun coinIdsHaveBeenPopulated() {
         putBoolean(coinIdPopulated, true)
     }
 
-    fun coinIdsHaveNotBeenPopulated() {
+    override fun coinIdsHaveNotBeenPopulated() {
         putBoolean(coinIdPopulated, false)
     }
 

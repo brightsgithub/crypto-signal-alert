@@ -8,6 +8,7 @@ import com.owusu.cryptosignalalert.data.mappers.SkuMapper
 import com.owusu.cryptosignalalert.data.models.SkuWrapper
 import com.owusu.cryptosignalalert.data.models.skus.Skus
 import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS
+import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS_MAP
 import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_REMOVE_ADS
 import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_UNLIMITED_ALERTS
 import com.owusu.cryptosignalalert.data.models.skus.Skus.SKU_UNLOCK_ALL
@@ -67,8 +68,16 @@ class GoogleBillingRepository(
         billingDataSource.refresh()
     }
 
+    override fun getSkuIds(): List<String> {
+        return INAPP_SKUS.toList()
+    }
+
+    override fun getSkuIdsMap(): Map<String, String> {
+        return INAPP_SKUS_MAP
+    }
+
     override suspend fun getSkuDetails(skus: List<String>?): List<SkuDetailsDomain> {
-        val skuList = skus ?: INAPP_SKUS.toList()
+        val skuList = skus ?: getSkuIds()
         val skDetailsDomainList = mutableListOf<SkuDetailsDomain>()
 
         for(sku: String in skuList) {

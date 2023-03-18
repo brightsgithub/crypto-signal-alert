@@ -31,6 +31,14 @@ val domainModule = module() {
     }
 
     factory {
+        SaveNewPriceTargetsWithLimitUseCase(
+            priceTargetsRepository = get(),
+            saveNewPriceTargetsUseCase = get(),
+            appPreferencesRepository = get()
+        )
+    }
+
+    factory {
         SaveNewPriceTargetsUseCase(get())
     }
 
@@ -61,7 +69,11 @@ val domainModule = module() {
     }
 
     factory {
-        StartupBillingUseCase(billingRepository = get(), refreshSkuDetailsUseCase = get())
+        StartupBillingUseCase(
+            billingRepository = get(),
+            refreshSkuDetailsUseCase = get(),
+            appPreferences = get()
+        )
     }
 
     factory {

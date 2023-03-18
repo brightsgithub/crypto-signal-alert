@@ -19,6 +19,11 @@ class PriceTargetsDataSourceImpl(
         return mapper.transform(entityList)
     }
 
+    @Synchronized
+    override suspend fun getPriceTargetsCount(): Int {
+        return priceTargetDao.getPriceTargetsCount()
+    }
+
     override suspend fun getPriceTargetsToAlertUser(): List<PriceTargetDomain> {
         val entityList = priceTargetDao.getPriceTargetsToAlertUser()
         return mapper.transform(entityList)

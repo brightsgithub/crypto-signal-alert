@@ -81,7 +81,7 @@ val uiModule = module() {
     viewModel {
         PriceTargetEntryViewModel(
             coinUIToPriceTargetDomainMapper = get(),
-            saveNewPriceTargetsUseCase = get(),
+            saveNewPriceTargetsWithLimitUseCase = get(),
             getCoinDetailUseCase = get(),
             coinDetailToUIMapper = get(),
             dispatcherBackground = get(named(IO)),

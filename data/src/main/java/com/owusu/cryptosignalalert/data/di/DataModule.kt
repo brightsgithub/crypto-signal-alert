@@ -24,10 +24,7 @@ import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.PriceWrapperDomain
-import com.owusu.cryptosignalalert.domain.repository.BillingRepository
-import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
-import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
-import com.owusu.cryptosignalalert.domain.repository.PriceInfoRepository
+import com.owusu.cryptosignalalert.domain.repository.*
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.*
@@ -117,7 +114,7 @@ open class DataModuleWrapper(private val context: Context) {
             PriceTargetsDataSourceImpl(get(), get(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)))
         }
 
-        single { AppPreferences(context) }
+        single<AppPreferencesRepository> { AppPreferences(context) }
 
         single<BillingRepository> {
             GoogleBillingRepository(

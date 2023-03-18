@@ -12,4 +12,6 @@ interface BillingRepository {
     suspend fun refresh()
     fun buySku(screenProxy: ScreenProxy, sku: String)
     val billingFlowInProcess: Flow<Boolean>
+    fun getSkuIds(): List<String>
+    fun getSkuIdsMap(): Map<String, String>
 }

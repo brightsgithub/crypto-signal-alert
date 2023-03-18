@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.data.repository
 
-import com.owusu.cryptosignalalert.data.datasource.AppPreferences
 import com.owusu.cryptosignalalert.data.datasource.CoinIdsLocalDataSource
 import com.owusu.cryptosignalalert.data.datasource.CoinsListDataSource
 import com.owusu.cryptosignalalert.data.mappers.CoinDetailAPIToDomainMapper
@@ -12,6 +11,7 @@ import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
 import com.owusu.cryptosignalalert.domain.models.HistoricPriceWrapperDomain
+import com.owusu.cryptosignalalert.domain.repository.AppPreferencesRepository
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,7 +21,7 @@ class CoinsRepositoryImpl(
     private val dataAPIListMapper: DataAPIListMapper<CoinAPI, CoinDomain>,
     private val coinIdAPIMapper: CoinIdAPIToDomainIdMapper,
     private val coinIdsLocalDataSource: CoinIdsLocalDataSource,
-    private val appPreferences: AppPreferences,
+    private val appPreferences: AppPreferencesRepository,
     private val coinDetailAPIToDomainMapper: CoinDetailAPIToDomainMapper,
     private val historicalPriceAPIToDomainMapper: HistoricalPriceAPIToDomainMapper,
 

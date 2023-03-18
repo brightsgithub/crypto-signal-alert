@@ -154,6 +154,28 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         assertNotNull(coinDetail.blockTimeInMinutes)
     }
 
+    @Test
+    fun getHistoricalPriceDataTest() = runBlocking {
+
+        val coinId = "bitcoin"
+        initDispatcher(getResponseForHistoricalPrice(R.raw.get_historic_price_data, coinId, "usd"))
+
+        val historicPriceWrapperDomain = coinsRepository.getHistoricalPriceData(coinId, "usd")
+
+
+        // check the first set
+        assert(historicPriceWrapperDomain.prices[0].timestamp > 0)
+        assert(historicPriceWrapperDomain.prices[0].timestamp == 1678961435283)
+        assert(historicPriceWrapperDomain.prices[0].price > 0)
+        assert(historicPriceWrapperDomain.prices[0].price.equals(24899.615594296833))
+
+        // check the last set
+        assert(historicPriceWrapperDomain.prices[288].timestamp > 0)
+        assert(historicPriceWrapperDomain.prices[288].timestamp == 1679047801000)
+        assert(historicPriceWrapperDomain.prices[288].price > 0)
+        assert(historicPriceWrapperDomain.prices[288].price.equals(26594.518100449))
+    }
+
     private fun getResponseMapForCoinsListWithMarketData(page: Int,
                                                          recordsPerPage: Int,
                                                          currencies: String,
@@ -211,6 +233,23 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         request.append("&", "community_data", "=", false.toString())
         request.append("&", "developer_data", "=", false.toString())
         request.append("&", "sparkline", "=", false.toString())
+
+        val requestUrl = request.toString()
+        val response = getDefaultHeader(mockResIdFile)
+        return mapOf(requestUrl to response)
+    }
+
+
+    private fun getResponseForHistoricalPrice(mockResIdFile: Int, coinId: String, currency: String): Map<String, MockResponse> {
+
+        val hostName = endPoints.getHostName()
+        // https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1
+        // This is a get request, so be sure to include the query string
+        val request = StringBuilder()
+        request.append(hostName)
+        request.append(endPoints.getHistoricalPriceData(), coinId, "/market_chart")
+        request.append("?", "vs_currency", "=", currency)
+        request.append("&", "days", "=", "1")
 
         val requestUrl = request.toString()
         val response = getDefaultHeader(mockResIdFile)

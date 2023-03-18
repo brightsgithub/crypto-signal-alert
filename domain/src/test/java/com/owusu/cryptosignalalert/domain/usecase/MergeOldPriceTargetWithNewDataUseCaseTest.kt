@@ -1,21 +1,26 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
-import com.owusu.cryptosignalalert.domain.models.CoinDomain
-import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
-import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.models.*
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.any
 import org.junit.Before
 import org.junit.Test
+import java.io.File
+import java.io.FileReader
+import java.util.Calendar
 
 class MergeOldPriceTargetWithNewDataUseCaseTest {
 
     private lateinit var cut: MergeOldPriceTargetWithNewDataUseCase
+    private val mockGetHistoricalPriceUseCase  = mockk<GetHistoricalPriceUseCase>()
 
     @Before
     fun setUp() {
-        cut = MergeOldPriceTargetWithNewDataUseCase()
+        coEvery {mockGetHistoricalPriceUseCase.invoke(any()) } returns getStaticHistoricalPriceData()
+        cut = MergeOldPriceTargetWithNewDataUseCase(mockGetHistoricalPriceUseCase)
     }
 
     @Test
@@ -45,6 +50,11 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
     @Test
     fun  `completedOnDate should equal null when new price target does not meet the users price target`() {
         runTest {
+
+            coEvery {mockGetHistoricalPriceUseCase.invoke(any()) } returnsMany listOf(
+                getStaticHistoricalPriceDataHigherThan20k(),
+                getStaticHistoricalPriceDataForEthLowerThan2k()
+            )
 
             val currentPriceTargets = getMockedCurrentPriceTargetsDomain()
 
@@ -92,6 +102,10 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
     @Test
     fun `hasTargetBeenHit should return false when new price target does not meet users price target`() {
         runTest {
+            coEvery {mockGetHistoricalPriceUseCase.invoke(any()) } returnsMany listOf(
+                getStaticHistoricalPriceDataHigherThan20k(),
+                getStaticHistoricalPriceDataForEthLowerThan2k()
+            )
 
             val currentPriceTargets = getMockedCurrentPriceTargetsDomain()
 
@@ -259,5 +273,59 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { completedOnDate } returns "Jan 1"
             },
         )
+    }
+
+    private fun getStaticHistoricalPriceData(): HistoricPriceWrapperDomain {
+        val prices = arrayListOf<HistoricPriceDomain>()
+        prices.add(HistoricPriceDomain(1678892579000, 24808.153320502854))
+        prices.add(HistoricPriceDomain(1678892139910, 24750.833170525402))
+        prices.add(HistoricPriceDomain(1678891806700, 24608.64962541245))
+        prices.add(HistoricPriceDomain(1678891498363, 24651.314584738193))
+        prices.add(HistoricPriceDomain(1678891220459, 24751.780149332506))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(30), 24751.104247902713))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(25), 24872.82892089749))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(20), 24973.988273159932))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(15), 24969.360546799628))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(10), 19000.579825437104))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(5), 24982.33290077767))
+        return HistoricPriceWrapperDomain(prices)
+    }
+
+    private fun getStaticHistoricalPriceDataHigherThan20k(): HistoricPriceWrapperDomain {
+        val prices = arrayListOf<HistoricPriceDomain>()
+        prices.add(HistoricPriceDomain(1678892579000, 24808.153320502854))
+        prices.add(HistoricPriceDomain(1678892139910, 24750.833170525402))
+        prices.add(HistoricPriceDomain(1678891806700, 24608.64962541245))
+        prices.add(HistoricPriceDomain(1678891498363, 24651.314584738193))
+        prices.add(HistoricPriceDomain(1678891220459, 24751.780149332506))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(30), 24751.104247902713))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(25), 24872.82892089749))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(20), 24973.988273159932))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(15), 24969.360546799628))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(10), 25969.579825437104))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(5), 24982.33290077767))
+        return HistoricPriceWrapperDomain(prices)
+    }
+
+    private fun getStaticHistoricalPriceDataForEthLowerThan2k(): HistoricPriceWrapperDomain {
+        val prices = arrayListOf<HistoricPriceDomain>()
+        prices.add(HistoricPriceDomain(1678892579000, 1000.153320502854))
+        prices.add(HistoricPriceDomain(1678892139910, 1000.833170525402))
+        prices.add(HistoricPriceDomain(1678891806700, 1000.64962541245))
+        prices.add(HistoricPriceDomain(1678891498363, 1000.314584738193))
+        prices.add(HistoricPriceDomain(1678891220459, 1000.780149332506))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(30), 1000.104247902713))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(25), 1000.82892089749))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(20), 1000.988273159932))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(15), 1000.360546799628))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(10), 1000.579825437104))
+        prices.add(HistoricPriceDomain(getHistoricalTimestamp(5), 1000.33290077767))
+        return HistoricPriceWrapperDomain(prices)
+    }
+
+    private fun getHistoricalTimestamp(timeInMinutesToSubtract: Int): Long {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MINUTE, -timeInMinutesToSubtract)
+        return calendar.timeInMillis
     }
 }

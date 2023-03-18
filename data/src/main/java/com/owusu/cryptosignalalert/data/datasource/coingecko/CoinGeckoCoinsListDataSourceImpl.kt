@@ -78,7 +78,7 @@ class CoinGeckoCoinsListDataSourceImpl(
             url {
                 parameters.append("vs_currency", currency)
                 parameters.append("days", "1")
-                parameters.append("interval", "daily")
+                //parameters.append("interval", "daily")
             }
 
         }.body()

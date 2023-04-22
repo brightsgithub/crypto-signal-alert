@@ -13,5 +13,6 @@
     <string name="icn_search_clear_content_description">Search for crypto assets</string>
     <string name="icn_search_view_demo_app_bar_search">Search crypto assets</string>
     <string name="icn_search_back_content_description">Navigate back</string>
+    <string name="max_saved_priced_targets_reached">Max limit of %1$s  price targets reached</string>
 
 </resources>

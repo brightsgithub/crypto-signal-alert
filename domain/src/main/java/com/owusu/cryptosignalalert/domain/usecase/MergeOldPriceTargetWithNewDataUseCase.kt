@@ -144,7 +144,7 @@ class MergeOldPriceTargetWithNewDataUseCase(
     ): Boolean {
 
 
-        val historicalPriceData = getHistoricalPriceUseCase.invoke(GetHistoricalPriceUseCase.Params(coinId))
+        val historicalPriceData = HistoricPriceWrapperDomain(arrayListOf()) //getHistoricalPriceUseCase.invoke(GetHistoricalPriceUseCase.Params(coinId))
         val fifteenMinutesAgo = getHistoricalTimestamp(20)// should get the last 4
         val filteredHistoricPriceDomains = onlyAddPricesFrom15MinutesAgo(fifteenMinutesAgo, historicalPriceData, currentPrice)
 

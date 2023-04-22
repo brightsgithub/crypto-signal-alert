@@ -1,8 +1,8 @@
 package com.owusu.cryptosignalalert.views.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,19 +25,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
-import com.owusu.cryptosignalalert.models.CoinDetailUI
-import com.owusu.cryptosignalalert.models.CoinUI
-import com.owusu.cryptosignalalert.models.PriceTargetEntryViewState
+import com.owusu.cryptosignalalert.models.*
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
-import com.owusu.cryptosignalalert.viewmodels.PurchaseViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.getViewModel
+import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel, navigateToTargetsList:() -> Unit) {
@@ -46,9 +46,24 @@ fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel, navigateToTargetsLi
         val coinUI = sharedViewModel.selectedCoinUI
         val viewModel = getViewModel<PriceTargetEntryViewModel>()
         val viewState = viewModel.viewState.collectAsState(initial = PriceTargetEntryViewState())
+        //val screenEvents = viewModel.screenEvents.collectAsState(initial = PriceEntryScreenEvents.Nothing)
+        val screenEvents by remember(viewModel) { viewModel.screenEvents }.collectAsState(initial = PriceEntryScreenEvents.Nothing)
+        val screenEvents2  = viewModel.screenEvents.collectAsStateW
+
 
         LaunchedEffect(viewModel) {
             viewModel.getCoinDetails(coinUI = coinUI)
+        }
+
+        LaunchedEffect(true) {
+            snapshotFlow {viewModel.screenEvents    }
+                .collect {
+                handleUIAction(screenEvents = )
+            }
+            viewModel.screenEvents.collectLatest { newValue ->
+                // Update the UI with the latest value
+                handleUIAction(newValue)
+            }
         }
 
         Surface(color = MaterialTheme.colors.background) {
@@ -65,6 +80,49 @@ fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel, navigateToTargetsLi
         LoadingWidget3()
     }
 }
+
+
+@Composable
+fun handleUIAction(screenEvents: PriceEntryScreenEvents) {
+    when (screenEvents) {
+        PriceEntryScreenEvents.Nothing -> {}
+        PriceEntryScreenEvents.SavePriceTargetFailure -> showButtonAndSnackbar()
+        PriceEntryScreenEvents.SavePriceTargetSuccess -> showButtonAndSnackbar()
+    }
+}
+
+@Composable
+fun showButtonAndSnackbar() {
+    Snackbar(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text(text = stringResource(R.string.max_saved_priced_targets_reached, 2))
+    }
+}
+
+
+
+
+
+//@Composable
+//fun handleUIAction(screenEvents: PriceEntryScreenEvents) {
+//    when (screenEvents) {
+//        PriceEntryScreenEvents.Nothing -> {}
+//        PriceEntryScreenEvents.SavePriceTargetFailure -> showButtonAndSnackbar()
+//        PriceEntryScreenEvents.SavePriceTargetSuccess -> showButtonAndSnackbar()
+//    }
+//}
+//
+//@Composable
+//fun showButtonAndSnackbar() {
+//
+//    Snackbar(
+//        modifier = Modifier.padding(16.dp)
+//    ) {
+//        Text(text = stringResource(R.string.max_saved_priced_targets_reached, 2))
+//    }
+//}
+
 
 @Composable
 fun LoadingWidget3(boxModifier: Modifier? = null){
@@ -231,7 +289,8 @@ private fun ShowPriceTargetEntryScreen(
                     }
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-                    .border(width = 1.dp,
+                    .border(
+                        width = 1.dp,
                         color = Color.White,
                         shape = RoundedCornerShape(8.dp)
                     )

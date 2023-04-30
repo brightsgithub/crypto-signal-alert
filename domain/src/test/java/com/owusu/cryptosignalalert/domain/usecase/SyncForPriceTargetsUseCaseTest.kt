@@ -5,13 +5,15 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import io.mockk.*
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class SyncForPriceTargetsUseCaseTest {
 
-    private val mockGetPriceTargetsUseCase = mockk<GetPriceTargetsUseCase>()
+    private val mockGetPriceTargetsThatHaveNotBeenHitUseCase = mockk<GetPriceTargetsThatHaveNotBeenHitUseCase>()
     private val mockGetCoinsListUseCase = mockk<GetCoinsListUseCase>()
     private val mockUpdatePriceTargetsUseCase = mockk<UpdatePriceTargetsUseCase>()
     private val mockMergeOldPriceTargetWithNewDataUseCase = mockk<MergeOldPriceTargetWithNewDataUseCase>()
@@ -22,7 +24,7 @@ class SyncForPriceTargetsUseCaseTest {
     @Before
     fun setUp() {
         cut = SyncForPriceTargetsUseCase(
-            getPriceTargetsUseCase = mockGetPriceTargetsUseCase,
+            getPriceTargetsThatHaveNotBeenHitUseCase = mockGetPriceTargetsThatHaveNotBeenHitUseCase,
             getCoinsListUseCase = mockGetCoinsListUseCase,
             updatePriceTargetsUseCase = mockUpdatePriceTargetsUseCase,
             dateUtils = mockDateUtil,
@@ -38,7 +40,7 @@ class SyncForPriceTargetsUseCaseTest {
     fun `when there are no price targets return false`() {
         runTest {
 
-            coEvery { mockGetPriceTargetsUseCase.invoke() }.returns(emptyList())
+            coEvery { mockGetPriceTargetsThatHaveNotBeenHitUseCase.invoke() } returns flowOf(emptyList())
 
             val wasUpdatePerformed = cut.invoke()
 
@@ -53,7 +55,7 @@ class SyncForPriceTargetsUseCaseTest {
             // Hierarchical mocking
             val listOfMockedPriceTargets = getMockedPriceTargetsDomain()
 
-            coEvery { mockGetPriceTargetsUseCase.invoke() } returns listOfMockedPriceTargets
+            coEvery { mockGetPriceTargetsThatHaveNotBeenHitUseCase.invoke() } returns flowOf(listOfMockedPriceTargets)
 
             val ids = "bitcoin,ethereum"
 

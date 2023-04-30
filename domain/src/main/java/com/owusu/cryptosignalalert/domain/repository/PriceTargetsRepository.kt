@@ -12,4 +12,5 @@ interface PriceTargetsRepository {
     suspend fun deletePriceTargets(priceTargets: List<PriceTargetDomain>)
     suspend fun getPriceTargetsCount(): Int
     suspend fun nukeAll()
+    suspend fun getPriceTargetsThatHaveNotBeenHitCount(): Int
 }

@@ -11,5 +11,6 @@ interface PriceTargetsDataSource {
     suspend fun updatePriceTargets(priceTargets: List<PriceTargetDomain>)
     suspend fun deletePriceTargets(priceTargets: List<PriceTargetDomain>)
     suspend fun getPriceTargetsCount(): Int
+    suspend fun getPriceTargetsThatHaveNotBeenHitCount(): Int
     suspend fun nukeAll()
 }

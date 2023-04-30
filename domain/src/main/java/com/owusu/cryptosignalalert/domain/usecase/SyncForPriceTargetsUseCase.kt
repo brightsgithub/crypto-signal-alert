@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.domain.usecase
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
+import kotlinx.coroutines.flow.first
 import java.util.*
 
 /*
@@ -20,7 +21,7 @@ used to be in this class and has now been extracted out and is now testable
 */
 
 class SyncForPriceTargetsUseCase(
-    private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
+    private val getPriceTargetsThatHaveNotBeenHitUseCase: GetPriceTargetsThatHaveNotBeenHitUseCase,
     private val getCoinsListUseCase: GetCoinsListUseCase,
     private val updatePriceTargetsUseCase: UpdatePriceTargetsUseCase,
     private val mergeOldPriceTargetWithNewDataUseCase: MergeOldPriceTargetWithNewDataUseCase,
@@ -31,7 +32,7 @@ class SyncForPriceTargetsUseCase(
     // and the calling view model can listen
     override suspend fun invoke(): Boolean {
 
-        // 1. getPriceTargetsUseCase which will give you a list of price targets.
+        // 1. getPriceTargetsThatHaveNotBeenHitUseCase which will give you a list of price targets.
         // need to get the price targets that have not been hit
         val priceTargets = getPriceTargets()
         if (priceTargets.isEmpty()) return false
@@ -56,7 +57,8 @@ class SyncForPriceTargetsUseCase(
     }
 
     private suspend fun getPriceTargets(): List<PriceTargetDomain> {
-        return getPriceTargetsUseCase.invoke()
+        // Collect the current list result immediately
+        return getPriceTargetsThatHaveNotBeenHitUseCase.invoke().first()
     }
 
     private suspend fun mergeOldPriceTargetWithNew(

@@ -13,7 +13,7 @@ class SaveNewPriceTargetsWithLimitUseCase(
 
     override suspend fun invoke(params: Params): Boolean {
 
-        val noOfRecords = priceTargetsRepository.getPriceTargetsCount() + 1
+        val noOfRecords = priceTargetsRepository.getPriceTargetsThatHaveNotBeenHitCount() + 1
 
         val noOfRecsAllowed = if(appPreferencesRepository.isPriceTargetLimitPurchased()) {
             PurchaseConstants.MAX_PRICE_TARGET_RECORDS_ALLOWED

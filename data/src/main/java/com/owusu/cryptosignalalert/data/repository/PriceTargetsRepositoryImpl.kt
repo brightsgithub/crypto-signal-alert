@@ -21,6 +21,10 @@ class PriceTargetsRepositoryImpl(
         return priceTargetsDataSource.getPriceTargetsThatHaveNotBeenHit()
     }
 
+    override suspend fun getPriceTargetsThatHaveNotBeenHitCount(): Int {
+        return priceTargetsDataSource.getPriceTargetsThatHaveNotBeenHitCount()
+    }
+
     override suspend fun saveNewPriceTargets(priceTargets: List<PriceTargetDomain>): Boolean {
         return priceTargetsDataSource.insertPriceTargets(priceTargets)
     }

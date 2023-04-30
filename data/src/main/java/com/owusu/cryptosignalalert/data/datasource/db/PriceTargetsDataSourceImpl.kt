@@ -24,6 +24,10 @@ class PriceTargetsDataSourceImpl(
         return priceTargetDao.getPriceTargetsCount()
     }
 
+    override suspend fun getPriceTargetsThatHaveNotBeenHitCount(): Int {
+        return priceTargetDao.getPriceTargetsThatHaveNotBeenHitCount()
+    }
+
     override suspend fun getPriceTargetsToAlertUser(): List<PriceTargetDomain> {
         val entityList = priceTargetDao.getPriceTargetsToAlertUser()
         return mapper.transform(entityList)

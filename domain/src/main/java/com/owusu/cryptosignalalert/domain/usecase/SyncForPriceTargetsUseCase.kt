@@ -47,7 +47,8 @@ class SyncForPriceTargetsUseCase(
         val batches = priceTargets.chunked(5) // since we can have many repeated targets i.e. multiple btc targets
 
         for ((index, currentPriceTargetBatch) in batches.withIndex()) {
-            System.out.println("SyncForPriceTargetsUseCase number of batches "+currentPriceTargetBatch.size)
+            System.out.println("SyncForPriceTargetsUseCase Total number of batches  = "+batches.size)
+            System.out.println("SyncForPriceTargetsUseCase Total current batch size  = "+currentPriceTargetBatch.size)
             // 3. carry out business rules so we know what targets have been met etc. and we know
             // what fields to update in the DB via savePriceTargetUseCase
             updatedPriceTargets = mergeOldPriceTargetWithNew(coinsList,currentPriceTargetBatch)
@@ -59,6 +60,8 @@ class SyncForPriceTargetsUseCase(
                 System.out.println("SyncForPriceTargetsUseCase before delay "+ Date())
                 delay(65000) // Wait for 1 minute and 5 seconds  before processing the next batch
                 System.out.println("SyncForPriceTargetsUseCase after delay "+ Date())
+            } else {
+                System.out.println("SyncForPriceTargetsUseCase ok All DONE! ******** "+ Date())
             }
         }
 

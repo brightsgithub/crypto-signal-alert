@@ -31,7 +31,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("/Users/brightpersonal/Documents/dev/KEYS/cryptosignalert.keystore")
+            storeFile file("/Users/brightpersonal/Documents/dev/KEYS/CRYPTO_SIGNAL_ALERT_KEY/cryptosignalert.keystore")
             storePassword "Leatherface1877Fredfred2"
             keyAlias "bright"
             keyPassword "Leatherface1877Fredfred2"

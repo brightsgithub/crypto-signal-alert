@@ -4,6 +4,7 @@ import com.owusu.cryptosignalalert.domain.models.*
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.any
 import org.junit.Before
@@ -31,6 +32,10 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
 
             val mockListOfLatestCoins =  listOf(
                 CoinDomain(id = "bitcoin", currentPrice = 19000.0),
+                CoinDomain(id = "ethereum", currentPrice = 2100.0),
+                CoinDomain(id = "bitcoin", currentPrice = 19000.0),
+                CoinDomain(id = "ethereum", currentPrice = 2100.0),
+                CoinDomain(id = "bitcoin", currentPrice = 19000.0),
                 CoinDomain(id = "ethereum", currentPrice = 2100.0)
             )
 
@@ -44,6 +49,14 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
             assert(newlyMergedPriceTargets[0].hasPriceTargetBeenHit)
             assert(newlyMergedPriceTargets[1].hasPriceTargetBeenHit)
             assert(newlyMergedPriceTargets[1].completedOnDate == newlyMergedPriceTargets[1].lastUpdated)
+
+            assert(newlyMergedPriceTargets[2].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[3].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[3].completedOnDate == newlyMergedPriceTargets[3].lastUpdated)
+
+            assert(newlyMergedPriceTargets[4].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[5].hasPriceTargetBeenHit)
+            assert(newlyMergedPriceTargets[5].completedOnDate == newlyMergedPriceTargets[5].lastUpdated)
         }
     }
 
@@ -214,6 +227,53 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
                 every { priceTargetDirection } returns PriceTargetDirection.ABOVE
                 every { completedOnDate } returns null
             },
+            mockk {
+                every { localPrimeId } returns 0
+                every { id } returns "bitcoin"
+                every { name } returns "Bitcoin"
+                every { currentPrice } returns 21518.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 20000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.BELOW
+                every { completedOnDate } returns null
+            },
+            mockk {
+                every { localPrimeId } returns 1
+                every { id } returns "ethereum"
+                every { name } returns "Ethereum"
+                every { currentPrice } returns 1500.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 2000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+                every { completedOnDate } returns null
+            },mockk {
+                every { localPrimeId } returns 0
+                every { id } returns "bitcoin"
+                every { name } returns "Bitcoin"
+                every { currentPrice } returns 21518.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 20000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.BELOW
+                every { completedOnDate } returns null
+            },
+            mockk {
+                every { localPrimeId } returns 1
+                every { id } returns "ethereum"
+                every { name } returns "Ethereum"
+                every { currentPrice } returns 1500.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 2000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+                every { completedOnDate } returns null
+            }
         )
     }
 
@@ -313,10 +373,12 @@ class MergeOldPriceTargetWithNewDataUseCaseTest {
         prices.add(HistoricPriceDomain(1678892139910, 1000.833170525402))
         prices.add(HistoricPriceDomain(1678891806700, 1000.64962541245))
         prices.add(HistoricPriceDomain(1678891498363, 1000.314584738193))
+
         prices.add(HistoricPriceDomain(1678891220459, 1000.780149332506))
         prices.add(HistoricPriceDomain(getHistoricalTimestamp(30), 1000.104247902713))
         prices.add(HistoricPriceDomain(getHistoricalTimestamp(25), 1000.82892089749))
         prices.add(HistoricPriceDomain(getHistoricalTimestamp(20), 1000.988273159932))
+
         prices.add(HistoricPriceDomain(getHistoricalTimestamp(15), 1000.360546799628))
         prices.add(HistoricPriceDomain(getHistoricalTimestamp(10), 1000.579825437104))
         prices.add(HistoricPriceDomain(getHistoricalTimestamp(5), 1000.33290077767))

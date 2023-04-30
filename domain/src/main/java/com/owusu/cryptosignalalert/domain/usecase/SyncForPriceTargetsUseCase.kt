@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.domain.usecase
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import java.util.*
 
@@ -31,6 +32,7 @@ class SyncForPriceTargetsUseCase(
     // needs to have a flow so that the Alarm manager can listen
     // and the calling view model can listen
     override suspend fun invoke(): Boolean {
+        var updatedPriceTargets = emptyList<PriceTargetDomain>()
 
         // 1. getPriceTargetsThatHaveNotBeenHitUseCase which will give you a list of price targets.
         // need to get the price targets that have not been hit
@@ -42,13 +44,24 @@ class SyncForPriceTargetsUseCase(
         // 2. Query against the api for targets obtained above.
         val coinsList = getCoinsList(ids)
 
-        // 3. carry out business rules so we know what targets have been met etc. and we know
-        // what fields to update in the DB via savePriceTargetUseCase
-        val updatedPriceTargets = mergeOldPriceTargetWithNew(coinsList,priceTargets)
+        val batches = priceTargets.chunked(5) // since we can have many repeated targets i.e. multiple btc targets
 
-        // 4. update all price targets. At this point some may have met their price targets
-        // and some will just have updated their current price updated
-        updatePriceTargets(updatedPriceTargets)
+        for ((index, currentPriceTargetBatch) in batches.withIndex()) {
+            System.out.println("SyncForPriceTargetsUseCase number of batches "+currentPriceTargetBatch.size)
+            // 3. carry out business rules so we know what targets have been met etc. and we know
+            // what fields to update in the DB via savePriceTargetUseCase
+            updatedPriceTargets = mergeOldPriceTargetWithNew(coinsList,currentPriceTargetBatch)
+
+            // 4. update all price targets. At this point some may have met their price targets
+            // and some will just have updated their current price updated
+            updatePriceTargets(updatedPriceTargets)
+            if (index != batches.lastIndex) {
+                System.out.println("SyncForPriceTargetsUseCase before delay "+ Date())
+                delay(65000) // Wait for 1 minute and 5 seconds  before processing the next batch
+                System.out.println("SyncForPriceTargetsUseCase after delay "+ Date())
+            }
+        }
+
         return updatedPriceTargets.isNotEmpty()
     }
 

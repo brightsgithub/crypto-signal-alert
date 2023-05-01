@@ -57,9 +57,15 @@ class SyncForPriceTargetsUseCaseTest {
 
             coEvery { mockGetPriceTargetsThatHaveNotBeenHitUseCase.invoke() } returns flowOf(listOfMockedPriceTargets)
 
-            val ids = "bitcoin,ethereum,bitcoin,ethereum,bitcoin,ethereum"
+            val ids = "bitcoin,ethereum,bitcoin,ethereum,bitcoin,ethereum,bitcoin,ethereum,bitcoin,ethereum,bitcoin,ethereum"
 
             val mockListOfLatestCoins2 =  listOf(
+                CoinDomain(id = "bitcoin", currentPrice = 19000.0),
+                CoinDomain(id = "ethereum", currentPrice = 2100.0),
+                CoinDomain(id = "bitcoin", currentPrice = 19000.0),
+                CoinDomain(id = "ethereum", currentPrice = 2100.0),
+                CoinDomain(id = "bitcoin", currentPrice = 19000.0),
+                CoinDomain(id = "ethereum", currentPrice = 2100.0),
                 CoinDomain(id = "bitcoin", currentPrice = 19000.0),
                 CoinDomain(id = "ethereum", currentPrice = 2100.0),
                 CoinDomain(id = "bitcoin", currentPrice = 19000.0),
@@ -79,6 +85,66 @@ class SyncForPriceTargetsUseCaseTest {
 
     private fun getMockedPriceTargetsDomain(): List<PriceTargetDomain> {
         return listOf<PriceTargetDomain>(
+            mockk {
+                every { id } returns "bitcoin"
+                every { name } returns "Bitcoin"
+                every { currentPrice } returns 21518.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 20000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.BELOW
+            },
+            mockk {
+                every { id } returns "ethereum"
+                every { name } returns "Ethereum"
+                every { currentPrice } returns 1500.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 2000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+            },
+            mockk {
+                every { id } returns "bitcoin"
+                every { name } returns "Bitcoin"
+                every { currentPrice } returns 21518.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 20000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.BELOW
+            },
+            mockk {
+                every { id } returns "ethereum"
+                every { name } returns "Ethereum"
+                every { currentPrice } returns 1500.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 2000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+            },
+            mockk {
+                every { id } returns "bitcoin"
+                every { name } returns "Bitcoin"
+                every { currentPrice } returns 21518.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 20000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.BELOW
+            },
+            mockk {
+                every { id } returns "ethereum"
+                every { name } returns "Ethereum"
+                every { currentPrice } returns 1500.0
+                every { lastUpdated } returns "2022-07-09T12:31:40.339Z"
+                every { userPriceTarget } returns 2000.0
+                every { hasPriceTargetBeenHit } returns false
+                every { hasUserBeenAlerted } returns false
+                every { priceTargetDirection } returns PriceTargetDirection.ABOVE
+            },
             mockk {
                 every { id } returns "bitcoin"
                 every { name } returns "Bitcoin"

@@ -59,6 +59,7 @@ val uiModule = module() {
             priceTargetsMapper = get(named(PriceTargetUIMapper::class.java.name)),
             getPriceTargetsUseCase = get(),
             deletePriceTargetsUseCase = get(),
+            isSyncRunningUseCase = get(),
             dispatcherBackground = get(named(IO)),
             dispatcherMain = get(named(MAIN)),
             workerTag = Constants.SYNC_PRICES_WORKER_TAG,

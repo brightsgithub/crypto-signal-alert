@@ -44,20 +44,30 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
-
 private var workManagerJob: Job? = null
 
 fun observeWorkManagerStatus(activity: ComponentActivity, viewModel: AlertListViewModel) {
     workManagerJob = activity.lifecycleScope.launch {
         viewModel.workInfoLiveData.observe(activity) { workInfoList ->
             Log.v("My_Sync_FragAlertList", "START")
-
             if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.RUNNING)) {
                 Log.v("My_Sync_FragAlertList", "show spinner")
+                if (viewModel.isSyncRunning()) {
+                    Log.v("My_Sync_FragAlertList", "Sync is Running!")
+                    // since we can be blocked for a while while syncing is taking place, lets not
+                    // show an empty screen and at least display something in the meantime
+                    viewModel.loadAlertList()
+                } else {
+                    Log.v("My_Sync_FragAlertList", "Sync is NOT Running, so wait for enqueued to be called instead.")
+                }
             } else if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.ENQUEUED)) {
+                // If the sync is NOT running then it is enqueued and will enter here immediatley.
+                // If the sync IS running then this won't get called until the sync is finished, hence why above
+                // we load the list if viewModel.isSyncRunning() since WorkInfo.State.RUNNING does not tell us what we want.
                 val workInfo =workInfoList.first()
                 Log.v("My_Sync_FragAlertList", "state" + workInfo.state.toString())
                 val myOutputData = workInfo.outputData.getString(Constants.KEY_PRICE_TARGET_UPDATED_STATUS)
+                Log.v("My_Sync_FragAlertList", "myOutputData  = "+ myOutputData)
                 //if (myOutputData == DISPLAY_LATEST_DATA) { // only seems to work with one time req. maybe for chained workers?
                 Log.v("My_Sync_FragAlertList", Constants.DISPLAY_LATEST_DATA)
                 // When a sync has occurred, refresh the screen

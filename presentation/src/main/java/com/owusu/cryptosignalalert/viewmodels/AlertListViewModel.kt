@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.usecase.DeletePriceTargetsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
+import com.owusu.cryptosignalalert.domain.usecase.IsSyncRunningUseCase
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
@@ -24,6 +25,7 @@ class AlertListViewModel(
     private val priceTargetsMapper: UIMapper<PriceTargetDomain, PriceTargetUI>,
     private val getPriceTargetsUseCase: GetPriceTargetsUseCase,
     private val deletePriceTargetsUseCase: DeletePriceTargetsUseCase,
+    private val isSyncRunningUseCase: IsSyncRunningUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher,
     private val workerTag: String,
@@ -40,6 +42,10 @@ class AlertListViewModel(
         // we won't observe here since we don't want to pass in the lifecycleScope.
         // let the view observe and let it call back the viewmodel.
         workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(workerTag)
+    }
+
+    fun isSyncRunning(): Boolean {
+        return isSyncRunningUseCase.execute()
     }
 
     fun loadAlertList(scope: CoroutineScope = viewModelScope) {

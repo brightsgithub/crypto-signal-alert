@@ -87,4 +87,10 @@ val domainModule = module() {
     factory { SearchCoinIdsUseCase(coinsRepository = get()) }
 
     factory { GetHistoricalPriceUseCase(coinsRepository = get()) }
+
+    factory { IsSyncRunningUseCase(appPreferencesRepository = get()) }
+
+    factory { SyncHasStartedStatusUseCase(appPreferencesRepository = get()) }
+
+    factory { SyncHasFinishedStatusUseCase(appPreferencesRepository = get()) }
 }

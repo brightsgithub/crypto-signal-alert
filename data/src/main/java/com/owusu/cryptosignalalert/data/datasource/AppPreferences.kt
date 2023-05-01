@@ -19,6 +19,7 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
     private val isPriceTargetLimitFree = "ccccxzzzzxxkjghyyrtrrtrthhrtfrgtdfgdgf"
     private val isVibrate = "vibraedssddsdsddsddsds"
     private val coinIdPopulated = "dfdfdgghfghfghgfhhfgdxxxx"
+    private val isWorkManagerExecuting = "qqqqqqpppppooooibcbcbjhjhwehbchwbechjkk"
 
 
     private val sharedPreferences = context.getSharedPreferences(myPref, Context.MODE_PRIVATE)
@@ -118,6 +119,18 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
 
     override fun coinIdsHaveNotBeenPopulated() {
         putBoolean(coinIdPopulated, false)
+    }
+
+    override fun isWorkManagerExecuting(): Boolean {
+        return getBoolean(isWorkManagerExecuting, false)
+    }
+
+    override fun workManagerIsExecuting() {
+        putBoolean(isWorkManagerExecuting, true)
+    }
+
+    override fun workManagerHasFinishedExecuting() {
+        putBoolean(isWorkManagerExecuting, false)
     }
 
     @Synchronized private fun putLong(key: String, value:Long) {

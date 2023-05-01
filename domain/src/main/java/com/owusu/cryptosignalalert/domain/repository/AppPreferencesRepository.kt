@@ -17,4 +17,8 @@ interface AppPreferencesRepository {
     fun hasCoinIdsBeenPopulated(): Boolean
     fun coinIdsHaveBeenPopulated()
     fun coinIdsHaveNotBeenPopulated()
+
+    fun isWorkManagerExecuting(): Boolean
+    fun workManagerIsExecuting()
+    fun workManagerHasFinishedExecuting()
 }

@@ -62,9 +62,7 @@ class StartupBillingUseCase(
             when(skuDetail.sku) {
                 skuIdsMap[ProductKeys.UNLOCK_ALL] -> {
                     if (skuDetail.isPurchased) {
-                        appPreferences.makeAppFree()
-                        appPreferences.makePriceTargetLimitFree()
-                        appPreferences.makeAdsFree()
+                        makeEverythingFree()
                         break
                     }
                     else {
@@ -90,8 +88,18 @@ class StartupBillingUseCase(
             }
         }
 
+        // TODO
+        // ############################## REMOVE!!!!!!
+        //makeEverythingFree()
+
         System.out.println("StartupBillingUseCase_2 "+ appPreferences.isAppFree())
         System.out.println("StartupBillingUseCase_2 "+ appPreferences.isPriceTargetLimitPurchased())
         System.out.println("StartupBillingUseCase_2 "+ appPreferences.isAdsPurchased())
+    }
+
+    private fun makeEverythingFree() {
+        appPreferences.makeAppFree()
+        appPreferences.makePriceTargetLimitFree()
+        appPreferences.makeAdsFree()
     }
 }

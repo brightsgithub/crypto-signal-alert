@@ -104,7 +104,10 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
 
                 if(event == Lifecycle.Event.ON_CREATE) {
                     // only observe when in onCreate() has been called
-                    observeWorkManagerStatus(activity as ComponentActivity, viewModel)
+                    // observeWorkManagerStatus(activity as ComponentActivity, viewModel) // no longer needed. we listen via flow
+                    // listen in for any changes to the list as we are now using a flow.
+                    // When a sync occurs and this table changes, we will know about it
+                    viewModel.loadAlertList()
                 }
             }
 
@@ -138,7 +141,7 @@ private fun ShowPriceTargets(priceTargets: List<PriceTargetUI>) {
 private fun PriceTargetCard(priceTarget: PriceTargetUI,
                             onDeleteClicked:(target: PriceTargetUI) -> Unit) {
 
-    val showPopup = rememberSaveable { mutableStateOf(false) }
+    var showPopup = rememberSaveable { mutableStateOf(false) }
     var anchorFromCompletedOnOrLastUpdated: ConstrainedLayoutReference
 
     Card(
@@ -332,9 +335,13 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                         top.linkTo(coinName.top, margin = 4.dp)
                     }
                     .clickable {
-                        onDeleteClicked(priceTarget)
+                        showPopup.value = true
                     }
             )
+
+            if (showPopup.value) {
+                ShowDeleteDialog(priceTarget, showPopup, onDeleteClicked)
+            }
         }
     }
 }
@@ -342,10 +349,22 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
 
 
 @Composable
-fun SimpleAlertDialog() {
+fun ShowDeleteDialog(
+    priceTarget: PriceTargetUI,
+    showPopUpState: MutableState<Boolean>,
+    onDeleteClicked:(target: PriceTargetUI) -> Unit) {
     AlertDialog(
-        confirmButton = { },
-        onDismissRequest = { },
+        title = { Text(text = "Delete "+ priceTarget.name+"?") },
+        confirmButton = { Button(onClick = {
+            onDeleteClicked(priceTarget)
+            showPopUpState.value = false
+        } ) {
+            Text(text = "Confirm")
+        }},
+        dismissButton = { Button(onClick = { showPopUpState.value = false } ) {
+            Text(text = "Cancel")
+        }},
+        onDismissRequest = { showPopUpState.value = false },
     )
 }
 

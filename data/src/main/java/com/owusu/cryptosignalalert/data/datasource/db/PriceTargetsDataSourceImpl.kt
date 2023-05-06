@@ -14,9 +14,10 @@ class PriceTargetsDataSourceImpl(
     ): PriceTargetsDataSource {
 
     @Synchronized
-    override suspend fun getPriceTargets(): List<PriceTargetDomain> {
-        val entityList = priceTargetDao.getPriceTargets()
-        return mapper.transform(entityList)
+    override fun getPriceTargets(): Flow<List<PriceTargetDomain>> {
+        return priceTargetDao.getPriceTargets().map {it
+            mapper.transform(it)
+        }
     }
 
     @Synchronized

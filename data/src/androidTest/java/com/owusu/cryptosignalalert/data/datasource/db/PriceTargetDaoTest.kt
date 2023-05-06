@@ -58,7 +58,7 @@ class PriceTargetDaoTest : KoinComponent {
         val coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
         priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
 
-        val coinsListFromDb = priceTargetDao.getPriceTargets()
+        val coinsListFromDb = priceTargetDao.getPriceTargets().first()
 
         assertTrue(coinsToBeAddedToBb[0].id == coinsListFromDb[0].id)
         assertTrue(coinsListFromDb.size == numOfCoins)
@@ -75,7 +75,7 @@ class PriceTargetDaoTest : KoinComponent {
 
         var coinsToBeAddedToBb = createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget)
         priceTargetDao.insertPriceTargets(createPriceTargets(numOfCoins, hasPriceTargetBeenHit, hasUserBeenAlerted, userPriceTarget))
-        val coinsListFromDb = priceTargetDao.getPriceTargets()
+        val coinsListFromDb = priceTargetDao.getPriceTargets().first()
 
 
         // now update the userPriceTargets
@@ -85,7 +85,7 @@ class PriceTargetDaoTest : KoinComponent {
         priceTargetDao.updatePriceTargets(coinsListFromDb)
 
         // get the updated list from the db
-        val updatedCoinsListFromDb = priceTargetDao.getPriceTargets()
+        val updatedCoinsListFromDb = priceTargetDao.getPriceTargets().first()
 
         // ensure the prices are different
         Assert.assertTrue(coinsToBeAddedToBb[0].userPriceTarget != updatedCoinsListFromDb[0].userPriceTarget)
@@ -105,7 +105,7 @@ class PriceTargetDaoTest : KoinComponent {
         // Insert some allowed contacts
         priceTargetDao.insertPriceTargets(coinsToBeAddedToBb)
 
-        val coinsListFromDb = priceTargetDao.getPriceTargets()
+        val coinsListFromDb = priceTargetDao.getPriceTargets().first()
 
         // Assert that the contact was inserted into the db
         Assert.assertTrue(coinsToBeAddedToBb[0].id ==  coinsListFromDb[0].id)

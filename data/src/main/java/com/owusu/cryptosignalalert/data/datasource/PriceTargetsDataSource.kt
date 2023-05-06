@@ -4,7 +4,7 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import kotlinx.coroutines.flow.Flow
 
 interface PriceTargetsDataSource {
-    suspend fun getPriceTargets(): List<PriceTargetDomain>
+    fun getPriceTargets(): Flow<List<PriceTargetDomain>>
     suspend fun getPriceTargetsToAlertUser(): List<PriceTargetDomain>
     fun getPriceTargetsThatHaveNotBeenHit(): Flow<List<PriceTargetDomain>>
     suspend fun insertPriceTargets(priceTargets: List<PriceTargetDomain>): Boolean

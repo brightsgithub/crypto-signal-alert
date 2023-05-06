@@ -17,7 +17,7 @@ interface PriceTargetDao {
     suspend fun deletePriceTargets(priceTargets: List<PriceTargetEntity>) : Int
 
     @Query("SELECT * FROM price_targets_table pt")
-    suspend fun getPriceTargets() : List<PriceTargetEntity>
+    fun getPriceTargets() : Flow<List<PriceTargetEntity>>
 
     @Query("SELECT COUNT(*) FROM price_targets_table")
     suspend fun getPriceTargetsCount() : Int

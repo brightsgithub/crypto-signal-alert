@@ -51,8 +51,9 @@ class AlertListViewModel(
     fun loadAlertList(scope: CoroutineScope = viewModelScope) {
         scope.launch(dispatcherBackground) {
             showLoadingState()
-            val alertList = getPriceTargetsUseCase.invoke()
-            handleAlertList(alertList)
+            getPriceTargetsUseCase.invoke().collect { alertList ->
+                handleAlertList(alertList)
+            }
         }
     }
 
@@ -60,7 +61,6 @@ class AlertListViewModel(
         viewModelScope.launch(dispatcherBackground) {
             val targets = priceTargetsMapper.mapUIListToDomainList(listOf(priceTargetUI))
             deletePriceTargetsUseCase.invoke(DeletePriceTargetsUseCase.Params(targets))
-            loadAlertList()
         }
     }
 

@@ -9,7 +9,7 @@ class PriceTargetsRepositoryImpl(
     private val priceTargetsDataSource: PriceTargetsDataSource
 ) : PriceTargetsRepository {
 
-    override suspend fun getPriceTargets(): List<PriceTargetDomain> {
+    override fun getPriceTargets(): Flow<List<PriceTargetDomain>> {
         return priceTargetsDataSource.getPriceTargets()
     }
 

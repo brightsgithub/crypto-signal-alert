@@ -22,7 +22,7 @@ import org.koin.androidx.compose.getViewModel
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
 // https://developer.android.com/jetpack/compose/navigation#create-navhost
 @Composable
-fun HomeNavGraph(navHostController: NavHostController) {
+fun HomeNavGraph(navHostController: NavHostController, onSearchBarClick: () -> Unit) {
 
     val sharedViewModel = getViewModel<SharedViewModel>()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -42,7 +42,7 @@ fun HomeNavGraph(navHostController: NavHostController) {
             })
         }
         composable(NavigationItem.PriceTargets.route) {
-            PriceTargetsScreen(sharedViewModel)
+            PriceTargetsScreen(sharedViewModel, onSearchBarClick = onSearchBarClick)
         }
 
         composable(NavigationItem.Purchase.route) {

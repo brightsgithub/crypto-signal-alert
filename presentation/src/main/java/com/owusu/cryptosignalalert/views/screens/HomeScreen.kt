@@ -49,19 +49,22 @@ import org.koin.androidx.compose.getViewModel
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
 @Composable
 fun HomeScreen(navController: NavHostController = rememberNavController()) {
+
+    val onSearchBarClick = {
+        navController.navigate(route = Graphs.SEARCH_NAV_GRAPH)
+    }
+
     Scaffold(
-        topBar = { TopBar(onSearchBarClick = {
-            navController.navigate(route = Graphs.SEARCH_NAV_GRAPH)
-        }) },
+        topBar = { TopBar(onSearchBarClick = onSearchBarClick) },
         bottomBar = { BottomNavigationBar(navController) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
                 if (1 > 0) {
-                    HomeNavGraph(navHostController = navController)
+                    HomeNavGraph(navHostController = navController, onSearchBarClick = onSearchBarClick)
                 } else {
                     Column() {
                         Row(modifier = Modifier.weight(0.9f)) {
-                            HomeNavGraph(navHostController = navController)
+                            HomeNavGraph(navHostController = navController, onSearchBarClick = onSearchBarClick)
                         }
                         Row(modifier = Modifier.weight(0.1f)) {
                             Box() {

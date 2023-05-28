@@ -10,13 +10,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -81,7 +85,7 @@ fun stopObservingWorkManagerStatus() {
 }
 
 @Composable
-fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
+fun PriceTargetsScreen(sharedViewModel: SharedViewModel, onSearchBarClick: () -> Unit) {
     CryptoSignalAlertTheme {
 
         val viewModel = getViewModel<AlertListViewModel>()
@@ -91,7 +95,7 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
 
         viewModel.viewState.collectAsState(initial = AlertListViewState()).value.let {
             Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowPriceTargets(it.priceTargets)
+                ShowPriceTargets(it.priceTargets, onSearchBarClick = onSearchBarClick)
             }
         }
 
@@ -124,15 +128,43 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
 }
 
 @Composable
-private fun ShowPriceTargets(priceTargets: List<PriceTargetUI>) {
+private fun ShowPriceTargets(priceTargets: List<PriceTargetUI>, onSearchBarClick: () -> Unit) {
 
     val viewModel = getViewModel<AlertListViewModel>()
 
-    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-        items(items = priceTargets) { priceTarget ->
-            PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
-                viewModel.deletePriceTarget(userPriceTarget)
-            })
+    var fabHeight by remember {
+        mutableStateOf(0)
+    }
+
+    val heightInDp = with(LocalDensity.current) { fabHeight.toDp() }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                modifier = Modifier.onGloballyPositioned {
+                    fabHeight = it.size.height
+                },
+                shape = CircleShape,
+                onClick = {
+                          onSearchBarClick()
+                },
+            ) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "icon")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+            contentPadding = PaddingValues(bottom = heightInDp + 16.dp)
+        ) {
+            items(items = priceTargets) { priceTarget ->
+                PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
+                    viewModel.deletePriceTarget(userPriceTarget)
+                })
+            }
         }
     }
 }

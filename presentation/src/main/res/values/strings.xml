@@ -12,6 +12,7 @@
     <string name="buy_all_icon">Buy all products</string>
     <string name="icn_search_clear_content_description">Search for crypto assets</string>
     <string name="icn_search_view_demo_app_bar_search">Search crypto assets</string>
+    <string name="icn_settings">Search crypto assets</string>
     <string name="icn_search_back_content_description">Navigate back</string>
 
 </resources>

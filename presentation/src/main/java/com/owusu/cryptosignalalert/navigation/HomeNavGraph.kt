@@ -55,6 +55,8 @@ fun HomeNavGraph(navHostController: NavHostController, onSearchBarClick: () -> U
         targetsEntryGraph(navHostController, sharedViewModel)
 
         coinSearchNavGraph(navHostController, sharedViewModel)
+
+        settingsNavGraph(navHostController, sharedViewModel)
     }
 }
 

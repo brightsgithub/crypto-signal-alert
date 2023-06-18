@@ -8,6 +8,8 @@ import com.owusu.cryptosignalalert.data.datasource.*
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoCoinsListDataSourceImpl
 import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoPricesDataSourceImpl
 import com.owusu.cryptosignalalert.data.datasource.db.*
+import com.owusu.cryptosignalalert.data.datasource.settings.LocalFixedSettingsDataSource
+import com.owusu.cryptosignalalert.data.datasource.settings.SettingsDataSource
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.mappers.*
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
@@ -18,6 +20,7 @@ import com.owusu.cryptosignalalert.data.models.skus.Skus.INAPP_SKUS
 import com.owusu.cryptosignalalert.data.repository.PriceTargetsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.CoinsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.PriceInfoRepositoryImpl
+import com.owusu.cryptosignalalert.data.repository.SettingsRepositoryImpl
 import com.owusu.cryptosignalalert.data.repository.billing.BillingDataSource
 import com.owusu.cryptosignalalert.data.repository.billing.GoogleBillingRepository
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
@@ -112,6 +115,14 @@ open class DataModuleWrapper(private val context: Context) {
 
         single<PriceTargetsDataSource> {
             PriceTargetsDataSourceImpl(get(), get(named(NAMED_PriceTargetEntityToPriceTargetDomainMapper)))
+        }
+
+        single<SettingsRepository> {
+            SettingsRepositoryImpl(settingsDataSource = get())
+        }
+
+        factory <SettingsDataSource>{
+            LocalFixedSettingsDataSource()
         }
 
         single<AppPreferencesRepository> { AppPreferences(context) }

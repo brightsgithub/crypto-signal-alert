@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -54,8 +55,12 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
         navController.navigate(route = Graphs.SEARCH_NAV_GRAPH)
     }
 
+    val onSettingsClicked = {
+        navController.navigate(route = Graphs.SETTINGS_NAV_GRAPH)
+    }
+
     Scaffold(
-        topBar = { TopBar(onSearchBarClick = onSearchBarClick) },
+        topBar = { TopBar(onSearchBarClick = onSearchBarClick, onSettingsClicked = onSettingsClicked) },
         bottomBar = { BottomNavigationBar(navController) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
@@ -81,7 +86,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
 // https://johncodeos.com/how-to-add-search-in-list-with-jetpack-compose/
 // https://www.devbitsandbytes.com/configuring-searchview-in-jetpack-compose/
 @Composable
-fun TopBar(onSearchBarClick: () -> Unit) {
+fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
         backgroundColor = colorResource(id = R.color.colorPrimary),
@@ -95,6 +100,15 @@ fun TopBar(onSearchBarClick: () -> Unit) {
                     contentDescription = stringResource(id = R.string.icn_search_view_demo_app_bar_search)
                 )
             }
+
+            IconButton(
+                modifier = Modifier,
+                onClick = { onSettingsClicked() }) {
+                Icon(
+                    Icons.Filled.Settings,
+                    contentDescription = stringResource(id = R.string.icn_settings)
+                )
+            }
         }
     )
 }
@@ -102,7 +116,7 @@ fun TopBar(onSearchBarClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun TopBarPreview() {
-    TopBar(onSearchBarClick = {})
+    TopBar(onSearchBarClick = {}, onSettingsClicked = {})
 }
 
 @Composable

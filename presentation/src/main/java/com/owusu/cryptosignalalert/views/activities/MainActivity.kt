@@ -26,7 +26,6 @@ import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.navigation.NavigationItem
 import com.owusu.cryptosignalalert.navigation.RootNavigationGraph
-import com.owusu.cryptosignalalert.navigation.Routes
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel

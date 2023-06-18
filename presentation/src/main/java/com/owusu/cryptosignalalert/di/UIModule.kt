@@ -116,6 +116,17 @@ val uiModule = module() {
         )
     }
 
+    viewModel {
+        SettingsViewModel(
+            loadSettingsUseCase = get(),
+            settingDomainToUIMapper = get(),
+            dispatcherBackground = get(named(IO)),
+            dispatcherMain = get(named(MAIN))
+        )
+    }
+
+    factory { SettingDomainToUIMapper }
+
     single {
         CryptoDateUtils.getInstance()
     }

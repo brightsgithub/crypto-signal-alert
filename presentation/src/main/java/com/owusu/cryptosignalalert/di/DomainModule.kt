@@ -93,4 +93,6 @@ val domainModule = module() {
     factory { SyncHasStartedStatusUseCase(appPreferencesRepository = get()) }
 
     factory { SyncHasFinishedStatusUseCase(appPreferencesRepository = get()) }
+
+    factory { LoadSettingsUseCase(settingsRepository = get()) }
 }

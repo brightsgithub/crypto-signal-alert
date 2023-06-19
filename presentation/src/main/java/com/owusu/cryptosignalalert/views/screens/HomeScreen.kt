@@ -41,9 +41,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.owusu.cryptosignalalert.R
-import com.owusu.cryptosignalalert.navigation.Graphs
-import com.owusu.cryptosignalalert.navigation.HomeNavGraph
-import com.owusu.cryptosignalalert.navigation.NavigationItem
+import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import org.koin.androidx.compose.getViewModel
 
@@ -51,12 +49,25 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun HomeScreen(navController: NavHostController = rememberNavController()) {
 
+    // https://developer.android.com/jetpack/compose/navigation
     val onSearchBarClick = {
-        navController.navigate(route = Graphs.SEARCH_NAV_GRAPH)
+        navController.navigate(route = CoinSearchScreens.CoinSearch.route) {
+            // Navigate to the "search” destination only if we’re not already on
+            // the "search" destination, avoiding multiple copies on the top of the
+            // back stack
+            // YOU MUST USE ROUTE NOT GRAPH!
+            launchSingleTop = true
+        }
     }
 
     val onSettingsClicked = {
-        navController.navigate(route = Graphs.SETTINGS_NAV_GRAPH)
+        navController.navigate(route = SettingsScreens.Settings.route) {
+            // Navigate to the "settings” destination only if we’re not already on
+            // the "settings" destination, avoiding multiple copies on the top of the
+            // back stack
+            // YOU MUST USE ROUTE NOT GRAPH!
+            launchSingleTop = true
+        }
     }
 
     Scaffold(

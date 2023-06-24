@@ -3,7 +3,9 @@ package com.owusu.cryptosignalalert.views.screens
 import android.app.Activity
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -95,7 +97,7 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel, onSearchBarClick: () ->
 
         viewModel.viewState.collectAsState(initial = AlertListViewState()).value.let {
             Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowPriceTargets(it.priceTargets, onSearchBarClick = onSearchBarClick)
+                ShowPriceTargets(it, onSearchBarClick = onSearchBarClick)
             }
         }
 
@@ -127,8 +129,9 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel, onSearchBarClick: () ->
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ShowPriceTargets(priceTargets: List<PriceTargetUI>, onSearchBarClick: () -> Unit) {
+private fun ShowPriceTargets(state: AlertListViewState, onSearchBarClick: () -> Unit) {
 
     val viewModel = getViewModel<AlertListViewModel>()
 
@@ -160,7 +163,31 @@ private fun ShowPriceTargets(priceTargets: List<PriceTargetUI>, onSearchBarClick
                 .padding(it),
             contentPadding = PaddingValues(bottom = heightInDp + 16.dp)
         ) {
-            items(items = priceTargets) { priceTarget ->
+
+            if (state.totalNumberOfTargets > 0) {
+                stickyHeader {
+                    // Header content here
+                    ConstraintLayout(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = Color.Black)
+                        .height(50.dp)
+                    ) {
+                        // Create references for the composables to constrain
+                        val (
+                            targetsMet
+                        ) = createRefs()
+                        Text(
+                            text = "Targets met: "+state.numberOfTargetsMet+" of "+state.totalNumberOfTargets,
+                            modifier = Modifier.constrainAs(targetsMet) {
+                                start.linkTo(parent.start, margin = 16.dp)
+                                centerVerticallyTo(parent)
+                            }, color = Color.White
+                        )
+                    }
+                }
+            }
+
+            items(items = state.priceTargets) { priceTarget ->
                 PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
                     viewModel.deletePriceTarget(userPriceTarget)
                 })
@@ -420,43 +447,45 @@ private fun getGreaterOrLessThanSymbol(priceTarget: PriceTargetUI) : String {
 @Preview
 @Composable
 fun PriceTargetCardPreview() {
-    val target = PriceTargetUI(
-        localPrimeId = 0,
-        id = "bitcoin",
-        name = "Bitcoin",
-        symbol = "BTC",
-        lastUpdated = "sat feb 4",
-        userPriceTargetDisplay = "US$17,000",
-        currentPriceDisplay = "US$17,000",
-        priceTargetDirection = PriceTargetDirectionUI.ABOVE,
-        progress = 0.5f,
-        progressPercentageDisplay = "50%",
-        completedOnDate = "Mon Jan 4"
-
-    )
-   PriceTargetCard(priceTarget = target, onDeleteClicked = { userPriceTarget ->
+   PriceTargetCard(priceTarget = getPriceTarget(1).first(), onDeleteClicked = { userPriceTarget ->
 
    })
 }
 
 @Preview
 @Composable
-fun PriceTargetCardPreviewNoCompletedOn() {
-    val target = PriceTargetUI(
-        localPrimeId = 0,
-        id = "bitcoin",
-        name = "Bitcoin",
-        symbol = "BTC",
-        lastUpdated = "sat feb 4",
-        userPriceTargetDisplay = "US$17,000",
-        currentPriceDisplay = "US$17,000",
-        priceTargetDirection = PriceTargetDirectionUI.ABOVE,
-        progress = 0.5f,
-        progressPercentageDisplay = "50%",
-        completedOnDate = null
-
+fun ShowListPriceTargetCardPreview() {
+    val state = AlertListViewState(
+        priceTargets = getPriceTarget(20)
     )
-    PriceTargetCard(priceTarget = target, onDeleteClicked = { userPriceTarget ->
+    ShowPriceTargets(state = state, onSearchBarClick = { })
+}
+
+@Preview
+@Composable
+fun PriceTargetCardPreviewNoCompletedOn() {
+    PriceTargetCard(priceTarget = getPriceTarget(1).first(), onDeleteClicked = { userPriceTarget ->
 
     })
+}
+
+private fun getPriceTarget(size: Int): List<PriceTargetUI> {
+    val targets = arrayListOf<PriceTargetUI>()
+    for (index in 0 until size) {
+        val target = PriceTargetUI(
+            localPrimeId = 0,
+            id = "bitcoin_",
+            name = "Bitcoin_"+index,
+            symbol = "BTC",
+            lastUpdated = "sat feb 4",
+            userPriceTargetDisplay = "US$17,000",
+            currentPriceDisplay = "US$17,000",
+            priceTargetDirection = PriceTargetDirectionUI.ABOVE,
+            progress = 0.5f,
+            progressPercentageDisplay = "50%",
+            completedOnDate = "Mon Jan 4"
+        )
+        targets.add(target)
+    }
+    return targets
 }

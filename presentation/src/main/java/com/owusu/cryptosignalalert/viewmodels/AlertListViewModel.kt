@@ -74,6 +74,21 @@ class AlertListViewModel(
 
     private fun handleAlertList(priceTargetsDomainList: List<PriceTargetDomain>) {
         val priceTargets = priceTargetsMapper.mapDomainListToUIList(priceTargetsDomainList)
-        _state.value = _state.value.copy(priceTargets = priceTargets)
+        val numOfTargetsMet = calculateNumberOfTargetsMet(priceTargets)
+        _state.value = _state.value.copy(
+            priceTargets = priceTargets,
+            numberOfTargetsMet = numOfTargetsMet,
+            totalNumberOfTargets = priceTargets.size
+        )
+    }
+
+    private fun calculateNumberOfTargetsMet(priceTargetsList: List<PriceTargetUI>): Int {
+        var numOfTargetsMet = 0;
+        priceTargetsList.forEach {
+            if (it.hasPriceTargetBeenHit) {
+                numOfTargetsMet++
+            }
+        }
+        return numOfTargetsMet
     }
 }

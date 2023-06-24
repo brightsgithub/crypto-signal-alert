@@ -3,10 +3,7 @@ package com.owusu.cryptosignalalert.views.screens
 import android.app.Activity
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -33,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
@@ -232,6 +231,17 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                 percentageProgressDisplay
             ) = createRefs()
 
+            /**
+             * when using constraint layout with compose, I get this error: Destructuring declaration
+             * initializer of type ConstraintLayoutScope.ConstrainedLayoutReferences must have a 'component17()' function
+             * i.e I cant add more references to the above, so the below is the work around.
+             * By removing syncprogress from the destructuring declaration and creating a separate
+             * reference for it, you can add it to the layout without exceeding the limit of 16 values.
+             * Adjust the positioning of the other composables and set the constraints for syncprogress
+             * using the constrainAs modifier.
+             */
+            val syncProgress = createRef()
+
             Text(text = "",
                 modifier = Modifier.constrainAs(marketRank) {
                     top.linkTo(parent.top, margin = 4.dp)
@@ -398,6 +408,15 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                     }
             )
 
+
+            CircularProgressClock(progress = 0.8f, modifier = Modifier
+                .constrainAs(syncProgress) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(targetPriceLabel2.bottom, margin = 20.dp)
+                    bottom.linkTo(parent.bottom)
+                })
+
             if (showPopup.value) {
                 ShowDeleteDialog(priceTarget, showPopup, onDeleteClicked)
             }
@@ -405,7 +424,58 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
     }
 }
 
+@Composable
+fun CircularProgressClock(
+    progress: Float,
+    //constrainedLayoutReference: ConstrainedLayoutReference,
+    modifier: Modifier = Modifier
+) {
+    val progressState = remember { mutableStateOf(progress) }
 
+    ConstraintLayout(modifier = modifier
+        .width(35.dp)
+        .height(35.dp)) {
+        val (progressBar, syncingText) = createRefs()
+
+        Box(modifier = Modifier
+            .constrainAs(progressBar) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(syncingText.top, margin = 16.dp)
+                width = Dimension.fillToConstraints
+                height = Dimension.wrapContent
+            }
+            .border(1.dp, Color.White, shape = CircleShape)) {
+            CircularProgressIndicator(
+                progress = progressState.value,
+                color = Color.White,
+                strokeWidth = 16.dp
+                )
+        }
+
+
+        Text(
+            text = "Sync...",
+            color = Color.White,
+            modifier = Modifier.constrainAs(syncingText) {
+                //top.linkTo(progressBar.bottom, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom)
+            },
+            fontSize = 10.sp
+        )
+    }
+}
+
+
+
+@Preview
+@Composable
+fun CircularProgressClockPreview() {
+    CircularProgressClock(progress = 0.80f)
+}
 
 @Composable
 fun ShowDeleteDialog(

@@ -11,10 +11,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-
-//import org.koin.core.KoinComponent
-//import org.koin.core.inject
-
 /**
  * Created by Bright Owusu-Amankwaa on 24/01/21.
  */
@@ -23,7 +19,7 @@ class AlarmReceiver : BroadcastReceiver() , KoinComponent {
     private val cryptoAlarmManager: CryptoAlarmManager by inject()
 
     init {
-        Log.v("CryptoSignalService", "AlarmReceiver instance created ")
+        Log.v("CryptoBroadcastReceiver", "AlarmReceiver instance created ")
     }
 
     override fun onReceive(

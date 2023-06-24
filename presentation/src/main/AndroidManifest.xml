@@ -37,6 +37,9 @@
 <!--            </intent-filter>-->
 <!--        </receiver>-->
 
+
+
+
         <service android:name="com.owusu.cryptosignalalert.service.CryptoSignalAlertService"
             android:enabled="true"
             android:exported="true"
@@ -49,6 +52,17 @@
                 <action android:name="com.owusu.cryptosignalalert.alarm.CryptoAlarmManager.INTENT_ACTION_START_ALARM_LISTENER" />
             </intent-filter>
         </receiver>
+
+
+        <receiver
+            android:name="com.owusu.cryptosignalalert.receivers.AlertStopReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.owusu.cryptosignalalert.receivers.ACTION_ALERT_STOP" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

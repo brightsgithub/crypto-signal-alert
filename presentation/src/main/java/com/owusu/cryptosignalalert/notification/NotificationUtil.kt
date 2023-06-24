@@ -12,7 +12,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.owusu.cryptosignalalert.CryptoSignalAlertApp
 import com.owusu.cryptosignalalert.R
-import com.owusu.cryptosignalalert.service.CryptoSignalAlertService
+import com.owusu.cryptosignalalert.receivers.ACTION_ALERT_STOP
+import com.owusu.cryptosignalalert.receivers.AlertStopReceiver
 import com.owusu.cryptosignalalert.views.activities.MainActivity
 import kotlin.random.Random
 
@@ -26,7 +27,7 @@ class NotificationUtil {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val manager = CryptoSignalAlertApp.instance.getSystemService(NotificationManager::class.java)
                 val notificationId = rand(1, Int.MAX_VALUE)
-                manager.notify(notificationId, getNewNotification(notificationId ,newMsg, CryptoSignalAlertApp.instance))
+                manager.notify(notificationId, getNotification(notificationId ,newMsg, CryptoSignalAlertApp.instance))
             }
         }
 
@@ -44,7 +45,8 @@ class NotificationUtil {
         }
 
         fun getNotification(notificationId: Int, input: String, context: Context): Notification {
-            val actionStopIntent = Intent(CryptoSignalAlertService.ACTION_STOP)
+            val actionStopIntent = Intent(context, AlertStopReceiver::class.java)
+            actionStopIntent.action = ACTION_ALERT_STOP
 
             var updatePendingIntent: PendingIntent? = null
             updatePendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -62,7 +64,7 @@ class NotificationUtil {
                         R.drawable.ic_launcher_foreground))
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setContentIntent(getPendingIntent(context))
-                .addAction(R.drawable.ic_launcher_foreground, "Stop", updatePendingIntent)
+                .addAction(R.drawable.ic_launcher_foreground, "Stop sound", updatePendingIntent)
                 .setOnlyAlertOnce(true)
                 .build()
             return notification

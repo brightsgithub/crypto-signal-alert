@@ -14,7 +14,7 @@ class PopulateCoinIdsUseCase(
                 delay(params.delayInMilliSecs) // so we don't break our api req/min limit
             }
             saveNewCoinIds()
-            saveNewTimeToUpdateCoinIdsDate(params.currentTime, 6)
+            saveNewTimeToUpdateCoinIdsDate(params.currentTime, 11)
         }
     }
 

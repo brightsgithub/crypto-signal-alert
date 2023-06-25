@@ -1,15 +1,18 @@
 package com.owusu.cryptosignalalert.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.models.states.UpdateSyncState
 import com.owusu.cryptosignalalert.domain.usecase.DeletePriceTargetsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.IsSyncRunningUseCase
+import com.owusu.cryptosignalalert.domain.usecase.ListenToSyncPriceTargetsUpdatesUseCase
 import com.owusu.cryptosignalalert.mappers.UIMapper
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
@@ -30,7 +33,9 @@ class AlertListViewModel(
     private val dispatcherMain: CoroutineDispatcher,
     private val workerTag: String,
     private val app: Application,
-    private val workManager: WorkManager): AndroidViewModel(app) {
+    private val workManager: WorkManager,
+    private val listenToSyncPriceTargetsUpdatesUseCase: ListenToSyncPriceTargetsUpdatesUseCase
+): AndroidViewModel(app) {
 
     var workInfoLiveData: LiveData<List<WorkInfo>> // <-- ADD THIS
 
@@ -55,6 +60,22 @@ class AlertListViewModel(
                 handleAlertList(alertList)
             }
         }
+    }
+
+    fun listenToUpdateSyncState(scope: CoroutineScope = viewModelScope) {
+        scope.launch(dispatcherBackground) {
+            listenToSyncPriceTargetsUpdatesUseCase.invoke().collect {
+                showRemainingSyncWorkToBeDone(it)
+            }
+        }
+    }
+
+    private fun showRemainingSyncWorkToBeDone(updateSyncState: UpdateSyncState) {
+        val shouldShowSyncState = (updateSyncState.remainingPercentageOfWorkToBeDone > 0 && updateSyncState.remainingPercentageOfWorkToBeDone < 1)
+        _state.value = _state.value.copy(
+            remainingSyncPercentageToBeUpdated = updateSyncState.remainingPercentageOfWorkToBeDone,
+            shouldShowSyncState = shouldShowSyncState
+        )
     }
 
     fun deletePriceTarget(priceTargetUI: PriceTargetUI) {

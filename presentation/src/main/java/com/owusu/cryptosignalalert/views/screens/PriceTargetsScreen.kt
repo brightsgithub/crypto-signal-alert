@@ -3,6 +3,8 @@ package com.owusu.cryptosignalalert.views.screens
 import android.app.Activity
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -108,6 +110,8 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel, onSearchBarClick: () ->
                 Log.v("The_current_life", event.toString())
 
                 if(event == Lifecycle.Event.ON_CREATE) {
+                    viewModel.listenToUpdateSyncState()
+
                     // only observe when in onCreate() has been called
                     // observeWorkManagerStatus(activity as ComponentActivity, viewModel) // no longer needed. we listen via flow
                     // listen in for any changes to the list as we are now using a flow.
@@ -173,8 +177,11 @@ private fun ShowPriceTargets(state: AlertListViewState, onSearchBarClick: () -> 
                     ) {
                         // Create references for the composables to constrain
                         val (
-                            targetsMet
+                            targetsMet,
+                            syncProgress,
+                            syncText
                         ) = createRefs()
+
                         Text(
                             text = "Targets met: "+state.numberOfTargetsMet+" of "+state.totalNumberOfTargets,
                             modifier = Modifier.constrainAs(targetsMet) {
@@ -182,6 +189,26 @@ private fun ShowPriceTargets(state: AlertListViewState, onSearchBarClick: () -> 
                                 centerVerticallyTo(parent)
                             }, color = Color.White
                         )
+                        if (state.shouldShowSyncState) {
+                            Text(
+                                text = "Syncing...",
+                                color = Color.White,
+                                modifier = Modifier.constrainAs(syncText) {
+                                    top.linkTo(parent.top)
+                                    end.linkTo(syncProgress.start, margin = 4.dp)
+                                    bottom.linkTo(parent.bottom)
+                                },
+                                fontSize = 10.sp
+                            )
+
+
+                            CircularProgressClock(state = state, modifier = Modifier
+                                .constrainAs(syncProgress) {
+                                    end.linkTo(parent.end, margin = 16.dp)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                })
+                        }
                     }
                 }
             }
@@ -408,15 +435,6 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                     }
             )
 
-
-            CircularProgressClock(progress = 0.8f, modifier = Modifier
-                .constrainAs(syncProgress) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(targetPriceLabel2.bottom, margin = 20.dp)
-                    bottom.linkTo(parent.bottom)
-                })
-
             if (showPopup.value) {
                 ShowDeleteDialog(priceTarget, showPopup, onDeleteClicked)
             }
@@ -426,46 +444,37 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
 
 @Composable
 fun CircularProgressClock(
-    progress: Float,
+    state: AlertListViewState,
     //constrainedLayoutReference: ConstrainedLayoutReference,
     modifier: Modifier = Modifier
 ) {
-    val progressState = remember { mutableStateOf(progress) }
-
     ConstraintLayout(modifier = modifier
-        .width(35.dp)
-        .height(35.dp)) {
-        val (progressBar, syncingText) = createRefs()
+        .width(20.dp)
+        .height(20.dp)) {
+        val (progressBar) = createRefs()
+
+        val animatedProgress = animateFloatAsState(
+            targetValue = state.remainingSyncPercentageToBeUpdated,
+            animationSpec = tween(durationMillis = 500) // Adjust the duration as needed
+        ).value
+
 
         Box(modifier = Modifier
             .constrainAs(progressBar) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                bottom.linkTo(syncingText.top, margin = 16.dp)
+                //bottom.linkTo(syncingText.top, margin = 16.dp)
                 width = Dimension.fillToConstraints
                 height = Dimension.wrapContent
             }
             .border(1.dp, Color.White, shape = CircleShape)) {
             CircularProgressIndicator(
-                progress = progressState.value,
+                progress = animatedProgress,
                 color = Color.White,
                 strokeWidth = 16.dp
                 )
         }
-
-
-        Text(
-            text = "Sync...",
-            color = Color.White,
-            modifier = Modifier.constrainAs(syncingText) {
-                //top.linkTo(progressBar.bottom, margin = 16.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom)
-            },
-            fontSize = 10.sp
-        )
     }
 }
 
@@ -474,7 +483,9 @@ fun CircularProgressClock(
 @Preview
 @Composable
 fun CircularProgressClockPreview() {
-    CircularProgressClock(progress = 0.80f)
+    CircularProgressClock(AlertListViewState(
+        remainingSyncPercentageToBeUpdated = 0.80f,
+        shouldShowSyncState = true))
 }
 
 @Composable
@@ -524,9 +535,23 @@ fun PriceTargetCardPreview() {
 
 @Preview
 @Composable
+fun ShowListPriceTargetCardWithSyncPreview() {
+    val state = AlertListViewState(
+        priceTargets = getPriceTarget(20),
+        remainingSyncPercentageToBeUpdated = 0.50f,
+        totalNumberOfTargets = 20,
+        shouldShowSyncState = true
+    )
+    ShowPriceTargets(state = state, onSearchBarClick = { })
+}
+
+@Preview
+@Composable
 fun ShowListPriceTargetCardPreview() {
     val state = AlertListViewState(
-        priceTargets = getPriceTarget(20)
+        priceTargets = getPriceTarget(20),
+        remainingSyncPercentageToBeUpdated = 0.50f,
+        totalNumberOfTargets = 20
     )
     ShowPriceTargets(state = state, onSearchBarClick = { })
 }

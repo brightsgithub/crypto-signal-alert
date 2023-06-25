@@ -2,6 +2,8 @@ package com.owusu.cryptosignalalert.domain.usecase
 
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.models.states.UpdateSyncState
+import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -26,7 +28,9 @@ class SyncForPriceTargetsUseCase(
     private val getCoinsListUseCase: GetCoinsListUseCase,
     private val updatePriceTargetsUseCase: UpdatePriceTargetsUseCase,
     private val mergeOldPriceTargetWithNewDataUseCase: MergeOldPriceTargetWithNewDataUseCase,
-    private val dateUtils: CryptoDateUtils
+    private val dateUtils: CryptoDateUtils,
+    private val priceTargetsRepository: PriceTargetsRepository,
+    private val calculateRemainingWorkUseCase: CalculateRemainingWorkUseCase,
     ): SuspendedUseCaseUnit<Boolean> {
 
     private val MAX_BATCH_SIZE = 5
@@ -42,7 +46,7 @@ class SyncForPriceTargetsUseCase(
 
         // 1. getPriceTargetsThatHaveNotBeenHitUseCase which will give you a list of price targets.
         // need to get the price targets that have not been hit
-        val priceTargets = getPriceTargets()
+        val priceTargets = getPriceTargetsThatHaveNotBeenHit()
         if (priceTargets.isEmpty()) return false
 
         val ids = getListOfIds(priceTargets)
@@ -87,6 +91,7 @@ class SyncForPriceTargetsUseCase(
             // 2. update all price targets. At this point some may have met their price targets
             // and some will just have updated their current price updated
             updatePriceTargets(updatedPriceTargets1)
+            updateSyncState(totalPriceTargetsSize = priceTargets.size, numberOfItemsCompleted = currentPriceTargetBatch.size)
             if (index != batches.lastIndex) {
                 System.out.println("SyncForPriceTargetsUseCase before delay " + Date())
                 delay(delayInMilliSeconds)
@@ -103,7 +108,7 @@ class SyncForPriceTargetsUseCase(
         updatePriceTargetsUseCase.invoke(UpdatePriceTargetsUseCase.Params(updatedPriceTargets))
     }
 
-    private suspend fun getPriceTargets(): List<PriceTargetDomain> {
+    private suspend fun getPriceTargetsThatHaveNotBeenHit(): List<PriceTargetDomain> {
         // Collect the current list result immediately
         return getPriceTargetsThatHaveNotBeenHitUseCase.invoke().first()
     }
@@ -133,5 +138,13 @@ class SyncForPriceTargetsUseCase(
         )
 
         return getCoinsListUseCase.invoke(params)
+    }
+
+    private suspend fun updateSyncState(totalPriceTargetsSize: Int, numberOfItemsCompleted: Int) {
+        var state = UpdateSyncState()
+        val params = CalculateRemainingWorkUseCase.Params(totalPriceTargetsSize, numberOfItemsCompleted)
+        val remainingPercentage = calculateRemainingWorkUseCase.invoke(params)
+        state = state.copy(remainingPercentageOfWorkToBeDone = remainingPercentage)
+        priceTargetsRepository.updateSyncState(state)
     }
 }

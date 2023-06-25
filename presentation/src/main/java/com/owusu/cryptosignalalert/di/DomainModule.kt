@@ -57,7 +57,9 @@ val domainModule = module() {
     }
 
     single {
-        SyncForPriceTargetsUseCase(get(), get(), get(), get(), get())
+        SyncForPriceTargetsUseCase(get(), get(), get(), get(), get(),
+            priceTargetsRepository = get(),
+        calculateRemainingWorkUseCase = get())
     }
 
     factory {
@@ -95,4 +97,8 @@ val domainModule = module() {
     factory { SyncHasFinishedStatusUseCase(appPreferencesRepository = get()) }
 
     factory { LoadSettingsUseCase(settingsRepository = get()) }
+
+    factory { ListenToSyncPriceTargetsUpdatesUseCase(priceTargetsRepository = get()) }
+
+    factory { CalculateRemainingWorkUseCase() }
 }

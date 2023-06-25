@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.domain.repository
 
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.models.states.UpdateSyncState
 import kotlinx.coroutines.flow.Flow
 
 interface PriceTargetsRepository {
@@ -13,4 +14,7 @@ interface PriceTargetsRepository {
     suspend fun getPriceTargetsCount(): Int
     suspend fun nukeAll()
     suspend fun getPriceTargetsThatHaveNotBeenHitCount(): Int
+    fun listenToSyncUpdateState(): Flow<UpdateSyncState>
+
+    suspend fun updateSyncState(updateSyncState: UpdateSyncState)
 }

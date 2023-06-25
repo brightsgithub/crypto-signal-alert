@@ -3,8 +3,11 @@ package com.owusu.cryptosignalalert.domain.usecase
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.models.states.UpdateSyncState
+import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import io.mockk.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -18,6 +21,8 @@ class SyncForPriceTargetsUseCaseTest {
     private val mockUpdatePriceTargetsUseCase = mockk<UpdatePriceTargetsUseCase>()
     private val mockMergeOldPriceTargetWithNewDataUseCase = mockk<MergeOldPriceTargetWithNewDataUseCase>()
     private val mockDateUtil = mockk<CryptoDateUtils>()
+    private val mockPriceTargetsRepository = mockk<PriceTargetsRepository>()
+    private val mockCalculateRemainingWorkUseCase = mockk<CalculateRemainingWorkUseCase>()
 
     private lateinit var cut: SyncForPriceTargetsUseCase
 
@@ -28,12 +33,19 @@ class SyncForPriceTargetsUseCaseTest {
             getCoinsListUseCase = mockGetCoinsListUseCase,
             updatePriceTargetsUseCase = mockUpdatePriceTargetsUseCase,
             dateUtils = mockDateUtil,
-            mergeOldPriceTargetWithNewDataUseCase = mockMergeOldPriceTargetWithNewDataUseCase
+            mergeOldPriceTargetWithNewDataUseCase = mockMergeOldPriceTargetWithNewDataUseCase,
+            priceTargetsRepository = mockPriceTargetsRepository,
+            calculateRemainingWorkUseCase = mockCalculateRemainingWorkUseCase
         )
 
         every { mockDateUtil.convertDateToFormattedStringWithTime(any()) } returns "01/01/2020"
         coEvery { mockUpdatePriceTargetsUseCase.invoke(any()) } just runs
         coEvery { mockMergeOldPriceTargetWithNewDataUseCase.invoke(any()) } returns getMockedPriceTargetsDomain()
+        coEvery { mockCalculateRemainingWorkUseCase.invoke(any()) } returns 0.5f
+        coEvery { mockPriceTargetsRepository.updateSyncState(any()) } just runs
+        coEvery { mockPriceTargetsRepository.listenToSyncUpdateState() } returns flowOf(
+            UpdateSyncState()
+        )
     }
 
     @Test

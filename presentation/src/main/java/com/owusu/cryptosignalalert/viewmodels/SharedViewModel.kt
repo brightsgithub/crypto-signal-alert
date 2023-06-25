@@ -11,6 +11,7 @@ import com.owusu.cryptosignalalert.models.CoinUI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
 
 class SharedViewModel(
     private val startupBillingUseCase: StartupBillingUseCase,
@@ -25,7 +26,7 @@ class SharedViewModel(
     }
 
     private suspend fun populateCoinIds() {
-        populateCoinIdsUseCase.invoke()
+        populateCoinIdsUseCase.invoke(PopulateCoinIdsUseCase.Params(currentTime = Calendar.getInstance()))
     }
 
     /**

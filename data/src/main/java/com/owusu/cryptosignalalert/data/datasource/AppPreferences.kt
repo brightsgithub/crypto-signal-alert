@@ -18,7 +18,7 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
     private val isAdsFree = "ccccxxxkjghyyrtrrtrthhrtfrgtdfgdgf"
     private val isPriceTargetLimitFree = "ccccxzzzzxxkjghyyrtrrtrthhrtfrgtdfgdgf"
     private val isVibrate = "vibraedssddsdsddsddsds"
-    private val coinIdPopulated = "dfdfdgghfghfghgfhhfgdxxxx"
+    private val coinIdLastUpdated = "dfdfdgghfghfghgfhhfgdxxxxxzadddddx"
     private val isWorkManagerExecuting = "qqqqqqpppppooooibcbcbjhjhwehbchwbechjkk"
 
 
@@ -109,16 +109,12 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
         putBoolean(isAppFree, false)
     }
 
-    override fun hasCoinIdsBeenPopulated(): Boolean {
-        return getBoolean(coinIdPopulated, false)
+    override fun getLastCoinIdUpdate(): Long {
+        return getLong(coinIdLastUpdated, 0)
     }
 
-    override fun coinIdsHaveBeenPopulated() {
-        putBoolean(coinIdPopulated, true)
-    }
-
-    override fun coinIdsHaveNotBeenPopulated() {
-        putBoolean(coinIdPopulated, false)
+    override fun setLastCoinIdUpdate(timestamp: Long) {
+        putLong(coinIdLastUpdated, timestamp)
     }
 
     override fun isWorkManagerExecuting(): Boolean {

@@ -14,9 +14,8 @@ interface AppPreferencesRepository {
     fun makeAppFree()
     fun makeAppPurchasable()
 
-    fun hasCoinIdsBeenPopulated(): Boolean
-    fun coinIdsHaveBeenPopulated()
-    fun coinIdsHaveNotBeenPopulated()
+    fun getLastCoinIdUpdate(): Long
+    fun setLastCoinIdUpdate(timestamp: Long)
 
     fun isWorkManagerExecuting(): Boolean
     fun workManagerIsExecuting()

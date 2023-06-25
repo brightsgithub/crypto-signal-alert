@@ -44,7 +44,6 @@ class CoinsRepositoryImpl(
     override suspend fun saveAllCoinIds(coinIds: List<CoinIdDomain>) {
         val entityList = coinIdAPIMapper.domainToEntity(coinIds)
         coinIdsLocalDataSource.saveAllCoinIds(entityList)
-        appPreferences.coinIdsHaveBeenPopulated()
     }
 
     override fun searchCoinIds(searchStr: String): Flow<List<CoinIdDomain>> {
@@ -54,13 +53,16 @@ class CoinsRepositoryImpl(
         }
     }
 
-    override fun hasCoinIdsBeenPopulated(): Boolean {
-        return appPreferences.hasCoinIdsBeenPopulated()
+    override fun setLastCoinIdUpdate(timestamp: Long) {
+        appPreferences.setLastCoinIdUpdate(timestamp)
+    }
+
+    override fun getLastCoinIdUpdate(): Long {
+        return appPreferences.getLastCoinIdUpdate()
     }
 
     override suspend fun nukeCoinIdsData() {
         coinIdsLocalDataSource.nukeCoinIdsData()
-        appPreferences.coinIdsHaveNotBeenPopulated()
     }
 
     override suspend fun getCoinDetail(coinId: String): CoinDetailDomain {

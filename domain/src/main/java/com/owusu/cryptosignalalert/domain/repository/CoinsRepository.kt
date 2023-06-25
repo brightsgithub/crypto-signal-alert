@@ -16,8 +16,9 @@ interface CoinsRepository {
     suspend fun getAllCoinIds(): List<CoinIdDomain>
     suspend fun saveAllCoinIds(coinIds: List<CoinIdDomain>)
     fun searchCoinIds(searchStr: String): Flow<List<CoinIdDomain>>
-    fun hasCoinIdsBeenPopulated(): Boolean
     suspend fun nukeCoinIdsData()
     suspend fun getCoinDetail(coinId: String): CoinDetailDomain
     suspend fun getHistoricalPriceData(coinId: String, currency: String): HistoricPriceWrapperDomain
+    fun setLastCoinIdUpdate(timestamp: Long)
+    fun getLastCoinIdUpdate(): Long
 }

@@ -22,6 +22,11 @@ class LocalFixedSettingsDataSource: SettingsDataSource {
                 // selectedValue = "Version 1.0.0"
             ),
             SettingDomain(
+                title = "AppVersion",
+                //subTitle = "Current version",
+                //selectedValue = "Version 1.0.0"
+            ),
+            SettingDomain(
                 isLastSetting = true,
                 title = "AppVersion",
                 //subTitle = "Current version",

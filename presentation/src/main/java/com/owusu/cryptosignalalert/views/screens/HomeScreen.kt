@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.views.screens
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -47,7 +48,7 @@ import org.koin.androidx.compose.getViewModel
 
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
 @Composable
-fun HomeScreen(navController: NavHostController = rememberNavController()) {
+fun HomeScreen(navController: NavHostController = rememberNavController(), preselectedScreen: MutableState<String?>) {
 
     // https://developer.android.com/jetpack/compose/navigation
     val onSearchBarClick = {
@@ -72,7 +73,7 @@ fun HomeScreen(navController: NavHostController = rememberNavController()) {
 
     Scaffold(
         topBar = { TopBar(onSearchBarClick = onSearchBarClick, onSettingsClicked = onSettingsClicked) },
-        bottomBar = { BottomNavigationBar(navController) },
+        bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
                 if (1 > 0) {
@@ -131,7 +132,7 @@ fun TopBarPreview() {
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+fun BottomNavigationBar(navController: NavHostController, preselectedScreen: MutableState<String?>) {
     val items = listOf(
         NavigationItem.Home,
         NavigationItem.PriceTargets,
@@ -145,6 +146,8 @@ fun BottomNavigationBar(navController: NavHostController) {
     val bottomBarDestination = items.any { it.route == currentDestination?.route }
     if (!bottomBarDestination) return
 
+    val selectedScreen = preselectedScreen.value ?: currentDestination?.route
+
     BottomNavigation(
         backgroundColor = colorResource(id = R.color.colorPrimary),
         contentColor = Color.White
@@ -156,7 +159,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                 label = { Text(text = screen.title) },
                 selectedContentColor = Color.White,
                 alwaysShowLabel = true,
-                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                selected = selectedScreen == screen.route, //currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = {
                     navController.navigate(screen.route) {
 
@@ -185,6 +188,11 @@ fun BottomNavigationBar(navController: NavHostController) {
                     }
                 }
             )
+        }
+
+        preselectedScreen.value?.let {
+            navController.navigate(route = it)
+            preselectedScreen.value = null
         }
     }
 }

@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId "com.owusu.cryptosignalalert"
-        minSdk 21
+        minSdk 23
         targetSdk 32
         versionCode 4
         versionName "1.0.0"

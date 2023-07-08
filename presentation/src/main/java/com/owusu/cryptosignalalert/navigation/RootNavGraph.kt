@@ -1,13 +1,14 @@
 package com.owusu.cryptosignalalert.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.owusu.cryptosignalalert.views.screens.HomeScreen
 
 @Composable
-fun RootNavigationGraph(navHostController: NavHostController) {
+fun RootNavigationGraph(navHostController: NavHostController, preselectedScreen: MutableState<String?>) {
     NavHost(
         navController = navHostController,
         route = Graphs.MAIN_ROOT_GRAPH,
@@ -18,7 +19,7 @@ fun RootNavigationGraph(navHostController: NavHostController) {
             // OnBoarding graph
             // SplashScreen graph
             composable(route = Graphs.HOME_NAV_GRAPH) {
-                HomeScreen()
+                HomeScreen(preselectedScreen = preselectedScreen)
             }
         }
     )

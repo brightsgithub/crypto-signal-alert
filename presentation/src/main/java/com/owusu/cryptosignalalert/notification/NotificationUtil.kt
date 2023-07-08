@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.owusu.cryptosignalalert.CryptoSignalAlertApp
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.navigation.NavigationItem
 import com.owusu.cryptosignalalert.receivers.ACTION_ALERT_STOP
 import com.owusu.cryptosignalalert.receivers.AlertStopReceiver
 import com.owusu.cryptosignalalert.views.activities.MainActivity
@@ -63,35 +64,15 @@ class NotificationUtil {
                     BitmapFactory.decodeResource(context.getResources(),
                         R.drawable.ic_launcher_foreground))
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                .setContentIntent(getPendingIntent(context))
+                .setContentIntent(getPriceTargetsPendingIntent(context))
                 .addAction(R.drawable.ic_launcher_foreground, "Stop sound", updatePendingIntent)
                 .setOnlyAlertOnce(true)
                 .build()
             return notification
         }
-
-        private fun getNewNotification(notificationId: Int, input: String, context: Context): Notification {
-            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setContentTitle(context.getString(R.string.app_name))
-                .setContentText(input)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setLargeIcon(
-                    BitmapFactory.decodeResource(context.getResources(),
-                        R.drawable.ic_launcher_foreground))
-                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                .setContentIntent(getPendingIntent(context))
-                .build()
-            return notification
-        }
-
-        private fun getPendingIntent(context: Context): PendingIntent {
-            val notificationIntent = Intent(context, MainActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(
-                context,
-                0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
-            )
-            return pendingIntent
-        }
+    private fun getPriceTargetsPendingIntent(context: Context): PendingIntent {
+        return MainActivity.getPendingIntent(context, NavigationItem.PriceTargets.route)
+    }
 
         fun createNotificationChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

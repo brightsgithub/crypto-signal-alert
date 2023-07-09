@@ -39,6 +39,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.owusu.cryptosignalalert.models.SharedViewState
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.owusu.cryptosignalalert.R
@@ -48,7 +49,15 @@ import org.koin.androidx.compose.getViewModel
 
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
 @Composable
-fun HomeScreen(navController: NavHostController = rememberNavController(), preselectedScreen: MutableState<String?>) {
+fun HomeScreen(
+    navController: NavHostController = rememberNavController(),
+    preselectedScreen: MutableState<String?>
+) {
+    val sharedViewModel = getViewModel<SharedViewModel>()
+    val sharedViewState = sharedViewModel.sharedViewState.collectAsState(initial = SharedViewState())
+
+    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = scaffoldState.snackbarHostState
 
     // https://developer.android.com/jetpack/compose/navigation
     val onSearchBarClick = {
@@ -71,17 +80,58 @@ fun HomeScreen(navController: NavHostController = rememberNavController(), prese
         }
     }
 
+
+    val onShowSnackBar = { msg: String, actionLabel: String ->
+        sharedViewModel.showSnackBar(msg, actionLabel)
+    }
+
+    val onHideSnackBar = {  ->
+        sharedViewModel.hideSnackBar()
+    }
+
+
+
+    // If the UI state contains an error, show snackbar
+    if (sharedViewState.value.appSnackBar.shouldShowSnackBar) {
+
+        // `LaunchedEffect` will cancel and re-launch if
+        // `scaffoldState.snackbarHostState` changes
+        LaunchedEffect(snackbarHostState) {
+            // Show snackbar using a coroutine, when the coroutine is cancelled the
+            // snackbar will automatically dismiss. This coroutine will cancel whenever
+            // `state.hasError` is false, and only start when `state.hasError` is true
+            // (due to the above if-check), or if `scaffoldState.snackbarHostState` changes.
+            snackbarHostState.showSnackbar(
+                message = sharedViewState.value.appSnackBar.errorMsg,
+                actionLabel = sharedViewState.value.appSnackBar.actionLabel
+            )
+            onHideSnackBar()
+        }
+    }
+
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = { TopBar(onSearchBarClick = onSearchBarClick, onSettingsClicked = onSettingsClicked) },
         bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
                 if (1 > 0) {
-                    HomeNavGraph(navHostController = navController, onSearchBarClick = onSearchBarClick)
+                    HomeNavGraph(
+                        navHostController = navController,
+                        onSearchBarClick = onSearchBarClick,
+                        onShowSnackBar = onShowSnackBar
+                    )
                 } else {
                     Column() {
                         Row(modifier = Modifier.weight(0.9f)) {
-                            HomeNavGraph(navHostController = navController, onSearchBarClick = onSearchBarClick)
+                            HomeNavGraph(
+                                navHostController = navController,
+                                onSearchBarClick = onSearchBarClick,
+                                onShowSnackBar = onShowSnackBar
+                            )
                         }
                         Row(modifier = Modifier.weight(0.1f)) {
                             Box() {

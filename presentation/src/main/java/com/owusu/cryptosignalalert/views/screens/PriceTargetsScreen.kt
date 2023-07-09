@@ -88,7 +88,9 @@ fun stopObservingWorkManagerStatus() {
 }
 
 @Composable
-fun PriceTargetsScreen(sharedViewModel: SharedViewModel, onSearchBarClick: () -> Unit) {
+fun PriceTargetsScreen(
+    onSearchBarClick: () -> Unit,
+    onShowSnackBar: (msg: String, actionLabel: String) -> Unit) {
     CryptoSignalAlertTheme {
 
         val viewModel = getViewModel<AlertListViewModel>()
@@ -98,7 +100,7 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel, onSearchBarClick: () ->
 
         viewModel.viewState.collectAsState(initial = AlertListViewState()).value.let {
             Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowPriceTargets(it, onSearchBarClick = onSearchBarClick)
+                ShowPriceTargets(it, onSearchBarClick = onSearchBarClick, onShowSnackBar = onShowSnackBar)
             }
         }
 
@@ -134,7 +136,11 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel, onSearchBarClick: () ->
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ShowPriceTargets(state: AlertListViewState, onSearchBarClick: () -> Unit) {
+private fun ShowPriceTargets(
+    state: AlertListViewState,
+    onSearchBarClick: () -> Unit,
+    onShowSnackBar:(snackBarMsg: String, actionLabel: String) -> Unit
+) {
 
     val viewModel = getViewModel<AlertListViewModel>()
 
@@ -215,7 +221,11 @@ private fun ShowPriceTargets(state: AlertListViewState, onSearchBarClick: () -> 
 
             items(items = state.priceTargets) { priceTarget ->
                 PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
-                    viewModel.deletePriceTarget(userPriceTarget)
+                    if (state.shouldShowSyncState) {
+                        onShowSnackBar("Waiting for sync to complete", "Dismiss")
+                    } else {
+                        viewModel.deletePriceTarget(userPriceTarget)
+                    }
                 })
             }
         }
@@ -542,7 +552,7 @@ fun ShowListPriceTargetCardWithSyncPreview() {
         totalNumberOfTargets = 20,
         shouldShowSyncState = true
     )
-    ShowPriceTargets(state = state, onSearchBarClick = { })
+    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2 -> })
 }
 
 @Preview
@@ -553,7 +563,7 @@ fun ShowListPriceTargetCardPreview() {
         remainingSyncPercentageToBeUpdated = 0.50f,
         totalNumberOfTargets = 20
     )
-    ShowPriceTargets(state = state, onSearchBarClick = { })
+    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2 -> })
 }
 
 @Preview

@@ -50,17 +50,17 @@ class MainActivity : ComponentActivity(), KoinComponent, ScreenProxy {
         return preselectedScreen
     }
 
-    override fun onResume() {
-        super.onResume()
-        Handler().postDelayed ({
-            msg()
-        }, 3000)
-    }
-
-    private fun msg() {
-        notificationUtil.sendNewStandAloneNotification("Last updated at "+ cryptoDateUtils.convertDateToFormattedStringWithTime(
-            Calendar.getInstance().timeInMillis) + "\n" + "Hello testing")
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        Handler().postDelayed ({
+//            msg()
+//        }, 3000)
+//    }
+//
+//    private fun msg() {
+//        notificationUtil.sendNewStandAloneNotification("Last updated at "+ cryptoDateUtils.convertDateToFormattedStringWithTime(
+//            Calendar.getInstance().timeInMillis) + "\n" + "Hello testing")
+//    }
 
     companion object {
 

@@ -1,11 +1,12 @@
 package com.owusu.cryptosignalalert.models
 
 data class SharedViewState(
-    val appSnackBar: AppSnackBar = AppSnackBar()
+    val appSnackBar: AppSnackBar = AppSnackBar(actionCallback = {})
 )
 
 data class AppSnackBar(
     val shouldShowSnackBar: Boolean = false,
-    val errorMsg: String = "",
+    val snackBarMessage: String = "",
     val actionLabel: String = "",
+    val actionCallback:() -> Unit
 )

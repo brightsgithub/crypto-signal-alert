@@ -1,44 +1,21 @@
 package com.owusu.cryptosignalalert.views.screens
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import com.owusu.cryptosignalalert.models.SharedViewState
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -81,8 +58,8 @@ fun HomeScreen(
     }
 
 
-    val onShowSnackBar = { msg: String, actionLabel: String ->
-        sharedViewModel.showSnackBar(msg, actionLabel)
+    val onShowSnackBar = { msg: String, actionLabel: String, actionCallback:() -> Unit ->
+        sharedViewModel.showSnackBar(msg, actionLabel, actionCallback)
     }
 
     val onHideSnackBar = {  ->
@@ -101,10 +78,18 @@ fun HomeScreen(
             // snackbar will automatically dismiss. This coroutine will cancel whenever
             // `state.hasError` is false, and only start when `state.hasError` is true
             // (due to the above if-check), or if `scaffoldState.snackbarHostState` changes.
-            snackbarHostState.showSnackbar(
-                message = sharedViewState.value.appSnackBar.errorMsg,
-                actionLabel = sharedViewState.value.appSnackBar.actionLabel
+            val snackbarResult = snackbarHostState.showSnackbar(
+                message = sharedViewState.value.appSnackBar.snackBarMessage,
+                actionLabel = sharedViewState.value.appSnackBar.actionLabel,
             )
+
+            // Check if the snackbar action was clicked
+            if (snackbarResult == SnackbarResult.ActionPerformed) {
+                // Perform the desired action here
+                // This block of code will be executed when the action label is clicked
+                sharedViewState.value.appSnackBar.actionCallback.invoke()
+            }
+
             onHideSnackBar()
         }
     }

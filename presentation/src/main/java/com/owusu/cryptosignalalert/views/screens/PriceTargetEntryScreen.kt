@@ -40,7 +40,12 @@ import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel, navigateToTargetsList:() -> Unit) {
+fun PriceTargetEntryScreen(
+    sharedViewModel: SharedViewModel,
+    navigateToPurchaseScreen:() -> Unit,
+    navigateToTargetsList:() -> Unit,
+    onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
+) {
 
     CryptoSignalAlertTheme {
         val coinUI = sharedViewModel.selectedCoinUI
@@ -60,6 +65,18 @@ fun PriceTargetEntryScreen(sharedViewModel: SharedViewModel, navigateToTargetsLi
                 viewModel.saveNewPriceTarget(coinUI, userPriceTarget)
                 navigateToTargetsList()
             }
+        }
+
+        if (viewState.value.priceTargetsMessage.shouldShowMessage) {
+            onShowSnackBar(
+                viewState.value.priceTargetsMessage.message,
+                viewState.value.priceTargetsMessage.ctaText,
+                {
+                  if (viewState.value.priceTargetsMessage.isError) {
+                          navigateToPurchaseScreen()
+                  }
+                }
+            )
         }
 
         LoadingWidget3()

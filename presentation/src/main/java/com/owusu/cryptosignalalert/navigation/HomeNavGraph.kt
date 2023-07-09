@@ -25,7 +25,7 @@ import org.koin.androidx.compose.getViewModel
 fun HomeNavGraph(
     navHostController: NavHostController,
     onSearchBarClick: () -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String) -> Unit
+    onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
 ) {
 
     val sharedViewModel = getViewModel<SharedViewModel>()
@@ -56,7 +56,7 @@ fun HomeNavGraph(
 
 
         // nested graph
-        targetsEntryGraph(navHostController, sharedViewModel)
+        targetsEntryGraph(navHostController, sharedViewModel, onShowSnackBar = onShowSnackBar)
 
         coinSearchNavGraph(navHostController, sharedViewModel)
 

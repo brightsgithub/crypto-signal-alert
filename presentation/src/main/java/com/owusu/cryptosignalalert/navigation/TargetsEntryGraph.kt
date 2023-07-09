@@ -10,7 +10,8 @@ import com.owusu.cryptosignalalert.views.screens.PriceTargetEntryScreen
 
 fun NavGraphBuilder.targetsEntryGraph(
     navHostController: NavHostController,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    onShowSnackBar:(snackBarMsg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
 ) {
     navigation(
         route = Graphs.TARGETS_ENTRY_GRAPH,
@@ -27,7 +28,11 @@ fun NavGraphBuilder.targetsEntryGraph(
                         }
                         launchSingleTop = true
                     }
-                })
+                },
+                    navigateToPurchaseScreen = {
+                    navHostController.navigate(route = NavigationItem.Purchase.route)
+                },
+                    onShowSnackBar = onShowSnackBar)
             }
         }
     )

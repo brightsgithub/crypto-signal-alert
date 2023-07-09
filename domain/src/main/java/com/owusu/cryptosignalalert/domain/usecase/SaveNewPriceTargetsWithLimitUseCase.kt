@@ -21,7 +21,7 @@ class SaveNewPriceTargetsWithLimitUseCase(
             PurchaseConstants.MIN_PRICE_TARGET_RECORDS_ALLOWED
         }
 
-        return if (noOfRecords > noOfRecsAllowed) {
+        return if (noOfRecords >= noOfRecsAllowed) {
             // fail
             false
         } else {

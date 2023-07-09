@@ -3,17 +3,15 @@ package com.owusu.cryptosignalalert.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.owusu.cryptosignalalert.domain.models.states.BillingReadyState
 import com.owusu.cryptosignalalert.domain.models.states.StartUpBillingState
 import com.owusu.cryptosignalalert.domain.usecase.PopulateCoinIdsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.StartupBillingUseCase
+import com.owusu.cryptosignalalert.models.AppSnackBar
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.SharedViewState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -36,15 +34,27 @@ class SharedViewModel(
         populateCoinIdsUseCase.invoke(PopulateCoinIdsUseCase.Params(currentTime = Calendar.getInstance()))
     }
 
-    fun showSnackBar(msg: String, actionLabel: String) {
-        _sharedViewState.value = _sharedViewState.value.copy (
-            appSnackBar = _sharedViewState.value.appSnackBar.copy (
-                errorMsg = msg,
+//    fun showSnackBar(msg: String, actionLabel: String) {
+//        _sharedViewState.value = _sharedViewState.value.copy (
+//            appSnackBar = _sharedViewState.value.appSnackBar.copy (
+//                snackBarMessage = msg,
+//                actionLabel = actionLabel,
+//                shouldShowSnackBar = true,
+//            )
+//        )
+//    }
+
+    fun showSnackBar(msg: String, actionLabel: String, actionCallback: () -> Unit) {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            appSnackBar = AppSnackBar(
+                shouldShowSnackBar = true,
+                snackBarMessage = msg,
                 actionLabel = actionLabel,
-                shouldShowSnackBar = true
+                actionCallback = actionCallback
             )
         )
     }
+
 
     fun hideSnackBar() {
         _sharedViewState.value = SharedViewState()

@@ -14,11 +14,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.owusu.cryptosignalalert.models.SharedViewState
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
@@ -103,7 +107,7 @@ fun HomeScreen(
         bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
-                if (1 > 0) {
+                if (1 > 2) {
                     HomeNavGraph(
                         navHostController = navController,
                         onSearchBarClick = onSearchBarClick,
@@ -119,8 +123,15 @@ fun HomeScreen(
                             )
                         }
                         Row(modifier = Modifier.weight(0.1f)) {
-                            Box() {
-                                Text(text = "Ads Banner", modifier = Modifier.align(Alignment.Center))
+                            Box {
+                                //Text(text = "Ads Banner", modifier = Modifier.align(Alignment.Center))
+                                AndroidView(factory = {
+                                    AdView(it).apply {
+                                        adSize = AdSize.BANNER
+                                        adUnitId = "ca-app-pub-3940256099942544/6300978111"
+                                        loadAd(AdRequest.Builder().build())
+                                    }
+                                }, modifier = Modifier.fillMaxWidth())
                             }
                         }
                     }

@@ -17,6 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CryptoSignalAlert"
         android:name="com.owusu.cryptosignalalert.CryptoSignalAlertApp">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7902575335669699~8145535285"
+            />
         <activity
             android:launchMode= "singleInstance"
             android:name=".views.activities.MainActivity"

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "485679729018",
+    "project_id": "cryptosignalalert-f24d3",
+    "storage_bucket": "cryptosignalalert-f24d3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:485679729018:android:dc1d6898ba862b47646ec3",
+        "android_client_info": {
+          "package_name": "com.owusu.cryptosignalalert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "485679729018-aa46b4ps1fmf3sn5v6e2doqogeujf54n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUK5gBe-4FWVMYLQA_SXXq-Ef6i3eDsmE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "485679729018-aa46b4ps1fmf3sn5v6e2doqogeujf54n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

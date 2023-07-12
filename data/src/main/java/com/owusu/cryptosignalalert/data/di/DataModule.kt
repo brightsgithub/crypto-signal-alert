@@ -10,6 +10,7 @@ import com.owusu.cryptosignalalert.data.datasource.coingecko.CoinGeckoPricesData
 import com.owusu.cryptosignalalert.data.datasource.db.*
 import com.owusu.cryptosignalalert.data.datasource.settings.LocalFixedSettingsDataSource
 import com.owusu.cryptosignalalert.data.datasource.settings.SettingsDataSource
+import com.owusu.cryptosignalalert.data.datasource.settings.SettingsUtils
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
 import com.owusu.cryptosignalalert.data.mappers.*
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
@@ -122,7 +123,10 @@ open class DataModuleWrapper(private val context: Context) {
         }
 
         factory <SettingsDataSource>{
-            LocalFixedSettingsDataSource()
+            LocalFixedSettingsDataSource(
+                context = context,
+                settingsUtils = get()
+            )
         }
 
         single<AppPreferencesRepository> { AppPreferences(context) }
@@ -151,6 +155,10 @@ open class DataModuleWrapper(private val context: Context) {
 
         single {
             EndPoints()
+        }
+
+        single {
+            SettingsUtils()
         }
 
         single {

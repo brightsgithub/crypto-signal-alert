@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CryptoSignalAlert</string>
+    <string name="app_name">Crypto Price Target Alerts</string>
 
     <string-array name="price_direction_array">
         <item>ABOVE</item>
@@ -17,4 +17,31 @@
 
     <!--Test Banner id -->
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+
+
+
+    <!-- freedback -->
+    <string name="feedback_header_1">*** For Crypto Price Target Alerts use only ***</string>
+    <string name="device_type">Device type: </string>
+    <string name="android">Android</string>
+    <string name="the_android_version">Android version: </string>
+    <string name="the_app_version">App version: </string>
+    <string name="the_build_number">Build number: </string>
+    <string name="device_model">Device model: </string>
+    <string name="manufacturer">Manufacturer: </string>
+    <string name="feedback_header_2">**** Please type message below ***</string>
+    <string name="email_subject">Crypto Price Target Alerts Feedback</string>
+    <string name="contact_wear_speaker">Contact Crypto Price Target Alerts</string>
+    <string name="contact_developer">Contact developer</string>
+    <string name="contact_dev_pref_key">contact_dev_pref_key</string>
+    <string name="share_pref_key">share_pref_key</string>
+    <string name="share_with_friends">Share app with others</string>
+
+    <string name="privacy_policy_pref_key">privacy_policy_pref_key</string>
+    <string name="contact_title_detail">trainstationalert@gmail.com</string>
+
+
+    <string name="tell_a_friend_msg_body">Get the \'Crypto Price Target Alerts\' app from Google Play Store! </string>
+    <string name="app_play_store_url">https://play.google.com/store/apps/details?id=com.owusu.cryptosignalalert</string>
+
 </resources>

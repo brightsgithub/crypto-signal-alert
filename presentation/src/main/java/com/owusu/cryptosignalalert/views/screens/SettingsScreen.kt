@@ -1,5 +1,7 @@
 package com.owusu.cryptosignalalert.views.screens
 
+import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,30 +21,49 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ChainStyle
+import com.owusu.cryptosignalalert.domain.models.ScreenProxy
+import com.owusu.cryptosignalalert.models.SettingTypeUI
 import com.owusu.cryptosignalalert.models.SettingsViewState
+import com.owusu.cryptosignalalert.settings.ContactDeveloperHelper
+import com.owusu.cryptosignalalert.settings.SettingsHelper
+import org.koin.androidx.compose.get
 
 @Composable
 fun SettingsScreen() {
     CryptoSignalAlertTheme {
-
+        val settingsHelper = get<SettingsHelper>()
+        val contactDeveloperHelper = get<ContactDeveloperHelper>()
+        val context = LocalContext.current
         val settingsViewModel = getViewModel<SettingsViewModel>()
         settingsViewModel.loadSettings()
         settingsViewModel.viewState.collectAsState(initial = SettingsViewState()).value.let {
             Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowSettings(it.settings)
+                ShowSettings(it.settings, settingsHelper, contactDeveloperHelper, context)
             }
         }
     }
 }
 
 @Composable
-fun ShowSettings(settings: List<SettingUI>) {
+fun ShowSettings(
+    settings: List<SettingUI>,
+    settingsHelper: SettingsHelper,
+    contactDeveloperHelper: ContactDeveloperHelper,
+    context: Context
+) {
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(items = settings) { settingUI ->
-            ShowSetting(settingUI, onSettingClicked = { sku ->
-
+            ShowSetting(settingUI, onSettingClicked = { settingUI ->
+                when (settingUI.settingTypeUI) {
+                    SettingTypeUI.ContactDeveloper -> { contactDeveloperHelper.provideFeedback(context as Activity)}
+                    SettingTypeUI.Nothing -> { }
+                    SettingTypeUI.PrivacyPolicy -> { }
+                    SettingTypeUI.RateTheApp -> { settingsHelper.openAppOnGooglePlayStore(context) }
+                    SettingTypeUI.ShareApp -> { settingsHelper.shareApp(context)}
+                }
             })
         }
     }
@@ -111,7 +132,11 @@ fun ShowSetting(settingUI: SettingUI, onSettingClicked:(settingUI: SettingUI) ->
 @Preview
 @Composable
 fun ShowSettingsPreview() {
-    ShowSettings(settings = listOf(
+
+    val settingsHelper = get<SettingsHelper>()
+    val contactDeveloperHelper = get<ContactDeveloperHelper>()
+    val context = LocalContext.current
+    val settings = listOf(
         SettingUI(
             isFirstSetting = true,
             title = "Vibrate",
@@ -126,13 +151,20 @@ fun ShowSettingsPreview() {
         SettingUI(
             title = "Privacy Policy",
             subTitle = "Current version",
-           // selectedValue = "Version 1.0.0"
+            // selectedValue = "Version 1.0.0"
         ),
         SettingUI(
             isLastSetting = true,
-            title = "AppVersion",
+            title = "AppVersion"
             //subTitle = "Current version",
             //selectedValue = "Version 1.0.0"
         )
-    ))
+    )
+
+    ShowSettings(
+        settings = settings,
+        settingsHelper = settingsHelper,
+        context = context,
+        contactDeveloperHelper = contactDeveloperHelper
+    )
 }

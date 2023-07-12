@@ -10,6 +10,8 @@ import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.mappers.*
 import com.owusu.cryptosignalalert.models.PriceTargetUI
+import com.owusu.cryptosignalalert.settings.ContactDeveloperHelper
+import com.owusu.cryptosignalalert.settings.SettingsHelper
 import com.owusu.cryptosignalalert.util.PriceDisplayUtils
 import com.owusu.cryptosignalalert.util.PriceUtils
 import com.owusu.cryptosignalalert.viewmodels.*
@@ -150,5 +152,13 @@ val uiModule = module() {
 
     single {
         CryptoMediaPlayer()
+    }
+
+    single {
+        SettingsHelper()
+    }
+
+    single {
+        ContactDeveloperHelper(settingsHelper = get())
     }
 }

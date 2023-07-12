@@ -1,37 +1,46 @@
 package com.owusu.cryptosignalalert.data.datasource.settings
 
+import android.content.Context
 import com.owusu.cryptosignalalert.domain.models.SettingDomain
+import com.owusu.cryptosignalalert.domain.models.SettingType
 
-class LocalFixedSettingsDataSource: SettingsDataSource {
+class LocalFixedSettingsDataSource(
+    private val context: Context,
+    private val settingsUtils: SettingsUtils
+    ): SettingsDataSource {
     override suspend fun getSettings(): List<SettingDomain> {
         return listOf(
             SettingDomain(
+                settingType = SettingType.ContactDeveloper,
                 isFirstSetting = true,
-                title = "Vibrate",
-                subTitle = "Current version",
-                selectedValue = "Version 1.0.0",
+                title = "Contact Developer",
+                subTitle = "Contact for support"
             ),
             SettingDomain(
-                title = "Share with friends",
-                //subTitle = "Current version",
-                selectedValue = "Share with friends value"
+                settingType = SettingType.ShareApp,
+                title = "Share App",
+                subTitle = "Share this app with others"
             ),
             SettingDomain(
+                settingType = SettingType.PrivacyPolicy,
                 title = "Privacy Policy",
-                subTitle = "Current version",
+                subTitle = "Details of this app policies",
                 // selectedValue = "Version 1.0.0"
             ),
             SettingDomain(
-                title = "AppVersion",
-                //subTitle = "Current version",
-                //selectedValue = "Version 1.0.0"
+                settingType = SettingType.RateTheApp,
+                title = "Rate App",
+                subTitle = "Add a review to the Google Play Store",
             ),
             SettingDomain(
-                isLastSetting = true,
-                title = "AppVersion",
-                //subTitle = "Current version",
+                title = "App Version",
+                subTitle = getAppVersion(),
                 //selectedValue = "Version 1.0.0"
             )
         )
+    }
+
+    private fun getAppVersion(): String {
+        return settingsUtils.getAppVersionName(context)
     }
 }

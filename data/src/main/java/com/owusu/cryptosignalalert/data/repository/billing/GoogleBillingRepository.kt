@@ -83,7 +83,9 @@ class GoogleBillingRepository(
         for(sku: String in skuList) {
             skDetailsDomainList.add(
                 billingDataSource.getSkuDetails(sku)
-                    .map { skuDet -> SkuWrapper(skuDet!!) }
+                    .map {
+                            skuDet -> SkuWrapper(skuDet!!)
+                    }
                     .combine(observeNewPurchases()) { skuDetailsWrapper, newPurchasedSku ->
                         skuDetailsWrapper.copy(newPurchasedSku = newPurchasedSku)
                     }

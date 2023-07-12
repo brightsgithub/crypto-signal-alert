@@ -1,5 +1,8 @@
 package com.owusu.cryptosignalalert.domain.repository
 
+import com.owusu.cryptosignalalert.domain.models.states.PurchasedStateDomain
+import kotlinx.coroutines.flow.Flow
+
 interface AppPreferencesRepository {
 
     fun isPriceTargetLimitPurchased(): Boolean
@@ -20,4 +23,6 @@ interface AppPreferencesRepository {
     fun isWorkManagerExecuting(): Boolean
     fun workManagerIsExecuting()
     fun workManagerHasFinishedExecuting()
+
+    fun listenForPurchasedDataState(): Flow<PurchasedStateDomain>
 }

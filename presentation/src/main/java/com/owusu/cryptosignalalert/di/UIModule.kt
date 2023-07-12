@@ -92,7 +92,11 @@ val uiModule = module() {
     }
 
     viewModel {
-        SharedViewModel(startupBillingUseCase = get(), populateCoinIdsUseCase = get())
+        SharedViewModel(
+            startupBillingUseCase = get(),
+            populateCoinIdsUseCase = get(),
+            savedPurchasedStateChangesUseCase = get()
+        )
     }
 
     viewModel {

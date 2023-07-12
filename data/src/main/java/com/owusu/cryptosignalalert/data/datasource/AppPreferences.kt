@@ -2,7 +2,10 @@ package com.owusu.cryptosignalalert.data.datasource
 
 
 import android.content.Context
+import com.owusu.cryptosignalalert.domain.models.states.PurchasedStateDomain
 import com.owusu.cryptosignalalert.domain.repository.AppPreferencesRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class AppPreferences constructor(val context: Context): AppPreferencesRepository {
 
@@ -24,6 +27,9 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
 
     private val sharedPreferences = context.getSharedPreferences(myPref, Context.MODE_PRIVATE)
     private val editor = sharedPreferences.edit()
+
+    private val _purchasedState = MutableStateFlow(PurchasedStateDomain())
+    private val purchasedState: Flow<PurchasedStateDomain> = _purchasedState
 
     fun enableShakeTorch() {
         putBoolean(isShakeTorchEnabled,true)
@@ -73,41 +79,58 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
         return getBoolean(isOnBoadingScrCompleted, false)
     }
 
-    override fun isPriceTargetLimitPurchased(): Boolean {
-        return getBoolean(isPriceTargetLimitFree, false)
-    }
-
-    override fun makePriceTargetLimitFree() {
-        putBoolean(isPriceTargetLimitFree, true)
-    }
-
-    override fun makePriceTargetLimitPurchasable() {
-        putBoolean(isPriceTargetLimitFree, false)
+    override fun isAppFree(): Boolean {
+        return getBoolean(isAppFree, false)
     }
 
     override fun isAdsPurchased(): Boolean {
         return getBoolean(isAdsFree, false)
     }
 
+    override fun isPriceTargetLimitPurchased(): Boolean {
+        return getBoolean(isPriceTargetLimitFree, false)
+    }
+
+    override fun makePriceTargetLimitFree() {
+        val value = true
+        putBoolean(isPriceTargetLimitFree, value)
+        _purchasedState.value = _purchasedState.value.copy(isPriceTargetLimitPurchased = value)
+    }
+
+    override fun makePriceTargetLimitPurchasable() {
+        val value = false
+        putBoolean(isPriceTargetLimitFree, value)
+        _purchasedState.value = _purchasedState.value.copy(isPriceTargetLimitPurchased = value)
+    }
+
     override fun makeAdsFree() {
-        putBoolean(isAdsFree, true)
+        val value = true
+        putBoolean(isAdsFree, value)
+        _purchasedState.value = _purchasedState.value.copy(isAdsPurchased = value)
     }
 
     override fun makeAdsPurchasable() {
-        putBoolean(isAdsFree, false)
-    }
-
-    override fun isAppFree(): Boolean {
-        return getBoolean(isAppFree, false)
+        val value = false
+        putBoolean(isAdsFree, value)
+        _purchasedState.value = _purchasedState.value.copy(isAdsPurchased = value)
     }
 
     override fun makeAppFree() {
-        putBoolean(isAppFree, true)
+        val value = true
+        putBoolean(isAppFree, value)
+        _purchasedState.value = _purchasedState.value.copy(isAppFree = value)
     }
 
     override fun makeAppPurchasable() {
-        putBoolean(isAppFree, false)
+        val value = false
+        putBoolean(isAppFree, value)
+        _purchasedState.value = _purchasedState.value.copy(isAppFree = value)
     }
+
+    override fun listenForPurchasedDataState(): Flow<PurchasedStateDomain> {
+        return purchasedState
+    }
+
 
     override fun getLastCoinIdUpdate(): Long {
         return getLong(coinIdLastUpdated, 0)

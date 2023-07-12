@@ -222,7 +222,10 @@ class BillingDataSource private constructor(
      */
     fun isPurchased(sku: String): Flow<Boolean> {
         val skuStateFLow = skuStateMap[sku]!!
-        return skuStateFLow.map { skuState -> skuState == SkuState.SKU_STATE_PURCHASED_AND_ACKNOWLEDGED }
+        return skuStateFLow.map { skuState ->
+            val result = skuState == SkuState.SKU_STATE_PURCHASED_AND_ACKNOWLEDGED
+            result
+        }
     }
 
     /**
@@ -271,7 +274,9 @@ class BillingDataSource private constructor(
     }
 
     fun getSkuDetails(sku: String): Flow<SkuDetails?> {
-        return skuDetailsMap[sku]!!
+        val skuData = skuDetailsMap[sku]!!
+        Log.d("SKU_INFO", skuData.value.toString()+"")
+        return skuData
     }
 
     /**

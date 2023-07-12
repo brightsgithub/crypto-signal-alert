@@ -101,4 +101,6 @@ val domainModule = module() {
     factory { ListenToSyncPriceTargetsUpdatesUseCase(priceTargetsRepository = get()) }
 
     factory { CalculateRemainingWorkUseCase() }
+
+    factory { SavedPurchasedStateChangesUseCase(appPreferencesRepository = get()) }
 }

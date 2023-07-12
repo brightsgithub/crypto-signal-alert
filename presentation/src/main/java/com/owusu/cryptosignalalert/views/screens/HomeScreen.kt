@@ -107,7 +107,7 @@ fun HomeScreen(
         bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
-                if (1 > 2) {
+                if (sharedViewState.value.purchasedState.isAdsPurchased) {
                     HomeNavGraph(
                         navHostController = navController,
                         onSearchBarClick = onSearchBarClick,
@@ -131,7 +131,7 @@ fun HomeScreen(
                                         adUnitId = "ca-app-pub-3940256099942544/6300978111"
                                         loadAd(AdRequest.Builder().build())
                                     }
-                                }, modifier = Modifier.fillMaxWidth())
+                                }, modifier = Modifier.fillMaxSize())
                             }
                         }
                     }

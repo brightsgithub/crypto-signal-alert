@@ -23,7 +23,7 @@ android {
         applicationId "com.owusu.cryptosignalalert"
         minSdk 23
         targetSdk 32
-        versionCode 4
+        versionCode 5
         versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -43,8 +43,12 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            debuggable false
+//            minifyEnabled true
+//            debuggable false
+
+            minifyEnabled false
+            debuggable true
+
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }

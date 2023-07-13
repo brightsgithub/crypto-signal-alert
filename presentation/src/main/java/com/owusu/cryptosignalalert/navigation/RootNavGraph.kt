@@ -31,4 +31,5 @@ object Graphs {
     const val TARGETS_ENTRY_GRAPH = "TARGETS_ENTRY_GRAPH"
     const val SEARCH_NAV_GRAPH = "SEARCH_NAV_GRAPH"
     const val SETTINGS_NAV_GRAPH = "SETTINGS_NAV_GRAPH"
+    const val WEB_VIEW_NAV_GRAPH = "WEB_VIEW_NAV_GRAPH"
 }

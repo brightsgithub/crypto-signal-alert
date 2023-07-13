@@ -32,7 +32,7 @@ import com.owusu.cryptosignalalert.settings.SettingsHelper
 import org.koin.androidx.compose.get
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
     CryptoSignalAlertTheme {
         val settingsHelper = get<SettingsHelper>()
         val contactDeveloperHelper = get<ContactDeveloperHelper>()
@@ -41,7 +41,13 @@ fun SettingsScreen() {
         settingsViewModel.loadSettings()
         settingsViewModel.viewState.collectAsState(initial = SettingsViewState()).value.let {
             Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowSettings(it.settings, settingsHelper, contactDeveloperHelper, context)
+                ShowSettings(
+                    it.settings,
+                    settingsHelper,
+                    contactDeveloperHelper,
+                    context,
+                    onNavigateToWebView = onNavigateToWebView
+                )
             }
         }
     }
@@ -52,7 +58,8 @@ fun ShowSettings(
     settings: List<SettingUI>,
     settingsHelper: SettingsHelper,
     contactDeveloperHelper: ContactDeveloperHelper,
-    context: Context
+    context: Context,
+    onNavigateToWebView:(url: String) -> Unit
 ) {
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(items = settings) { settingUI ->
@@ -60,7 +67,7 @@ fun ShowSettings(
                 when (settingUI.settingTypeUI) {
                     SettingTypeUI.ContactDeveloper -> { contactDeveloperHelper.provideFeedback(context as Activity)}
                     SettingTypeUI.Nothing -> { }
-                    SettingTypeUI.PrivacyPolicy -> { }
+                    SettingTypeUI.PrivacyPolicy -> { onNavigateToWebView("https://sites.google.com/view/crypto-price-target-alerts-pri") }
                     SettingTypeUI.RateTheApp -> { settingsHelper.openAppOnGooglePlayStore(context) }
                     SettingTypeUI.ShareApp -> { settingsHelper.shareApp(context)}
                 }
@@ -165,6 +172,7 @@ fun ShowSettingsPreview() {
         settings = settings,
         settingsHelper = settingsHelper,
         context = context,
-        contactDeveloperHelper = contactDeveloperHelper
+        contactDeveloperHelper = contactDeveloperHelper,
+        onNavigateToWebView = {}
     )
 }

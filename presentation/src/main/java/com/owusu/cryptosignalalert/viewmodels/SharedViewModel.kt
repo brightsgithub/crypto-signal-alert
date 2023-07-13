@@ -91,7 +91,9 @@ class SharedViewModel(
         }
     }
 
+    // nav arguments - where we don't need our app to react to any real time changes
     lateinit var selectedCoinUI: CoinUI
+    var webViewUrl: String = ""
 
     private fun printCurrentState() {
         Log.v("SharedViewModel", "Current SharedViewState = "+ _sharedViewState.value)

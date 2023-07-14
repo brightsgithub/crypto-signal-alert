@@ -70,6 +70,52 @@ class SharedViewModel(
         )
     }
 
+    fun hideSettingsIcon() {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+                shouldShowSettingsIcon = false
+            )
+        )
+    }
+
+    fun showSettingsIcon() {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+                shouldShowSettingsIcon = true
+            )
+        )
+    }
+
+    fun showSearchIcon() {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+                shouldShowSearchIcon = true
+            )
+        )
+    }
+
+    fun hideSearchIcon() {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+                shouldShowSearchIcon = false
+            )
+        )
+    }
+
+    fun showAllActionItems() {
+        showSearchIcon()
+        showSettingsIcon()
+    }
+
+    fun hideAllActionItems() {
+        hideSearchIcon()
+        hideSettingsIcon()
+    }
+
+    fun showOnlySettings() {
+        showSettingsIcon()
+        hideSearchIcon()
+    }
 
     fun hideSnackBar() {
         _sharedViewState.value = SharedViewState()

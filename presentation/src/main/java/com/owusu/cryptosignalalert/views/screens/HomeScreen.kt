@@ -1,20 +1,30 @@
 package com.owusu.cryptosignalalert.views.screens
 
+import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.owusu.cryptosignalalert.models.SharedViewState
@@ -26,6 +36,7 @@ import com.google.android.gms.ads.AdView
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.getViewModel
 
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
@@ -35,6 +46,23 @@ fun HomeScreen(
     preselectedScreen: MutableState<String?>
 ) {
     val sharedViewModel = getViewModel<SharedViewModel>()
+    val destinationChangeListener = rememberDestinationChangeListener(navController, sharedViewModel)
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(Unit) {
+
+        lifecycle.addObserver(destinationChangeListener)
+
+        // Perform any additional initialization or actions if needed
+        Log.d("CURRENT_DESTINATION", "check ")
+
+        onDispose {
+            lifecycle.removeObserver(destinationChangeListener)
+        }
+    }
+
+
+
+
     val sharedViewState = sharedViewModel.sharedViewState.collectAsState(initial = SharedViewState())
 
     val scaffoldState = rememberScaffoldState()
@@ -98,12 +126,11 @@ fun HomeScreen(
         }
     }
 
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-        topBar = { TopBar(onSearchBarClick = onSearchBarClick, onSettingsClicked = onSettingsClicked) },
+        topBar = { TopBar(onSearchBarClick = onSearchBarClick, onSettingsClicked = onSettingsClicked, sharedViewState) },
         bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
@@ -141,31 +168,37 @@ fun HomeScreen(
         backgroundColor = colorResource(R.color.colorPrimary) // Set background color to avoid the white flashing when you switch between screens
     )
 }
+
 // https://johncodeos.com/how-to-add-search-in-list-with-jetpack-compose/
 // https://www.devbitsandbytes.com/configuring-searchview-in-jetpack-compose/
 @Composable
-fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit) {
+fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit, sharedViewState: State<SharedViewState>) {
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
         backgroundColor = colorResource(id = R.color.colorPrimary),
         contentColor = Color.White,
         actions = {
-            IconButton(
-                modifier = Modifier,
-                onClick = { onSearchBarClick() }) {
-                Icon(
-                    Icons.Filled.Search,
-                    contentDescription = stringResource(id = R.string.icn_search_view_demo_app_bar_search)
-                )
+            
+            if (sharedViewState.value.actionButtonState.shouldShowSearchIcon) {
+                IconButton(
+                    modifier = Modifier,
+                    onClick = { onSearchBarClick() }) {
+                    Icon(
+                        Icons.Filled.Search,
+                        contentDescription = stringResource(id = R.string.icn_search_view_demo_app_bar_search)
+                    )
+                }
             }
 
-            IconButton(
-                modifier = Modifier,
-                onClick = { onSettingsClicked() }) {
-                Icon(
-                    Icons.Filled.Settings,
-                    contentDescription = stringResource(id = R.string.icn_settings)
-                )
+            if (sharedViewState.value.actionButtonState.shouldShowSettingsIcon) {
+                IconButton(
+                    modifier = Modifier,
+                    onClick = { onSettingsClicked() }) {
+                    Icon(
+                        Icons.Filled.Settings,
+                        contentDescription = stringResource(id = R.string.icn_settings)
+                    )
+                }
             }
         }
     )
@@ -174,7 +207,8 @@ fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun TopBarPreview() {
-    TopBar(onSearchBarClick = {}, onSettingsClicked = {})
+    val state = rememberSaveable { mutableStateOf(SharedViewState()) }
+    TopBar(onSearchBarClick = {}, onSettingsClicked = {}, state)
 }
 
 @Composable
@@ -239,6 +273,50 @@ fun BottomNavigationBar(navController: NavHostController, preselectedScreen: Mut
         preselectedScreen.value?.let {
             navController.navigate(route = it)
             preselectedScreen.value = null
+        }
+    }
+}
+
+@Composable
+fun rememberDestinationChangeListener(navController: NavController, sharedViewModel: SharedViewModel): DestinationChangeListener {
+    val destinationChangeListener = remember {
+        DestinationChangeListener(sharedViewModel)
+    }
+    DisposableEffect(navController) {
+        navController.addOnDestinationChangedListener(destinationChangeListener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(destinationChangeListener)
+        }
+    }
+    return destinationChangeListener
+}
+
+class DestinationChangeListener(private val sharedViewModel: SharedViewModel) :
+    NavController.OnDestinationChangedListener, LifecycleObserver {
+
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
+        // Perform actions when the destination changes
+        val route = destination.route
+        Log.d("CURRENT_DESTINATION", "RootNavigationGraph: route = "+ route)
+
+        if (route.equals(NavigationItem.Home.route)) {
+            sharedViewModel.showAllActionItems()
+        } else if(route.equals(NavigationItem.PriceTargets.route)) {
+            sharedViewModel.showAllActionItems()
+        } else if(route.equals(NavigationItem.Purchase.route)) {
+            sharedViewModel.showAllActionItems()
+        } else if(route.equals(TargetEntryScreens.PriceTargetEntry.route)) {
+            sharedViewModel.showOnlySettings()
+        } else if(route.equals(CoinSearchScreens.CoinSearch.route)) {
+            sharedViewModel.showAllActionItems()
+        } else if(route.equals(SettingsScreens.Settings.route)) {
+            sharedViewModel.hideAllActionItems()
+        } else if(route.equals(WebViewScreens.WebView.route)) {
+            sharedViewModel.hideAllActionItems()
         }
     }
 }

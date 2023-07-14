@@ -20,6 +20,8 @@ data class PurchasedState(
 )
 
 data class ActionButtonState(
+    val title: String = "",
     val shouldShowSearchIcon: Boolean = true,
-    val shouldShowSettingsIcon: Boolean = true
+    val shouldShowSettingsIcon: Boolean = true,
+    val shouldShowUpButtonIcon: Boolean = false
 )

@@ -1,8 +1,10 @@
 package com.owusu.cryptosignalalert.viewmodels
 
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.domain.models.states.PurchasedStateDomain
 import com.owusu.cryptosignalalert.domain.models.states.StartUpBillingState
 import com.owusu.cryptosignalalert.domain.usecase.PopulateCoinIdsUseCase
@@ -11,21 +13,29 @@ import com.owusu.cryptosignalalert.domain.usecase.StartupBillingUseCase
 import com.owusu.cryptosignalalert.models.AppSnackBar
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.SharedViewState
+import com.owusu.cryptosignalalert.navigation.*
+import com.owusu.cryptosignalalert.resource.AppStringProvider
+import com.owusu.cryptosignalalert.viewmodels.helpers.ToolBarHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
 class SharedViewModel(
     private val startupBillingUseCase: StartupBillingUseCase,
     private val populateCoinIdsUseCase: PopulateCoinIdsUseCase,
-    private val savedPurchasedStateChangesUseCase: SavedPurchasedStateChangesUseCase
+    private val savedPurchasedStateChangesUseCase: SavedPurchasedStateChangesUseCase,
+    private val appStringProvider: AppStringProvider,
+    private val toolBarHelper: ToolBarHelper
     ): ViewModel() {
 
     private val _sharedViewState = MutableStateFlow(SharedViewState()) // for emitting
     val sharedViewState: Flow<SharedViewState> = _sharedViewState // for clients to listen to
+
+    init {
+        toolBarHelper.initToolBarHelper(state = _sharedViewState)
+    }
 
     fun initApp() {
         viewModelScope.launch {
@@ -70,52 +80,7 @@ class SharedViewModel(
         )
     }
 
-    fun hideSettingsIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
-                shouldShowSettingsIcon = false
-            )
-        )
-    }
 
-    fun showSettingsIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
-                shouldShowSettingsIcon = true
-            )
-        )
-    }
-
-    fun showSearchIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
-                shouldShowSearchIcon = true
-            )
-        )
-    }
-
-    fun hideSearchIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
-                shouldShowSearchIcon = false
-            )
-        )
-    }
-
-    fun showAllActionItems() {
-        showSearchIcon()
-        showSettingsIcon()
-    }
-
-    fun hideAllActionItems() {
-        hideSearchIcon()
-        hideSettingsIcon()
-    }
-
-    fun showOnlySettings() {
-        showSettingsIcon()
-        hideSearchIcon()
-    }
 
     fun hideSnackBar() {
         _sharedViewState.value = SharedViewState()
@@ -143,5 +108,9 @@ class SharedViewModel(
 
     private fun printCurrentState() {
         Log.v("SharedViewModel", "Current SharedViewState = "+ _sharedViewState.value)
+    }
+
+    fun handleToolBarIconVisibility(route: String?) {
+        toolBarHelper.handleToolBarIconVisibility(route)
     }
 }

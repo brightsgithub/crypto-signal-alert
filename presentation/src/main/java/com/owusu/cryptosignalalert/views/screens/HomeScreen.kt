@@ -2,14 +2,15 @@ package com.owusu.cryptosignalalert.views.screens
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -19,10 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -36,7 +34,6 @@ import com.google.android.gms.ads.AdView
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.getViewModel
 
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
@@ -49,19 +46,14 @@ fun HomeScreen(
     val destinationChangeListener = rememberDestinationChangeListener(navController, sharedViewModel)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(Unit) {
-
         lifecycle.addObserver(destinationChangeListener)
 
         // Perform any additional initialization or actions if needed
-        Log.d("CURRENT_DESTINATION", "check ")
 
         onDispose {
             lifecycle.removeObserver(destinationChangeListener)
         }
     }
-
-
-
 
     val sharedViewState = sharedViewModel.sharedViewState.collectAsState(initial = SharedViewState())
 
@@ -173,12 +165,26 @@ fun HomeScreen(
 // https://www.devbitsandbytes.com/configuring-searchview-in-jetpack-compose/
 @Composable
 fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit, sharedViewState: State<SharedViewState>) {
+
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
     TopAppBar(
-        title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
+        title = { Text(text = sharedViewState.value.actionButtonState.title, fontSize = 18.sp) },
         backgroundColor = colorResource(id = R.color.colorPrimary),
         contentColor = Color.White,
+        navigationIcon = {
+            if (sharedViewState.value.actionButtonState.shouldShowUpButtonIcon) {
+                IconButton(
+                    onClick = { onBackPressedDispatcher?.onBackPressed() }
+                ) {
+                    Icon(
+                        Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_desc_up_button)
+                    )
+                }
+            }
+        },
         actions = {
-            
             if (sharedViewState.value.actionButtonState.shouldShowSearchIcon) {
                 IconButton(
                     modifier = Modifier,
@@ -299,25 +305,7 @@ class DestinationChangeListener(private val sharedViewModel: SharedViewModel) :
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        // Perform actions when the destination changes
-        val route = destination.route
-        Log.d("CURRENT_DESTINATION", "RootNavigationGraph: route = "+ route)
-
-        if (route.equals(NavigationItem.Home.route)) {
-            sharedViewModel.showAllActionItems()
-        } else if(route.equals(NavigationItem.PriceTargets.route)) {
-            sharedViewModel.showAllActionItems()
-        } else if(route.equals(NavigationItem.Purchase.route)) {
-            sharedViewModel.showAllActionItems()
-        } else if(route.equals(TargetEntryScreens.PriceTargetEntry.route)) {
-            sharedViewModel.showOnlySettings()
-        } else if(route.equals(CoinSearchScreens.CoinSearch.route)) {
-            sharedViewModel.showAllActionItems()
-        } else if(route.equals(SettingsScreens.Settings.route)) {
-            sharedViewModel.hideAllActionItems()
-        } else if(route.equals(WebViewScreens.WebView.route)) {
-            sharedViewModel.hideAllActionItems()
-        }
+        sharedViewModel.handleToolBarIconVisibility(destination.route)
     }
 }
 

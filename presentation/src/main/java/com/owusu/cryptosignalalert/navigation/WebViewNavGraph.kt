@@ -23,6 +23,6 @@ fun NavGraphBuilder.webViewNavGraph(
 }
 
 sealed class WebViewScreens(val route: String) {
-    object WebView : WebViewScreens(route = "Settings")
+    object WebView : WebViewScreens(route = "privacy_policy")
     object SomeOtherWebViewScreens : WebViewScreens(route = "SomeOtherWebViewScreens")
 }

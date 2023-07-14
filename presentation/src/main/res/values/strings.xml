@@ -43,5 +43,12 @@
 
     <string name="tell_a_friend_msg_body">Get the \'Crypto Price Target Alerts\' app from Google Play Store! </string>
     <string name="app_play_store_url">https://play.google.com/store/apps/details?id=com.owusu.cryptosignalalert</string>
+    <string name="content_desc_up_button">Navigate back</string>
 
+
+    <!--Screen titles -->
+    <string name="settings_scr_title">Settings</string>
+    <string name="search_scr_title">Search</string>
+    <string name="privacy_policy_scr_title">Privacy Policy</string>
+    <string name="price_target_entry_scr_title">Price Target Entry</string>
 </resources>

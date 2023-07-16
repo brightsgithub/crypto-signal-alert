@@ -5,10 +5,15 @@ import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.android.gms.ads.AdRequest
 import com.owusu.cryptosignalalert.views.screens.HomeScreen
 
 @Composable
-fun RootNavigationGraph(navHostController: NavHostController, preselectedScreen: MutableState<String?>) {
+fun RootNavigationGraph(
+    navHostController: NavHostController,
+    preselectedScreen: MutableState<String?>,
+    adRequest: AdRequest
+    ) {
     NavHost(
         navController = navHostController,
         route = Graphs.MAIN_ROOT_GRAPH,
@@ -19,7 +24,7 @@ fun RootNavigationGraph(navHostController: NavHostController, preselectedScreen:
             // OnBoarding graph
             // SplashScreen graph
             composable(route = Graphs.HOME_NAV_GRAPH) {
-                HomeScreen(preselectedScreen = preselectedScreen)
+                HomeScreen(preselectedScreen = preselectedScreen, adRequest = adRequest)
             }
         }
     )

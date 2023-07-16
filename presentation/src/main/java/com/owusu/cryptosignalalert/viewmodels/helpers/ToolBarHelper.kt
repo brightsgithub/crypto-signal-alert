@@ -15,7 +15,7 @@ class ToolBarHelper(private val appStringProvider: AppStringProvider) {
         _sharedViewState = state
     }
 
-    fun handleToolBarIconVisibility(route: String?) {
+    fun handleToolBarVisibility(route: String?) {
 
         if (route == null) return
 
@@ -23,36 +23,43 @@ class ToolBarHelper(private val appStringProvider: AppStringProvider) {
             NavigationItem.Home.route -> {
                 showAllActionItems()
                 hideUpBtnIcon()
+                showToolBar()
                 setTitle(R.string.app_name)
             }
             NavigationItem.PriceTargets.route -> {
                 showAllActionItems()
                 hideUpBtnIcon()
+                showToolBar()
                 setTitle(R.string.app_name)
             }
             NavigationItem.Purchase.route -> {
                 showAllActionItems()
                 hideUpBtnIcon()
+                showToolBar()
                 setTitle(R.string.app_name)
             }
             TargetEntryScreens.PriceTargetEntry.route -> {
                 showOnlySettings()
                 showUpBtnIcon()
+                showToolBar()
                 setTitle(R.string.price_target_entry_scr_title)
             }
             CoinSearchScreens.CoinSearch.route -> {
                 showAllActionItems()
                 showUpBtnIcon()
+                hideToolBar()
                 setTitle(R.string.search_scr_title)
             }
             SettingsScreens.Settings.route -> {
                 hideAllActionItems()
                 showUpBtnIcon()
+                showToolBar()
                 setTitle(R.string.settings_scr_title)
             }
             WebViewScreens.WebView.route -> {
                 hideAllActionItems()
                 showUpBtnIcon()
+                showToolBar()
                 setTitle(R.string.privacy_policy_scr_title)
             }
         }
@@ -106,6 +113,21 @@ class ToolBarHelper(private val appStringProvider: AppStringProvider) {
         )
     }
 
+    private fun showToolBar() {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+                shouldShowToolTar = true
+            )
+        )
+    }
+
+    private fun hideToolBar() {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+                shouldShowToolTar = false
+            )
+        )
+    }
     private fun setTitle(@StringRes resId: Int) {
         _sharedViewState.value = _sharedViewState.value.copy(
             actionButtonState = _sharedViewState.value.actionButtonState.copy(

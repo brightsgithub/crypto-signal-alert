@@ -1,10 +1,8 @@
 package com.owusu.cryptosignalalert.viewmodels
 
 import android.util.Log
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.domain.models.states.PurchasedStateDomain
 import com.owusu.cryptosignalalert.domain.models.states.StartUpBillingState
 import com.owusu.cryptosignalalert.domain.usecase.PopulateCoinIdsUseCase
@@ -13,14 +11,15 @@ import com.owusu.cryptosignalalert.domain.usecase.StartupBillingUseCase
 import com.owusu.cryptosignalalert.models.AppSnackBar
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.SharedViewState
-import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.resource.AppStringProvider
 import com.owusu.cryptosignalalert.viewmodels.helpers.ToolBarHelper
+import com.owusu.cryptosignalalert.views.screens.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.random.Random
 
 class SharedViewModel(
     private val startupBillingUseCase: StartupBillingUseCase,
@@ -110,7 +109,34 @@ class SharedViewModel(
         Log.v("SharedViewModel", "Current SharedViewState = "+ _sharedViewState.value)
     }
 
-    fun handleToolBarIconVisibility(route: String?) {
-        toolBarHelper.handleToolBarIconVisibility(route)
+    fun onDestinationChanged(route: String?) {
+        toolBarHelper.handleToolBarVisibility(route)
+        attemptToShowInterstitialAd()
     }
+
+    private fun attemptToShowInterstitialAd() {
+        Log.d(TAG, "attemptToShowInterstitialAd called")
+        callFunctionWithProbability(probability = 0.2) {
+            Log.d(TAG, "shouldShowInterstitialAd = true")
+            _sharedViewState.value = _sharedViewState.value.copy(
+                shouldShowInterstitialAd = true
+            )
+        }
+    }
+
+    fun showInterstitialAdAttempted() {
+        _sharedViewState.value = _sharedViewState.value.copy(
+            shouldShowInterstitialAd = false
+        )
+    }
+
+    // 0.2 probability is a 20% chance of calling the supplied function.
+    // 0.5 probability is a 50% chance of calling the supplied function
+    private fun callFunctionWithProbability(probability: Double, function: () -> Unit) {
+        val randomValue = Random.nextDouble(0.0, 1.0)
+        if (randomValue <= probability) {
+            function()
+        }
+    }
+
 }

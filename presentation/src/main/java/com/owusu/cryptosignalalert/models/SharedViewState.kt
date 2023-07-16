@@ -3,7 +3,8 @@ package com.owusu.cryptosignalalert.models
 data class SharedViewState(
     val appSnackBar: AppSnackBar = AppSnackBar(actionCallback = {}),
     val purchasedState: PurchasedState = PurchasedState(),
-    val actionButtonState: ActionButtonState = ActionButtonState()
+    val actionButtonState: ActionButtonState = ActionButtonState(),
+    val shouldShowInterstitialAd: Boolean = false
 )
 
 data class AppSnackBar(
@@ -23,5 +24,6 @@ data class ActionButtonState(
     val title: String = "",
     val shouldShowSearchIcon: Boolean = true,
     val shouldShowSettingsIcon: Boolean = true,
-    val shouldShowUpButtonIcon: Boolean = false
+    val shouldShowUpButtonIcon: Boolean = false,
+    val shouldShowToolTar: Boolean = true,
 )

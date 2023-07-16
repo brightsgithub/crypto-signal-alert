@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.views.screens
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import org.koin.androidx.compose.getViewModel
 //@ExperimentalAnimationApi
 @Composable
 fun CoinSearchScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val searchViewModel = getViewModel<CoinSearchViewModel>()
 
     val coinSearchState = searchViewModel.coinIdSearchModelState.collectAsState(initial = CoinSearchState.Empty)
@@ -61,7 +63,7 @@ fun CoinSearchScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntr
         onSearchTextChanged = { searchViewModel.onSearchTextChanged(it) },
         onClearClick = { searchViewModel.onClearClick() },
         onNavigateBack = {
-            //navHostController.popBackStack()
+            onBackPressedDispatcher?.onBackPressed()
         },
         matchesFound = coinSearchState.value.coinIds.isNotEmpty(),
         resultsSize = coinSearchState.value.resultSize

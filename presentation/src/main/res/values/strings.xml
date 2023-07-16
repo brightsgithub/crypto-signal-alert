@@ -15,9 +15,11 @@
     <string name="icn_settings">Search crypto assets</string>
     <string name="icn_search_back_content_description">Navigate back</string>
 
-    <!--Test Banner id -->
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-
+    <!--AdMob -->
+    <string name="ad_mob_banner_id">ca-app-pub-7902575335669699/2392856598</string>
+    <string name="test_ad_mob_banner_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-7902575335669699/5067121397</string>
+    <string name="test_interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
 
 
     <!-- freedback -->

@@ -12,6 +12,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.navigation.NavigationItem
@@ -28,13 +32,20 @@ class MainActivity : ComponentActivity(), KoinComponent, ScreenProxy {
 
     private val notificationUtil: NotificationUtil by inject()
     private val cryptoDateUtils: CryptoDateUtils by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val adRequest = AdRequest.Builder().build()
+        MobileAds.initialize(this)
         setContent {
             val preselectedScreen: MutableState<String?> = getPreSelectedScreen()
             CryptoSignalAlertTheme {
                 val nav = rememberNavController()
-                RootNavigationGraph(navHostController = nav, preselectedScreen = preselectedScreen)
+                RootNavigationGraph(
+                    navHostController = nav,
+                    preselectedScreen = preselectedScreen,
+                    adRequest = adRequest
+                )
             }
         }
     }

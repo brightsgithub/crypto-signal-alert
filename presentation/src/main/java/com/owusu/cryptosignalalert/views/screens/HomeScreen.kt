@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -28,20 +29,26 @@ import androidx.navigation.NavHostController
 import com.owusu.cryptosignalalert.models.SharedViewState
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.owusu.cryptosignalalert.BuildConfig
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.views.activities.MainActivity
 import org.koin.androidx.compose.getViewModel
 
+const val TAG = "HomeScreen"
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
 @Composable
 fun HomeScreen(
     navController: NavHostController = rememberNavController(),
-    preselectedScreen: MutableState<String?>
+    preselectedScreen: MutableState<String?>,
+    adRequest: AdRequest
 ) {
+    val interstitialAd = rememberSaveable { mutableStateOf<InterstitialAd?>(null) }
+
     val sharedViewModel = getViewModel<SharedViewModel>()
     val destinationChangeListener = rememberDestinationChangeListener(navController, sharedViewModel)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -90,9 +97,68 @@ fun HomeScreen(
         sharedViewModel.hideSnackBar()
     }
 
+    val onShowInterstitialAdAttempted = {
+        sharedViewModel.showInterstitialAdAttempted()
+    }
 
+    // Show any snack bar message
+    ShowSnackBarMessage(sharedViewState, snackbarHostState, onHideSnackBar)
 
-    // If the UI state contains an error, show snackbar
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        topBar = { TopBar(
+            onSearchBarClick = onSearchBarClick,
+            onSettingsClicked = onSettingsClicked,
+            sharedViewState,
+        ) },
+        bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
+        content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
+            Box(modifier = Modifier.padding(padding)) {
+
+                if (sharedViewState.value.purchasedState.isAdsPurchased) {
+                    HomeNavGraph(
+                        navHostController = navController,
+                        onSearchBarClick = onSearchBarClick,
+                        onShowSnackBar = onShowSnackBar
+                    )
+                } else {
+
+                    ShowInterstitialAd(
+                        sharedViewState,
+                        interstitialAd,
+                        onShowInterstitialAdAttempted,
+                        adRequest
+                    )
+
+                    Column() {
+                        Row(modifier = Modifier.weight(0.9f)) {
+                            HomeNavGraph(
+                                navHostController = navController,
+                                onSearchBarClick = onSearchBarClick,
+                                onShowSnackBar = onShowSnackBar
+                            )
+                        }
+                        Row(modifier = Modifier.weight(0.1f)) {
+                            Box {
+                                BannerAdView()
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        backgroundColor = colorResource(R.color.colorPrimary) // Set background color to avoid the white flashing when you switch between screens
+    )
+}
+
+@Composable
+private fun ShowSnackBarMessage(
+    sharedViewState: State<SharedViewState>,
+    snackbarHostState: SnackbarHostState,
+    onHideSnackBar: () -> Unit
+) {
     if (sharedViewState.value.appSnackBar.shouldShowSnackBar) {
 
         // `LaunchedEffect` will cancel and re-launch if
@@ -117,48 +183,98 @@ fun HomeScreen(
             onHideSnackBar()
         }
     }
+}
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        topBar = { TopBar(onSearchBarClick = onSearchBarClick, onSettingsClicked = onSettingsClicked, sharedViewState) },
-        bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
-        content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
-            Box(modifier = Modifier.padding(padding)) {
-                if (sharedViewState.value.purchasedState.isAdsPurchased) {
-                    HomeNavGraph(
-                        navHostController = navController,
-                        onSearchBarClick = onSearchBarClick,
-                        onShowSnackBar = onShowSnackBar
-                    )
-                } else {
-                    Column() {
-                        Row(modifier = Modifier.weight(0.9f)) {
-                            HomeNavGraph(
-                                navHostController = navController,
-                                onSearchBarClick = onSearchBarClick,
-                                onShowSnackBar = onShowSnackBar
-                            )
-                        }
-                        Row(modifier = Modifier.weight(0.1f)) {
-                            Box {
-                                //Text(text = "Ads Banner", modifier = Modifier.align(Alignment.Center))
-                                AndroidView(factory = {
-                                    AdView(it).apply {
-                                        adSize = AdSize.BANNER
-                                        adUnitId = "ca-app-pub-3940256099942544/6300978111"
-                                        loadAd(AdRequest.Builder().build())
-                                    }
-                                }, modifier = Modifier.fillMaxSize())
+@Composable
+private fun ShowInterstitialAd(
+    sharedViewState: State<SharedViewState>,
+    interstitialAd: MutableState<InterstitialAd?>,
+    onShowInterstitialAdAttempted: () -> Unit,
+    adRequest: AdRequest
+) {
+    val context = LocalContext.current
+    val interstitialId = if (BuildConfig.DEBUG) {
+        stringResource(id = R.string.test_interstitial_ad_unit_id)
+    } else {
+        stringResource(id = R.string.interstitial_ad_unit_id)
+    }
+
+    if (sharedViewState.value.shouldShowInterstitialAd) {
+
+        LaunchedEffect(sharedViewState.value.shouldShowInterstitialAd) {
+            InterstitialAd.load(
+                context,
+                interstitialId,
+                adRequest,
+                object : InterstitialAdLoadCallback() {
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        interstitialAd.value = null
+                        Log.d(TAG, "onAdFailedToLoad")
+                    }
+
+                    override fun onAdLoaded(interAd_: InterstitialAd?) {
+                        interstitialAd.value = interAd_
+
+                        interstitialAd.value?.fullScreenContentCallback =
+                            object : FullScreenContentCallback() {
+                                override fun onAdClicked() {
+                                    // Called when a click is recorded for an ad.
+                                    Log.d(TAG, "Ad was clicked.")
+                                }
+
+                                override fun onAdDismissedFullScreenContent() {
+                                    // Called when ad is dismissed.
+                                    Log.d(TAG, "Ad dismissed fullscreen content.")
+                                    interstitialAd.value = null
+                                }
+
+                                override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+                                    // Called when ad fails to show.
+                                    Log.e(TAG, "Ad failed to show fullscreen content.")
+                                    interstitialAd.value = null
+                                }
+
+                                override fun onAdImpression() {
+                                    // Called when an impression is recorded for an ad.
+                                    Log.d(TAG, "Ad recorded an impression.")
+                                }
+
+                                override fun onAdShowedFullScreenContent() {
+                                    // Called when ad is shown.
+                                    Log.d(TAG, "Ad showed fullscreen content.")
+                                }
                             }
+
+                        Log.d(TAG, "onAdLoaded")
+                        if (interAd_ != null) {
+                            Log.d(TAG, "calling show")
+                            interstitialAd.value?.show(context as MainActivity)
                         }
                     }
                 }
-            }
-        },
-        backgroundColor = colorResource(R.color.colorPrimary) // Set background color to avoid the white flashing when you switch between screens
-    )
+            )
+
+            onShowInterstitialAdAttempted()
+        }
+    }
+}
+
+@Composable
+fun BannerAdView() {
+
+    val bannerId = if (BuildConfig.DEBUG) {
+        stringResource(id = R.string.test_ad_mob_banner_id)
+    } else {
+        stringResource(id = R.string.ad_mob_banner_id)
+    }
+
+    AndroidView(factory = {
+        AdView(it).apply {
+            adSize = AdSize.BANNER
+            adUnitId = bannerId
+            loadAd(AdRequest.Builder().build())
+        }
+    }, modifier = Modifier.fillMaxSize())
 }
 
 // https://johncodeos.com/how-to-add-search-in-list-with-jetpack-compose/
@@ -168,46 +284,50 @@ fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit, sharedVi
 
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-    TopAppBar(
-        title = { Text(text = sharedViewState.value.actionButtonState.title, fontSize = 18.sp) },
-        backgroundColor = colorResource(id = R.color.colorPrimary),
-        contentColor = Color.White,
-        navigationIcon = {
-            if (sharedViewState.value.actionButtonState.shouldShowUpButtonIcon) {
-                IconButton(
-                    onClick = { onBackPressedDispatcher?.onBackPressed() }
-                ) {
-                    Icon(
-                        Icons.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.content_desc_up_button)
-                    )
+    if (sharedViewState.value.actionButtonState.shouldShowToolTar) {
+        TopAppBar(
+            title = { Text(text = sharedViewState.value.actionButtonState.title, fontSize = 18.sp) },
+            backgroundColor = colorResource(id = R.color.colorPrimary),
+            contentColor = Color.White,
+            navigationIcon = {
+                if (sharedViewState.value.actionButtonState.shouldShowUpButtonIcon) {
+                    IconButton(
+                        onClick = { onBackPressedDispatcher?.onBackPressed() }
+                    ) {
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.content_desc_up_button)
+                        )
+                    }
                 }
-            }
-        },
-        actions = {
-            if (sharedViewState.value.actionButtonState.shouldShowSearchIcon) {
-                IconButton(
-                    modifier = Modifier,
-                    onClick = { onSearchBarClick() }) {
-                    Icon(
-                        Icons.Filled.Search,
-                        contentDescription = stringResource(id = R.string.icn_search_view_demo_app_bar_search)
-                    )
+            },
+            actions = {
+                if (sharedViewState.value.actionButtonState.shouldShowSearchIcon) {
+                    IconButton(
+                        modifier = Modifier,
+                        onClick = { onSearchBarClick() }) {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = stringResource(id = R.string.icn_search_view_demo_app_bar_search)
+                        )
+                    }
                 }
-            }
 
-            if (sharedViewState.value.actionButtonState.shouldShowSettingsIcon) {
-                IconButton(
-                    modifier = Modifier,
-                    onClick = { onSettingsClicked() }) {
-                    Icon(
-                        Icons.Filled.Settings,
-                        contentDescription = stringResource(id = R.string.icn_settings)
-                    )
+                if (sharedViewState.value.actionButtonState.shouldShowSettingsIcon) {
+                    IconButton(
+                        modifier = Modifier,
+                        onClick = { onSettingsClicked() }) {
+                        Icon(
+                            Icons.Filled.Settings,
+                            contentDescription = stringResource(id = R.string.icn_settings)
+                        )
+                    }
                 }
             }
-        }
-    )
+        )
+    }
+
+
 }
 
 @Preview(showBackground = true)
@@ -305,7 +425,7 @@ class DestinationChangeListener(private val sharedViewModel: SharedViewModel) :
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        sharedViewModel.handleToolBarIconVisibility(destination.route)
+        sharedViewModel.onDestinationChanged(destination.route)
     }
 }
 

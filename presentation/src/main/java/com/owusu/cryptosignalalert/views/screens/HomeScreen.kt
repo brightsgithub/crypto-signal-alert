@@ -117,13 +117,7 @@ fun HomeScreen(
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
 
-                if (sharedViewState.value.purchasedState.isAdsPurchased) {
-                    HomeNavGraph(
-                        navHostController = navController,
-                        onSearchBarClick = onSearchBarClick,
-                        onShowSnackBar = onShowSnackBar
-                    )
-                } else {
+                if (!sharedViewState.value.purchasedState.isAdsPurchased) {
 
                     ShowInterstitialAd(
                         sharedViewState,
@@ -146,6 +140,12 @@ fun HomeScreen(
                             }
                         }
                     }
+                } else {
+                    HomeNavGraph(
+                        navHostController = navController,
+                        onSearchBarClick = onSearchBarClick,
+                        onShowSnackBar = onShowSnackBar
+                    )
                 }
             }
         },

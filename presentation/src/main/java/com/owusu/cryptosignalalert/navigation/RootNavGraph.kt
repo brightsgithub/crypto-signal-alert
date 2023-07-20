@@ -25,9 +25,9 @@ fun RootNavigationGraph(
             // OnBoarding graph
             // SplashScreen graph
             composable(route = Graphs.HOME_NAV_GRAPH) {
-                AppTheme {
+               // AppTheme {
                     HomeScreen(preselectedScreen = preselectedScreen, adRequest = adRequest)
-                }
+              //  }
             }
         }
     )

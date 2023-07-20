@@ -6,10 +6,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
@@ -35,12 +37,23 @@ class MainActivity : ComponentActivity(), KoinComponent, ScreenProxy {
         setContent {
             val preselectedScreen: MutableState<String?> = getPreSelectedScreen()
             AppTheme {
-                val nav = rememberNavController()
-                RootNavigationGraph(
-                    navHostController = nav,
-                    preselectedScreen = preselectedScreen,
-                    adRequest = adRequest
-                )
+                /**
+                 * https://developer.android.com/codelabs/jetpack-compose-theming#3
+                 * In the home screen, you'll start by wrapping the main app composable in a Surface()
+                 * to provide the base for the app's content to be placed on top of it. Open
+                 * MainActivity.kt and wrap the RootNavigationGraph() composable with Surface.
+                 * You'll also provide a tonal elevation of 5.dp to give the surface a tonal color
+                 * of primary slot, which helps to provide contrast against the list item and the
+                 * search bar on top of it. By default, the tonal and shadow elevation for the surface is 0.dp.
+                 */
+                Surface(tonalElevation = 5.dp) {
+                    val nav = rememberNavController()
+                    RootNavigationGraph(
+                        navHostController = nav,
+                        preselectedScreen = preselectedScreen,
+                        adRequest = adRequest
+                    )
+                }
             }
         }
     }

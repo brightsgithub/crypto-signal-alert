@@ -360,7 +360,7 @@ fun BottomNavigationBar(navController: NavHostController, preselectedScreen: Mut
 
     NavigationBar(
        // backgroundColor = colorResource(id = R.color.colorPrimary),
-        contentColor = Color.White
+        //contentColor = Color.White
     ) {
 
         items.forEach { screen ->

@@ -158,6 +158,8 @@ private fun ShowPriceTargets(
                 onClick = {
                           onSearchBarClick()
                 },
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
             ) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "icon")
             }
@@ -238,10 +240,15 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
     var anchorFromCompletedOnOrLastUpdated: ConstrainedLayoutReference
 
     Card(
-        //backgroundColor = colorResource(id = R.color.dark_coin_row),
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp),
-        //elevation = 10.dp
+        colors = CardDefaults.cardColors(
+            containerColor = if (priceTarget.hasPriceTargetBeenHit) {
+                MaterialTheme.colorScheme.secondaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            }
+        )
     ) {
         ConstraintLayout(modifier = Modifier
             .padding(8.dp)

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -109,7 +110,7 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
 
     val extraPadding = if (expanded.value) 48.dp else 0.dp
 
-    Surface(
+    Card(
         //color = colorResource(id = R.color.dark_coin_row),
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).clickable {
             navigateToPriceTargetEntryScreen(coin!!)

@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,16 +15,15 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.owusu.cryptosignalalert.models.SettingUI
 import com.owusu.cryptosignalalert.viewmodels.SettingsViewModel
-import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
+import com.owusu.cryptosignalalert.views.theme.AppTheme
 import org.koin.androidx.compose.getViewModel
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ChainStyle
-import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.models.SettingTypeUI
 import com.owusu.cryptosignalalert.models.SettingsViewState
 import com.owusu.cryptosignalalert.settings.ContactDeveloperHelper
@@ -33,14 +32,14 @@ import org.koin.androidx.compose.get
 
 @Composable
 fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
-    CryptoSignalAlertTheme {
+   // AppTheme {
         val settingsHelper = get<SettingsHelper>()
         val contactDeveloperHelper = get<ContactDeveloperHelper>()
         val context = LocalContext.current
         val settingsViewModel = getViewModel<SettingsViewModel>()
         settingsViewModel.loadSettings()
         settingsViewModel.viewState.collectAsState(initial = SettingsViewState()).value.let {
-            Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
+  //          Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
                 ShowSettings(
                     it.settings,
                     settingsHelper,
@@ -48,9 +47,9 @@ fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
                     context,
                     onNavigateToWebView = onNavigateToWebView
                 )
-            }
+        //    }
         }
-    }
+   // }
 }
 
 @Composable
@@ -131,7 +130,7 @@ fun ShowSetting(settingUI: SettingUI, onSettingClicked:(settingUI: SettingUI) ->
                     //top.linkTo(settingsValue.bottom, margin = 4.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                },color = Color.White
+                },//color = Color.White
         )
     }
 }

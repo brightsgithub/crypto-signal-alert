@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import org.koin.androidx.compose.getViewModel
 
 const val TAG = "HomeScreen"
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavHostController = rememberNavController(),
@@ -64,8 +66,9 @@ fun HomeScreen(
 
     val sharedViewState = sharedViewModel.sharedViewState.collectAsState(initial = SharedViewState())
 
-    val scaffoldState = rememberScaffoldState()
-    val snackbarHostState = scaffoldState.snackbarHostState
+    //val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    //val snackbarHostState = scaffoldState.snackbarHostState
 
     // https://developer.android.com/jetpack/compose/navigation
     val onSearchBarClick = {
@@ -149,7 +152,7 @@ fun HomeScreen(
                 }
             }
         },
-        backgroundColor = colorResource(R.color.colorPrimary) // Set background color to avoid the white flashing when you switch between screens
+        //backgroundColor = colorResource(R.color.colorPrimary) // Set background color to avoid the white flashing when you switch between screens
     )
 }
 
@@ -279,6 +282,7 @@ fun BannerAdView() {
 
 // https://johncodeos.com/how-to-add-search-in-list-with-jetpack-compose/
 // https://www.devbitsandbytes.com/configuring-searchview-in-jetpack-compose/
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit, sharedViewState: State<SharedViewState>) {
 
@@ -287,8 +291,8 @@ fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit, sharedVi
     if (sharedViewState.value.actionButtonState.shouldShowToolTar) {
         TopAppBar(
             title = { Text(text = sharedViewState.value.actionButtonState.title, fontSize = 18.sp) },
-            backgroundColor = colorResource(id = R.color.colorPrimary),
-            contentColor = Color.White,
+            //backgroundColor = colorResource(id = R.color.colorPrimary),
+           // contentColor = Color.White,
             navigationIcon = {
                 if (sharedViewState.value.actionButtonState.shouldShowUpButtonIcon) {
                     IconButton(
@@ -354,16 +358,16 @@ fun BottomNavigationBar(navController: NavHostController, preselectedScreen: Mut
 
     val selectedScreen = preselectedScreen.value ?: currentDestination?.route
 
-    BottomNavigation(
-        backgroundColor = colorResource(id = R.color.colorPrimary),
+    NavigationBar(
+       // backgroundColor = colorResource(id = R.color.colorPrimary),
         contentColor = Color.White
     ) {
 
         items.forEach { screen ->
-            BottomNavigationItem(
+            NavigationBarItem(
                 icon = { Icon(painterResource(id = screen.icon), contentDescription = screen.title) },
                 label = { Text(text = screen.title) },
-                selectedContentColor = Color.White,
+                //selectedContentColor = Color.White,
                 alwaysShowLabel = true,
                 selected = selectedScreen == screen.route, //currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = {

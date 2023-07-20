@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -14,17 +13,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
-import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
-import com.owusu.cryptosignalalert.navigation.NavigationItem
 import com.owusu.cryptosignalalert.navigation.RootNavigationGraph
 import com.owusu.cryptosignalalert.notification.NotificationUtil
-import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
+import com.owusu.cryptosignalalert.views.theme.AppTheme
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.*
 
 // The Compose application is designed to be used in a single-activity architecture with no fragments.
 // https://stackoverflow.com/questions/68962458/how-are-android-activities-handled-with-jetpack-compose-and-compose-navigation
@@ -39,7 +34,7 @@ class MainActivity : ComponentActivity(), KoinComponent, ScreenProxy {
         MobileAds.initialize(this)
         setContent {
             val preselectedScreen: MutableState<String?> = getPreSelectedScreen()
-            CryptoSignalAlertTheme {
+            AppTheme {
                 val nav = rememberNavController()
                 RootNavigationGraph(
                     navHostController = nav,

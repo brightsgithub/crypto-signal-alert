@@ -2,13 +2,13 @@ package com.owusu.cryptosignalalert.views.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -31,12 +31,9 @@ import com.owusu.cryptosignalalert.models.CoinDetailUI
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.PriceTargetEntryViewState
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
-import com.owusu.cryptosignalalert.viewmodels.PurchaseViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
-import kotlinx.coroutines.flow.Flow
+import com.owusu.cryptosignalalert.views.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -47,7 +44,7 @@ fun PriceTargetEntryScreen(
     onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
 ) {
 
-    CryptoSignalAlertTheme {
+  //  AppTheme {
         val coinUI = sharedViewModel.selectedCoinUI
         val viewModel = getViewModel<PriceTargetEntryViewModel>()
         val viewState = viewModel.viewState.collectAsState(initial = PriceTargetEntryViewState())
@@ -56,7 +53,7 @@ fun PriceTargetEntryScreen(
             viewModel.getCoinDetails(coinUI = coinUI)
         }
 
-        Surface(color = MaterialTheme.colors.background) {
+        //Surface(color = MaterialTheme.colors.background) {
             
             ShowPriceTargetEntryScreen(
                 viewState,
@@ -65,7 +62,7 @@ fun PriceTargetEntryScreen(
                 viewModel.saveNewPriceTarget(coinUI, userPriceTarget)
                 navigateToTargetsList()
             }
-        }
+        //}
 
         if (viewState.value.priceTargetsMessage.shouldShowMessage) {
             onShowSnackBar(
@@ -80,7 +77,7 @@ fun PriceTargetEntryScreen(
         }
 
         LoadingWidget3()
-    }
+   // }
 }
 
 @Composable
@@ -103,6 +100,7 @@ fun LoadingWidget3(boxModifier: Modifier? = null){
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowPriceTargetEntryScreen(
     viewState: State<PriceTargetEntryViewState>,
@@ -270,7 +268,7 @@ private fun ShowPriceTargetEntryScreen(
 @Preview(showBackground = true)
 @Composable
 fun PriceTargetEntryScreenPreview() {
-    CryptoSignalAlertTheme {
+    AppTheme {
 
         val _state = MutableStateFlow(
             PriceTargetEntryViewState(isLoading = false,
@@ -314,7 +312,7 @@ fun PriceTargetEntryScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 fun PriceTargetEntryScreenPreviewNoDesc() {
-    CryptoSignalAlertTheme {
+    AppTheme {
 
         val _state = MutableStateFlow(
             PriceTargetEntryViewState(isLoading = true,

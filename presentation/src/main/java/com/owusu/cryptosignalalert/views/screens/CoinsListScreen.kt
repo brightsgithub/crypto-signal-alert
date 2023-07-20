@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -40,15 +38,14 @@ import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 import org.koin.androidx.compose.getViewModel
 
 // https://developer.android.com/codelabs/jetpack-compose-state?continue=https%3A%2F%2Fdeveloper.android.com%2Fcourses%2Fpathways%2Fjetpack-compose-for-android-developers-1%23codelab-https%3A%2F%2Fdeveloper.android.com%2Fcodelabs%2Fjetpack-compose-state#9
 @Composable
 fun CoinsListScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
-    Surface(color = MaterialTheme.colors.background) {
+    //Surface(color = MaterialTheme.colors.background) {
         ShowCoinsList(sharedViewModel, navigateToPriceTargetEntryScreen)
-    }
+   // }
 }
 
 @Composable
@@ -113,7 +110,7 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
     val extraPadding = if (expanded.value) 48.dp else 0.dp
 
     Surface(
-        color = colorResource(id = R.color.dark_coin_row),
+        //color = colorResource(id = R.color.dark_coin_row),
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).clickable {
             navigateToPriceTargetEntryScreen(coin!!)
         }
@@ -203,7 +200,8 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
                 end.linkTo(parent.end, margin = 4.dp)
                 top.linkTo(_24HrChangeLabel.top)
             },
-                color = getPercentageColor(coin.is24HrPriceChangePositive), fontSize = 12.sp)
+                //color = getPercentageColor(coin.is24HrPriceChangePositive), fontSize = 12.sp)
+                fontSize = 12.sp)
         }
     }
 }
@@ -236,11 +234,11 @@ private fun loading(boxModifier: Modifier? = null) {
     }
 }
 
-@Composable
-private fun getPercentageColor(is24HrPriceChangePositive: Boolean) : Color {
-    return if (is24HrPriceChangePositive) {
-        colorResource(R.color.percentage_gain_green)
-    } else {
-        colorResource(R.color.red)
-    }
-}
+//@Composable
+//private fun getPercentageColor(is24HrPriceChangePositive: Boolean) : Color {
+//    return if (is24HrPriceChangePositive) {
+//     //   colorResource(R.color.percentage_gain_green)
+//    } else {
+//      //  colorResource(R.color.red)
+//    }
+//}

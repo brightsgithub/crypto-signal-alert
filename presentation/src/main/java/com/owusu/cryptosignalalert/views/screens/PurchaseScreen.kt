@@ -1,18 +1,16 @@
 package com.owusu.cryptosignalalert.views.screens
 
-import android.app.Activity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,29 +26,26 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
-import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
-import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.models.PurchaseViewState
 import com.owusu.cryptosignalalert.models.SkuDetailsUI
 import com.owusu.cryptosignalalert.viewmodels.PurchaseViewModel
-import com.owusu.cryptosignalalert.views.screens.widgets.LoadingWidget
-import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
+import com.owusu.cryptosignalalert.views.theme.AppTheme
 import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun PurchaseScreen() {
-    CryptoSignalAlertTheme {
+    //AppTheme {
 
         val purchaseViewModel = getViewModel<PurchaseViewModel>()
         purchaseViewModel.loadSkuDetails()
         purchaseViewModel.viewState.collectAsState(initial = PurchaseViewState()).value.let {
-            Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
+           // Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
                 ShowPriceList(it.skuDetailsList)
-            }
+         //   }
         }
 
         LoadingWidget2(boxModifier = Modifier.fillMaxSize())
-    }
+    //}
 }
 
 @Composable
@@ -92,10 +87,10 @@ fun ShowPriceList(skuDetailsList: List<SkuDetailsUI>) {
 @Composable
 fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> Unit) {
     Card(
-        backgroundColor = colorResource(id = R.color.dark_coin_row),
+       // backgroundColor = colorResource(id = R.color.dark_coin_row),
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp),
-        elevation = 10.dp
+       // elevation = 10.dp
     ) {
         ConstraintLayout(modifier = Modifier
             .padding(8.dp)
@@ -166,19 +161,19 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
     }
 }
 
-@Composable
-private fun getProgressColor(skuDetailsUI: SkuDetailsUI) : Color {
-    return if (skuDetailsUI.isPurchased) {
-        colorResource(R.color.percentage_gain_green)
-    } else {
-        colorResource(R.color.white)
-    }
-}
+//@Composable
+//private fun getProgressColor(skuDetailsUI: SkuDetailsUI) : Color {
+//    return if (skuDetailsUI.isPurchased) {
+//        colorResource(R.color.percentage_gain_green)
+//    } else {
+//        colorResource(R.color.white)
+//    }
+//}
 
 @Composable
 @Preview(showBackground = true)
 fun PreviewPurchaseItem() {
-    CryptoSignalAlertTheme {
+    AppTheme {
         PurchaseItem(skuDetails = SkuDetailsUI(
             sku = "com.owusu.cryptosignalalert.unlock_all",
             title = "Buy All Bundle",

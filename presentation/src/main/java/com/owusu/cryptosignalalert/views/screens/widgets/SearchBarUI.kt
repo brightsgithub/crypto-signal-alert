@@ -7,7 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.owusu.cryptosignalalert.R
+
 
 //@ExperimentalAnimationApi
 //@ExperimentalComposeUiApi
@@ -71,6 +72,7 @@ fun SearchBarUI(
 
 //@ExperimentalAnimationApi
 //@ExperimentalComposeUiApi
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     searchText: String,
@@ -111,8 +113,8 @@ fun SearchBar(
             colors = TextFieldDefaults.textFieldColors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                backgroundColor = Color.Transparent,
-                cursorColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                //backgroundColor = Color.Transparent,
+                //cursorColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
             ),
             trailingIcon = {
                 AnimatedVisibility(

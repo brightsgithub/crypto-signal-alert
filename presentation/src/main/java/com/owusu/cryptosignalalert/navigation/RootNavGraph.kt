@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.android.gms.ads.AdRequest
 import com.owusu.cryptosignalalert.views.screens.HomeScreen
+import com.owusu.cryptosignalalert.views.theme.AppTheme
 
 @Composable
 fun RootNavigationGraph(
@@ -24,7 +25,9 @@ fun RootNavigationGraph(
             // OnBoarding graph
             // SplashScreen graph
             composable(route = Graphs.HOME_NAV_GRAPH) {
-                HomeScreen(preselectedScreen = preselectedScreen, adRequest = adRequest)
+                AppTheme {
+                    HomeScreen(preselectedScreen = preselectedScreen, adRequest = adRequest)
+                }
             }
         }
     )

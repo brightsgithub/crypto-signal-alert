@@ -116,7 +116,7 @@ class SharedViewModel(
 
     private fun attemptToShowInterstitialAd() {
         Log.d(TAG, "attemptToShowInterstitialAd called")
-        callFunctionWithProbability(probability = 0.2) {
+        callFunctionWithProbability(probability = 0.1) {
             Log.d(TAG, "shouldShowInterstitialAd = true")
             _sharedViewState.value = _sharedViewState.value.copy(
                 shouldShowInterstitialAd = true

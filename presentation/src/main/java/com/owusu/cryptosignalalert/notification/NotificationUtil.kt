@@ -63,7 +63,7 @@ class NotificationUtil {
                 .setLargeIcon(
                     BitmapFactory.decodeResource(context.getResources(),
                         R.drawable.ic_launcher_foreground))
-                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                //.setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setContentIntent(getPriceTargetsPendingIntent(context))
                 .addAction(R.drawable.ic_launcher_foreground, "Stop sound", updatePendingIntent)
                 .setOnlyAlertOnce(true)

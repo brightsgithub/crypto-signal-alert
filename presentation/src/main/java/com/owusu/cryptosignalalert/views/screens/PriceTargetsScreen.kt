@@ -10,12 +10,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -44,8 +43,6 @@ import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
-import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import com.owusu.cryptosignalalert.views.theme.CryptoSignalAlertTheme
 import com.owusu.cryptosignalalert.workmanager.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -92,7 +89,7 @@ fun PriceTargetsScreen(
     onSearchBarClick: () -> Unit,
     onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
 ) {
-    CryptoSignalAlertTheme {
+    //CryptoSignalAlertTheme {
 
         val viewModel = getViewModel<AlertListViewModel>()
         val activity = LocalContext.current as Activity
@@ -100,9 +97,9 @@ fun PriceTargetsScreen(
 
 
         viewModel.viewState.collectAsState(initial = AlertListViewState()).value.let {
-            Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
+            //Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
                 ShowPriceTargets(it, onSearchBarClick = onSearchBarClick, onShowSnackBar = onShowSnackBar)
-            }
+            //}
         }
 
         // Only executed once, not on every recomposition
@@ -132,10 +129,10 @@ fun PriceTargetsScreen(
                 lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-    }
+    //}
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowPriceTargets(
     state: AlertListViewState,
@@ -179,7 +176,7 @@ private fun ShowPriceTargets(
                     // Header content here
                     ConstraintLayout(modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = Color.Black)
+                       // .background(color = Color.Black)
                         .height(50.dp)
                     ) {
                         // Create references for the composables to constrain
@@ -194,12 +191,12 @@ private fun ShowPriceTargets(
                             modifier = Modifier.constrainAs(targetsMet) {
                                 start.linkTo(parent.start, margin = 16.dp)
                                 centerVerticallyTo(parent)
-                            }, color = Color.White
+                            }, // = Color.White
                         )
                         if (state.shouldShowSyncState) {
                             Text(
                                 text = "Syncing...",
-                                color = Color.White,
+                               // color = Color.White,
                                 modifier = Modifier.constrainAs(syncText) {
                                     top.linkTo(parent.top)
                                     end.linkTo(syncProgress.start, margin = 4.dp)
@@ -241,10 +238,10 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
     var anchorFromCompletedOnOrLastUpdated: ConstrainedLayoutReference
 
     Card(
-        backgroundColor = colorResource(id = R.color.dark_coin_row),
+        //backgroundColor = colorResource(id = R.color.dark_coin_row),
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp),
-        elevation = 10.dp
+        //elevation = 10.dp
     ) {
         ConstraintLayout(modifier = Modifier
             .padding(8.dp)
@@ -356,7 +353,8 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                     modifier = Modifier.constrainAs(percentageProgressDisplay) {
                         top.linkTo(progressBar.top)
                         start.linkTo(anchorFromCompletedOnOrLastUpdated.start)
-                    },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
+                    //},color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
+                    },fontSize = 12.sp)
 
 
                 LinearProgressIndicator(
@@ -370,9 +368,9 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                             top.linkTo(anchorFromCompletedOnOrLastUpdated.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
-                    backgroundColor = Color.White,
+                   // backgroundColor = Color.White,
                     progress = priceTarget.progress,
-                    color = getProgressColor(priceTarget)
+                  //  color = getProgressColor(priceTarget)
                 )
 
                 Image(
@@ -403,9 +401,9 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                             top.linkTo(anchorFromCompletedOnOrLastUpdated.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
-                    backgroundColor = Color.White,
+                   // backgroundColor = Color.White,
                     progress = priceTarget.progress,
-                    color = getProgressColor(priceTarget),
+                    //color = getProgressColor(priceTarget),
                 )
 
                 Image(
@@ -429,7 +427,8 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                     modifier = Modifier.constrainAs(percentageProgressDisplay) {
                         top.linkTo(progressBar.top)
                         start.linkTo(progressBar.end, 4.dp)
-                    },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
+                   // },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
+                    }, fontSize = 12.sp)
             }
 
             Image(
@@ -479,6 +478,7 @@ fun CircularProgressClock(
                 width = Dimension.fillToConstraints
                 height = Dimension.wrapContent
             }
+            //.border(1.dp, Color.White, shape = CircleShape)) {
             .border(1.dp, Color.White, shape = CircleShape)) {
             CircularProgressIndicator(
                 progress = animatedProgress,
@@ -519,14 +519,14 @@ fun ShowDeleteDialog(
     )
 }
 
-@Composable
-private fun getProgressColor(priceTarget: PriceTargetUI) : Color {
-    return when (priceTarget.priceTargetDirection) {
-        PriceTargetDirectionUI.ABOVE -> colorResource(R.color.percentage_gain_green)
-        PriceTargetDirectionUI.BELOW -> colorResource(R.color.red)
-        PriceTargetDirectionUI.NOT_SET -> colorResource(R.color.white)
-    }
-}
+//@Composable
+//private fun getProgressColor(priceTarget: PriceTargetUI) : Color {
+//    return when (priceTarget.priceTargetDirection) {
+//        PriceTargetDirectionUI.ABOVE -> colorResource(R.color.percentage_gain_green)
+//        PriceTargetDirectionUI.BELOW -> colorResource(R.color.red)
+//        PriceTargetDirectionUI.NOT_SET -> colorResource(R.color.white)
+//    }
+//}
 
 private fun getGreaterOrLessThanSymbol(priceTarget: PriceTargetUI) : String {
     return when (priceTarget.priceTargetDirection) {

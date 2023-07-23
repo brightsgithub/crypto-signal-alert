@@ -46,14 +46,14 @@ class MainActivity : ComponentActivity(), KoinComponent, ScreenProxy {
                  * of primary slot, which helps to provide contrast against the list item and the
                  * search bar on top of it. By default, the tonal and shadow elevation for the surface is 0.dp.
                  */
-                Surface(tonalElevation = 5.dp) {
+                //Surface(tonalElevation = 5.dp) {
                     val nav = rememberNavController()
                     RootNavigationGraph(
                         navHostController = nav,
                         preselectedScreen = preselectedScreen,
                         adRequest = adRequest
                     )
-                }
+                //}
             }
         }
     }

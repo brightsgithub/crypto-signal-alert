@@ -43,6 +43,8 @@ import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.views.theme.percentage_gain_green
+import com.owusu.cryptosignalalert.views.theme.red
 import com.owusu.cryptosignalalert.workmanager.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -158,8 +160,8 @@ private fun ShowPriceTargets(
                 onClick = {
                           onSearchBarClick()
                 },
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+               containerColor = MaterialTheme.colorScheme.primary,
+              //  contentColor = MaterialTheme.colorScheme.onTertiaryContainer
             ) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "icon")
             }
@@ -178,7 +180,7 @@ private fun ShowPriceTargets(
                     // Header content here
                     ConstraintLayout(modifier = Modifier
                         .fillMaxWidth()
-                       // .background(color = Color.Black)
+                        .background(color = MaterialTheme.colorScheme.surfaceVariant)
                         .height(50.dp)
                     ) {
                         // Create references for the composables to constrain
@@ -375,9 +377,9 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                             top.linkTo(anchorFromCompletedOnOrLastUpdated.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
-                   // backgroundColor = Color.White,
+                    trackColor = Color.White,
                     progress = priceTarget.progress,
-                  //  color = getProgressColor(priceTarget)
+                    color = getProgressColor(priceTarget)
                 )
 
                 Image(
@@ -408,9 +410,9 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                             top.linkTo(anchorFromCompletedOnOrLastUpdated.bottom, margin = 16.dp)
                             //end.linkTo(alertImage.start)
                         },
-                   // backgroundColor = Color.White,
+                    trackColor = Color.White,
                     progress = priceTarget.progress,
-                    //color = getProgressColor(priceTarget),
+                    color = getProgressColor(priceTarget)
                 )
 
                 Image(
@@ -434,8 +436,10 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                     modifier = Modifier.constrainAs(percentageProgressDisplay) {
                         top.linkTo(progressBar.top)
                         start.linkTo(progressBar.end, 4.dp)
-                   // },color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
-                    }, fontSize = 12.sp)
+                },
+                    color = getProgressColor(priceTarget = priceTarget),
+                    fontSize = 12.sp
+                )
             }
 
             Image(
@@ -526,14 +530,14 @@ fun ShowDeleteDialog(
     )
 }
 
-//@Composable
-//private fun getProgressColor(priceTarget: PriceTargetUI) : Color {
-//    return when (priceTarget.priceTargetDirection) {
-//        PriceTargetDirectionUI.ABOVE -> colorResource(R.color.percentage_gain_green)
-//        PriceTargetDirectionUI.BELOW -> colorResource(R.color.red)
-//        PriceTargetDirectionUI.NOT_SET -> colorResource(R.color.white)
-//    }
-//}
+@Composable
+private fun getProgressColor(priceTarget: PriceTargetUI) : Color {
+    return if (priceTarget.priceTargetDirection.equals(PriceTargetDirectionUI.ABOVE)) {
+        percentage_gain_green
+    } else {
+        red
+    }
+}
 
 private fun getGreaterOrLessThanSymbol(priceTarget: PriceTargetUI) : String {
     return when (priceTarget.priceTargetDirection) {

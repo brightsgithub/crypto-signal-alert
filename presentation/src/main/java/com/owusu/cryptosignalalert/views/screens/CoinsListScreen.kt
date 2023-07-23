@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +36,8 @@ import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.views.theme.percentage_gain_green
+import com.owusu.cryptosignalalert.views.theme.red
 import org.koin.androidx.compose.getViewModel
 
 // https://developer.android.com/codelabs/jetpack-compose-state?continue=https%3A%2F%2Fdeveloper.android.com%2Fcourses%2Fpathways%2Fjetpack-compose-for-android-developers-1%23codelab-https%3A%2F%2Fdeveloper.android.com%2Fcodelabs%2Fjetpack-compose-state#9
@@ -110,8 +109,10 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
 
     val extraPadding = if (expanded.value) 48.dp else 0.dp
 
-    Card(
-        //color = colorResource(id = R.color.dark_coin_row),
+    Surface(
+        //containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        //contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        color = MaterialTheme.colorScheme.surfaceVariant,
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).clickable {
             navigateToPriceTargetEntryScreen(coin!!)
         }
@@ -201,8 +202,8 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
                 end.linkTo(parent.end, margin = 4.dp)
                 top.linkTo(_24HrChangeLabel.top)
             },
-                //color = getPercentageColor(coin.is24HrPriceChangePositive), fontSize = 12.sp)
-                fontSize = 12.sp)
+                color = getPercentageColor(coin.is24HrPriceChangePositive), fontSize = 12.sp)
+
         }
     }
 }
@@ -235,11 +236,11 @@ private fun loading(boxModifier: Modifier? = null) {
     }
 }
 
-//@Composable
-//private fun getPercentageColor(is24HrPriceChangePositive: Boolean) : Color {
-//    return if (is24HrPriceChangePositive) {
-//     //   colorResource(R.color.percentage_gain_green)
-//    } else {
-//      //  colorResource(R.color.red)
-//    }
-//}
+@Composable
+private fun getPercentageColor(is24HrPriceChangePositive: Boolean) : Color {
+    return if (is24HrPriceChangePositive) {
+        percentage_gain_green
+    } else {
+        red
+    }
+}

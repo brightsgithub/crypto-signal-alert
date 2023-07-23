@@ -135,7 +135,7 @@ class SharedViewModel(
     private fun callFunctionWithProbability(probability: Double, function: () -> Unit) {
         val randomValue = Random.nextDouble(0.0, 1.0)
         if (randomValue <= probability) {
-           // function()
+           function()
         }
     }
 

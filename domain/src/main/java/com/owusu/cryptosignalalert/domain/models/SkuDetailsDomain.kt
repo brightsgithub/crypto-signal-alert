@@ -8,5 +8,12 @@ data class SkuDetailsDomain(
     val description: String,
     val price: String,
     var isPurchased: Boolean = false,
-    val isBundleBuyAll: Boolean
+    val isBundleBuyAll: Boolean,
+    val purchaseType: PurchaseType
 )
+
+sealed class PurchaseType {
+    object BuyAll: PurchaseType()
+    object UnlimitedAlerts: PurchaseType()
+    object RemoveAds: PurchaseType()
+}

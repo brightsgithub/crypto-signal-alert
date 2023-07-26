@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.data.mappers
 import com.android.billingclient.api.SkuDetails
 import com.owusu.cryptosignalalert.data.models.SkuWrapper
 import com.owusu.cryptosignalalert.data.models.skus.Skus
+import com.owusu.cryptosignalalert.domain.models.PurchaseType
 import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
 import com.owusu.cryptosignalalert.domain.models.states.NewPurchasesState
 
@@ -40,7 +41,8 @@ class SkuMapper {
                     description = skuDetails.description,
                     price = skuDetails.price,
                     isPurchased = isPurchased,
-                    isBundleBuyAll = false
+                    isBundleBuyAll = false,
+                    purchaseType = PurchaseType.UnlimitedAlerts
                 )
             }
             skus.SKU_REMOVE_ADS -> {
@@ -52,7 +54,8 @@ class SkuMapper {
                     description = skuDetails.description,
                     price = skuDetails.price,
                     isPurchased = isPurchased,
-                    isBundleBuyAll = false
+                    isBundleBuyAll = false,
+                    purchaseType = PurchaseType.RemoveAds
                 )
             }
             else -> {
@@ -64,7 +67,8 @@ class SkuMapper {
                     description = skuDetails.description,
                     price = skuDetails.price,
                     isPurchased = isPurchased,
-                    isBundleBuyAll = true
+                    isBundleBuyAll = true,
+                    purchaseType = PurchaseType.BuyAll
                 )
             }
         }

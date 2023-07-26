@@ -39,6 +39,9 @@ val dark_onsecondaryColorContainer = Color(0xFF76F8E1)
 val dark_coinRow = Color(0xFF283037) // #283037
 val percentage_gain_green = Color(0xFF00ff00) // #283037
 val red = Color(0xFFff0000) // #283037
+val brightOrange = Color(0xFFe24c00) // #283037
+val white = Color(0xFFffffff) // #283037
+val black = Color(0xFF000000) // #283037
 
 
 

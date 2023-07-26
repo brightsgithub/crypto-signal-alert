@@ -43,8 +43,7 @@ import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
-import com.owusu.cryptosignalalert.views.theme.percentage_gain_green
-import com.owusu.cryptosignalalert.views.theme.red
+import com.owusu.cryptosignalalert.views.theme.*
 import com.owusu.cryptosignalalert.workmanager.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -246,9 +245,14 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
             .padding(vertical = 4.dp, horizontal = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (priceTarget.hasPriceTargetBeenHit) {
-                MaterialTheme.colorScheme.secondaryContainer
+                brightOrange
             } else {
                 MaterialTheme.colorScheme.surfaceVariant
+            }
+        ,contentColor = if (priceTarget.hasPriceTargetBeenHit) {
+                white
+            } else {
+                light_onprimaryColor
             }
         )
     ) {
@@ -362,9 +366,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                     modifier = Modifier.constrainAs(percentageProgressDisplay) {
                         top.linkTo(progressBar.top)
                         start.linkTo(anchorFromCompletedOnOrLastUpdated.start)
-                    //},color = getProgressColor(priceTarget = priceTarget) ,fontSize = 12.sp)
-                    },fontSize = 12.sp)
-
+                    },color = getProgressColor(priceTarget = priceTarget, isText = true) ,fontSize = 12.sp)
 
                 LinearProgressIndicator(
                     modifier = Modifier
@@ -437,7 +439,7 @@ private fun PriceTargetCard(priceTarget: PriceTargetUI,
                         top.linkTo(progressBar.top)
                         start.linkTo(progressBar.end, 4.dp)
                 },
-                    color = getProgressColor(priceTarget = priceTarget),
+                    color = getProgressColor(priceTarget = priceTarget, true),
                     fontSize = 12.sp
                 )
             }
@@ -531,7 +533,16 @@ fun ShowDeleteDialog(
 }
 
 @Composable
-private fun getProgressColor(priceTarget: PriceTargetUI) : Color {
+private fun getProgressColor(priceTarget: PriceTargetUI, isText: Boolean = false) : Color {
+
+    if (priceTarget.hasPriceTargetBeenHit && isText) {
+        return white
+    }
+
+    if (priceTarget.hasPriceTargetBeenHit) {
+        return MaterialTheme.colorScheme.surfaceVariant
+    }
+
     return if (priceTarget.priceTargetDirection.equals(PriceTargetDirectionUI.ABOVE)) {
         percentage_gain_green
     } else {

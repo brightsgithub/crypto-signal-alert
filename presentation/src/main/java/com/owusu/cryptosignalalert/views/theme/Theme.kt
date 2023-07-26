@@ -119,7 +119,7 @@ private val DarkColorPalette = darkColorScheme(
 
 
 
-private val StocksDarkColorScheme = darkColorScheme(
+private val StocksDarkColorScheme = darkColorScheme (
     background = md_theme_dark_background,
     onBackground = md_theme_dark_onBackground,
     //surface = dark_coinRow,

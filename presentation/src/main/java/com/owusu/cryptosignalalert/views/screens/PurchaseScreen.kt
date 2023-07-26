@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -14,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -26,10 +28,12 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
+import com.owusu.cryptosignalalert.models.PurchaseTypeUI
 import com.owusu.cryptosignalalert.models.PurchaseViewState
 import com.owusu.cryptosignalalert.models.SkuDetailsUI
 import com.owusu.cryptosignalalert.viewmodels.PurchaseViewModel
 import com.owusu.cryptosignalalert.views.theme.AppTheme
+import com.owusu.cryptosignalalert.views.theme.white
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -113,13 +117,13 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
             }, fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
             Image(
-                painter = rememberImagePainter(R.mipmap.ic_launcher),
+                painter = rememberImagePainter(skuDetails.imageResId),
                 contentDescription = stringResource(R.string.buy_all_icon),
                 modifier = Modifier
                     // Set image size to 40 dp
                     .size(70.dp)
                     // Clip image to be shaped as a circle
-                    //.clip(CircleShape)
+                    .clip(CircleShape)
                     .constrainAs(icon) {
                         end.linkTo(parent.end, margin = 16.dp)
                         top.linkTo(title.top)
@@ -151,7 +155,11 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
 
             ) {
                 if (!skuDetails.isPurchased) {
-                    Text(text = "Buy "+skuDetails.price, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "Buy "+skuDetails.price,
+                        fontWeight = FontWeight.Bold,
+                        color = white
+                    )
                 } else {
                     Text(text = "Purchased", fontWeight = FontWeight.Bold)
                 }
@@ -180,7 +188,9 @@ fun PreviewPurchaseItem() {
             subTitle = "Buy everyting",
             description = "Special bundle offer: Set an unrestricted number of alerts & remove ads all for a single price!",
             price = "GBP 1.00",
-            isPurchased = false
+            isPurchased = false,
+            imageResId = R.drawable.noads,
+            purchaseTypeUI = PurchaseTypeUI.BuyAll
         ), onBuyClicked = { })
     }
 

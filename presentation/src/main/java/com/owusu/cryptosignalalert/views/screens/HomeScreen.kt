@@ -20,6 +20,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleObserver
@@ -38,6 +39,7 @@ import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.views.activities.MainActivity
+import com.owusu.cryptosignalalert.views.theme.*
 import org.koin.androidx.compose.getViewModel
 
 const val TAG = "HomeScreen"
@@ -359,15 +361,19 @@ fun BottomNavigationBar(navController: NavHostController, preselectedScreen: Mut
     val selectedScreen = preselectedScreen.value ?: currentDestination?.route
 
     NavigationBar(
-       // backgroundColor = colorResource(id = R.color.colorPrimary),
-        //contentColor = Color.White
+        containerColor = md_theme_dark_background,
+        tonalElevation = 8.dp
+//        contentColor = primaryColor
     ) {
 
         items.forEach { screen ->
             NavigationBarItem(
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = primaryColor,
+                    selectedIconColor = white
+                ),
                 icon = { Icon(painterResource(id = screen.icon), contentDescription = screen.title) },
                 label = { Text(text = screen.title) },
-                //selectedContentColor = Color.White,
                 alwaysShowLabel = true,
                 selected = selectedScreen == screen.route, //currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = {

@@ -82,7 +82,9 @@ class SharedViewModel(
 
 
     fun hideSnackBar() {
-        _sharedViewState.value = SharedViewState()
+        _sharedViewState.value = _sharedViewState.value.copy(
+            appSnackBar = _sharedViewState.value.appSnackBar.copy(shouldShowSnackBar = false)
+        )
     }
 
     /**

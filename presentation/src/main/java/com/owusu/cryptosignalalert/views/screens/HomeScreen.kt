@@ -176,6 +176,8 @@ private fun ShowSnackBarMessage(
             val snackbarResult = snackbarHostState.showSnackbar(
                 message = sharedViewState.value.appSnackBar.snackBarMessage,
                 actionLabel = sharedViewState.value.appSnackBar.actionLabel,
+                withDismissAction = true,
+                duration = SnackbarDuration.Short
             )
 
             // Check if the snackbar action was clicked

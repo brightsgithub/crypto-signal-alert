@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
+import com.owusu.cryptosignalalert.domain.models.CoinsListResult
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.states.UpdateSyncState
 import com.owusu.cryptosignalalert.domain.repository.PriceTargetsRepository
@@ -53,6 +54,8 @@ class SyncForPriceTargetsUseCase(
 
         // 2. Query against the api for targets obtained above.
         val coinsList = getCoinsList(ids)
+
+        if (coinsList.isEmpty()) return false
 
         // 3. Perform the Sync in batches so we don't blow our free api rate limit of 10 requests per min.
         updatedPriceTargets = performSyncInBatches(
@@ -137,7 +140,15 @@ class SyncForPriceTargetsUseCase(
             currencies = "usd"
         )
 
-        return getCoinsListUseCase.invoke(params)
+        return when (val data = getCoinsListUseCase.invoke(params)) {
+            is CoinsListResult.Error -> {
+                System.out.println("SyncForPriceTargetsUseCase rate limit reached error ")
+                emptyList()
+            }
+            is CoinsListResult.Success -> {
+                data.coinDomainList
+            }
+        }
     }
 
     private suspend fun updateSyncState(totalPriceTargetsSize: Int, numberOfItemsCompleted: Int) {

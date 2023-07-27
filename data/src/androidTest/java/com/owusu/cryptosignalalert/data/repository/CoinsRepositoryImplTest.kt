@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.data.repository
 import com.owusu.cryptosignalalert.data.test.R
 import com.owusu.cryptosignalalert.data.BaseCoreTest
 import com.owusu.cryptosignalalert.data.endpoints.EndPoints
+import com.owusu.cryptosignalalert.domain.models.CoinsListResult
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.runBlocking
@@ -45,14 +46,17 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
             R.raw.get_single_coin)
         )
 
-        val coinsList = coinsRepository.getCoinsList(page, recordsPerPage, currencies)
-
-        assert(coinsList.isNotEmpty())
-        assert(coinsList.size == recordsPerPage)
-        assert(coinsList[0].id != null)
-        assert(coinsList[0].name != null)
-        assert(coinsList[0].currentPrice!! > 0)
-        assert(coinsList[0].symbol != null)
+        when (val result = coinsRepository.getCoinsList(page, recordsPerPage, currencies)) {
+            is CoinsListResult.Error -> { throw Exception(result.coinsListResultErrorType.toString()) }
+            is CoinsListResult.Success -> {
+                assert(result.coinDomainList.isNotEmpty())
+                assert(result.coinDomainList.size == recordsPerPage)
+                assert(result.coinDomainList[0].id != null)
+                assert(result.coinDomainList[0].name != null)
+                assert(result.coinDomainList[0].currentPrice!! > 0)
+                assert(result.coinDomainList[0].symbol != null)
+            }
+        }
     }
 
     @Test
@@ -68,14 +72,19 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
             R.raw.get_coins_list_with_market_data)
         )
 
-        val coinsList = coinsRepository.getCoinsList(page, recordsPerPage, currencies)
+        when (val result = coinsRepository.getCoinsList(page, recordsPerPage, currencies)) {
+            is CoinsListResult.Error -> { throw Exception(result.coinsListResultErrorType.toString()) }
+            is CoinsListResult.Success -> {
+                assert(result.coinDomainList.isNotEmpty())
+                assert(result.coinDomainList.size == recordsPerPage)
+                assert(result.coinDomainList[0].id != null)
+                assert(result.coinDomainList[0].name != null)
+                assert(result.coinDomainList[0].currentPrice!! > 0)
+                assert(result.coinDomainList[0].symbol != null)
+            }
+        }
 
-        assert(coinsList.isNotEmpty())
-        assert(coinsList.size == recordsPerPage)
-        assert(coinsList[0].id != null)
-        assert(coinsList[0].name != null)
-        assert(coinsList[0].currentPrice!! > 0)
-        assert(coinsList[0].symbol != null)
+
     }
 
     @Test
@@ -87,34 +96,37 @@ class CoinsRepositoryImplTest : BaseCoreTest(), KoinComponent {
         val ids = "bitcoin,ethereum,ripple,solana"
 
         initDispatcher(getResponseMapForCoinsListWithMarketData(page, recordsPerPage, currencies, R.raw.get_coins_list_by_ids, ids))
-        val coinsAPIList = coinsRepository.getCoinsList(page, recordsPerPage, currencies, ids)
+        when (val result = coinsRepository.getCoinsList(page, recordsPerPage, currencies, ids)) {
+            is CoinsListResult.Error -> { throw Exception(result.coinsListResultErrorType.toString()) }
+            is CoinsListResult.Success -> {
+                assert(result.coinDomainList.isNotEmpty())
+                assert(result.coinDomainList.size == 4)
 
-        assert(coinsAPIList.isNotEmpty())
-        assert(coinsAPIList.size == 4)
+                val bitcoin = result.coinDomainList[0]
+                assert(bitcoin.id.equals("bitcoin"))
+                assert(bitcoin.name.equals("Bitcoin"))
+                assert(bitcoin.symbol.equals("btc"))
+                assert(bitcoin.currentPrice != null)
 
-        val bitcoin = coinsAPIList[0]
-        assert(bitcoin.id.equals("bitcoin"))
-        assert(bitcoin.name.equals("Bitcoin"))
-        assert(bitcoin.symbol.equals("btc"))
-        assert(bitcoin.currentPrice != null)
+                val ethereum = result.coinDomainList[1]
+                assert(ethereum.id.equals("ethereum"))
+                assert(ethereum.name.equals("Ethereum"))
+                assert(ethereum.symbol.equals("eth"))
+                assert(ethereum.currentPrice != null)
 
-        val ethereum = coinsAPIList[1]
-        assert(ethereum.id.equals("ethereum"))
-        assert(ethereum.name.equals("Ethereum"))
-        assert(ethereum.symbol.equals("eth"))
-        assert(ethereum.currentPrice != null)
+                val ripple = result.coinDomainList[2]
+                assert(ripple.id.equals("ripple"))
+                assert(ripple.name.equals("XRP"))
+                assert(ripple.symbol.equals("xrp"))
+                assert(ripple.currentPrice != null)
 
-        val ripple = coinsAPIList[2]
-        assert(ripple.id.equals("ripple"))
-        assert(ripple.name.equals("XRP"))
-        assert(ripple.symbol.equals("xrp"))
-        assert(ripple.currentPrice != null)
-
-        val solana = coinsAPIList[3]
-        assert(solana.id.equals("solana"))
-        assert(solana.name.equals("Solana"))
-        assert(solana.symbol.equals("sol"))
-        assert(solana.currentPrice != null)
+                val solana = result.coinDomainList[3]
+                assert(solana.id.equals("solana"))
+                assert(solana.name.equals("Solana"))
+                assert(solana.symbol.equals("sol"))
+                assert(solana.currentPrice != null)
+            }
+        }
     }
 
     @Test

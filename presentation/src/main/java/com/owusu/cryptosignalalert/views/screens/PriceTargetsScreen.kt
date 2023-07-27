@@ -15,15 +15,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -167,14 +168,36 @@ private fun ShowPriceTargets(
         },
         floatingActionButtonPosition = FabPosition.End
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
-            contentPadding = PaddingValues(bottom = heightInDp + 16.dp)
-        ) {
 
-            if (state.totalNumberOfTargets > 0) {
+        if (state.totalNumberOfTargets == 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp), // Optional padding to add some space around the image
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Image(
+                        painter = rememberImagePainter(R.drawable.ic_alert_not_set),
+                        contentDescription = stringResource(R.string.buy_all_icon),
+                        modifier = Modifier.size(70.dp),
+                        colorFilter = ColorFilter.tint(color = md_theme_dark_surfaceVariant)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = "No price targets", color = md_theme_dark_surfaceVariant)
+                }
+
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it),
+                contentPadding = PaddingValues(bottom = heightInDp + 16.dp)
+            ) {
+
                 stickyHeader {
                     // Header content here
                     ConstraintLayout(modifier = Modifier
@@ -199,7 +222,7 @@ private fun ShowPriceTargets(
                         if (state.shouldShowSyncState) {
                             Text(
                                 text = "Syncing...",
-                               // color = Color.White,
+                                // color = Color.White,
                                 modifier = Modifier.constrainAs(syncText) {
                                     top.linkTo(parent.top)
                                     end.linkTo(syncProgress.start, margin = 4.dp)
@@ -218,16 +241,16 @@ private fun ShowPriceTargets(
                         }
                     }
                 }
-            }
 
-            items(items = state.priceTargets) { priceTarget ->
-                PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
-                    if (state.shouldShowSyncState) {
-                        onShowSnackBar("Waiting for sync to complete", "Dismiss", {} )
-                    } else {
-                        viewModel.deletePriceTarget(userPriceTarget)
-                    }
-                })
+                items(items = state.priceTargets) { priceTarget ->
+                    PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
+                        if (state.shouldShowSyncState) {
+                            onShowSnackBar("Waiting for sync to complete", "Dismiss", {} )
+                        } else {
+                            viewModel.deletePriceTarget(userPriceTarget)
+                        }
+                    })
+                }
             }
         }
     }

@@ -29,7 +29,11 @@ import org.koin.androidx.compose.getViewModel
 //@ExperimentalComposeUiApi
 //@ExperimentalAnimationApi
 @Composable
-fun CoinSearchScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
+fun CoinSearchScreen(
+    sharedViewModel: SharedViewModel,
+    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
+    onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
+) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val searchViewModel = getViewModel<CoinSearchViewModel>()
 
@@ -56,6 +60,13 @@ fun CoinSearchScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntr
         }
     }
 
+    if (coinSearchState.value.coinSearchStateMessage.shouldShowMessage) {
+        onShowSnackBar(
+            coinSearchState.value.coinSearchStateMessage.message,
+            coinSearchState.value.coinSearchStateMessage.ctaText,
+            { }
+        )
+    }
 
     SearchBarUI(
         searchText = coinSearchState.value.searchStr,

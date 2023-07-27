@@ -1,6 +1,7 @@
 package com.owusu.cryptosignalalert.domain.usecase
 
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
+import com.owusu.cryptosignalalert.domain.models.CoinsListResult
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDirection
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.states.UpdateSyncState
@@ -86,14 +87,17 @@ class SyncForPriceTargetsUseCaseTest {
                 CoinDomain(id = "ethereum", currentPrice = 2100.0)
             )
 
+            val result = CoinsListResult.Success(mockListOfLatestCoins2)
+
             val params = GetCoinsListUseCase.Params(ids = ids, recordsPerPage = listOfMockedPriceTargets.size)
-            coEvery { mockGetCoinsListUseCase.invoke(params) } returns mockListOfLatestCoins2
+            coEvery { mockGetCoinsListUseCase.invoke(params) } returns result
 
             val wasUpdatePerformed = cut.invoke()
 
             assert(wasUpdatePerformed)
         }
     }
+
 
     private fun getMockedPriceTargetsDomain(): List<PriceTargetDomain> {
         return listOf<PriceTargetDomain>(

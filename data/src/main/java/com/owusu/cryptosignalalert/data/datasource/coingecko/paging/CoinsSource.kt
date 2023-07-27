@@ -3,6 +3,7 @@ package com.owusu.cryptosignalalert.data.datasource.coingecko.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.owusu.cryptosignalalert.domain.models.CoinDomain
+import com.owusu.cryptosignalalert.domain.models.CoinsListResult
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinsListUseCase
 
 class CoinsSource(
@@ -22,23 +23,36 @@ class CoinsSource(
 
         currentPageNum = pageNumber
 
-        // Make api call
-        val params = GetCoinsListUseCase.Params(pageNumber, recordsPerPage, currencies, ids)
-        val coinsList = getCoinsListUseCase.invoke(params)
+
 
         // Since 0 is the lowest page number, return null to signify no more pages should
         // be loaded before it.
         val prevKey = if (pageNumber > 1) pageNumber - 1 else null
 
-        // This API defines that it's out of data when a page returns empty. When out of
-        // data, we return `null` to signify no more pages should be loaded
-        val nextKey = if (coinsList.isNotEmpty()) pageNumber + 1 else null
+        // Make api call
+        val params = GetCoinsListUseCase.Params(pageNumber, recordsPerPage, currencies, ids)
+        when (val result = getCoinsListUseCase.invoke(params)) {
+            is CoinsListResult.Error -> {
 
-        return LoadResult.Page(
-            data = coinsList,
-            prevKey = prevKey,
-            nextKey = nextKey
-        )
+                // odd way to handle things but hey, we cannot return a wrapper object, only a list
+                return LoadResult.Page(
+                    data = listOf(CoinDomain(id = "Rate_Limit_Reached")),
+                    prevKey = prevKey,
+                    nextKey = null
+                )
+            }
+            is CoinsListResult.Success -> {
+                // This API defines that it's out of data when a page returns empty. When out of
+                // data, we return `null` to signify no more pages should be loaded
+                val nextKey = if (result.coinDomainList.isNotEmpty()) pageNumber + 1 else null
+
+                return LoadResult.Page(
+                    data = result.coinDomainList,
+                    prevKey = prevKey,
+                    nextKey = nextKey
+                )
+            }
+        }
     }
 
     fun getCurrentPageNumber(): Int {

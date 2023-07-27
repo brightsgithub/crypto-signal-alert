@@ -57,7 +57,7 @@ fun HomeNavGraph(
 
         // nested graph
         targetsEntryGraph(navHostController, sharedViewModel, onShowSnackBar = onShowSnackBar)
-        coinSearchNavGraph(navHostController, sharedViewModel)
+        coinSearchNavGraph(navHostController, sharedViewModel, onShowSnackBar = onShowSnackBar)
         settingsNavGraph(navHostController, sharedViewModel, onNavigateToWebView = { url ->
             sharedViewModel.webViewUrl = url
             navHostController.navigate(route = Graphs.WEB_VIEW_NAV_GRAPH)

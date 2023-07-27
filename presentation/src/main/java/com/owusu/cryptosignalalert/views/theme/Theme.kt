@@ -161,14 +161,14 @@ fun AppTheme(
      */
 
     val view = LocalView.current
-    if (!view.isInEditMode) {
+    //if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             //window.statusBarColor = colors.primary.toArgb()
             window.statusBarColor = black.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
-    }
+    //}
 
 
     MaterialTheme(

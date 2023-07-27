@@ -1,9 +1,6 @@
 package com.owusu.cryptosignalalert.domain.repository
 
-import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
-import com.owusu.cryptosignalalert.domain.models.CoinDomain
-import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
-import com.owusu.cryptosignalalert.domain.models.HistoricPriceWrapperDomain
+import com.owusu.cryptosignalalert.domain.models.*
 import kotlinx.coroutines.flow.Flow
 
 interface CoinsRepository {
@@ -11,7 +8,7 @@ interface CoinsRepository {
     suspend fun getCoinsList(page: Int,
                              recordsPerPage: Int,
                              currencies: String,
-                             ids: String? = null) : List<CoinDomain>
+                             ids: String? = null) : CoinsListResult
 
     suspend fun getAllCoinIds(): List<CoinIdDomain>
     suspend fun saveAllCoinIds(coinIds: List<CoinIdDomain>)

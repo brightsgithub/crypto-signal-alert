@@ -2,6 +2,7 @@ package com.owusu.cryptosignalalert.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.owusu.cryptosignalalert.domain.models.CoinsListResult
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinDetailUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinsListUseCase
 import com.owusu.cryptosignalalert.domain.usecase.SearchCoinIdsUseCase
@@ -28,6 +29,7 @@ class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase
     private var showProgressBar: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var matchedCoinIds: MutableStateFlow<List<CoinIdUI>> = MutableStateFlow(arrayListOf())
     private var resultSize: MutableStateFlow<Int> = MutableStateFlow(0)
+    private var coinSearchStateMessage: MutableStateFlow<CoinSearchStateMessage> = MutableStateFlow(CoinSearchStateMessage())
 
     private val _coinSearchStateEvents: MutableStateFlow<CoinSearchStateEvents> = MutableStateFlow(CoinSearchStateEvents.NOTHING)
     val coinSearchStateEvents: Flow<CoinSearchStateEvents> = _coinSearchStateEvents
@@ -38,14 +40,17 @@ class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase
         searchText,
         matchedCoinIds,
         showProgressBar,
-        resultSize
-    ) { text, matchedIds, showProgress, resultSize ->
+        resultSize,
+        coinSearchStateMessage
+    ) { text, matchedIds, showProgress, resultSize, coinSearchStateMessage ->
 
+        // refactor this state approach
         CoinSearchState(
             searchStr = text,
             coinIds = matchedIds,
             showProgressBar = showProgress,
-            resultSize = resultSize
+            resultSize = resultSize,
+            coinSearchStateMessage = coinSearchStateMessage
         )
     }
 
@@ -75,10 +80,26 @@ class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase
         scope.launch {
             showProgressBar.value = true
             val params = GetCoinsListUseCase.Params(ids = coinIdUI.id)
-            getCoinsListUseCase.invoke(params).firstOrNull()?.let {
-                val coinDomainUI = coinDomainToUIMapper.mapDomainToUI(it)
-                _coinSearchStateEvents.value = CoinSearchStateEvents.NavigateToPriceTargetEntryScreen(coinDomainUI)
+
+            when (val result = getCoinsListUseCase.invoke(params)) {
+                is CoinsListResult.Error -> {
+
+                    coinSearchStateMessage.value = CoinSearchStateMessage(
+                        shouldShowMessage = true,
+                        message = "Rate limit reached. Try later",
+                        ctaText = "Dismiss"
+                    )
+                }
+                is CoinsListResult.Success -> {
+                        result.coinDomainList.firstOrNull()?.let {
+
+                            val coinDomainUI = coinDomainToUIMapper.mapDomainToUI(it)
+                            _coinSearchStateEvents.value = CoinSearchStateEvents.NavigateToPriceTargetEntryScreen(coinDomainUI)
+                            coinSearchStateMessage.value = CoinSearchStateMessage(shouldShowMessage = false)
+                    }
+                }
             }
+
             showProgressBar.value = false
         }
     }

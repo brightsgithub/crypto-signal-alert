@@ -7,10 +7,7 @@ import com.owusu.cryptosignalalert.data.mappers.CoinIdAPIToDomainIdMapper
 import com.owusu.cryptosignalalert.data.mappers.DataAPIListMapper
 import com.owusu.cryptosignalalert.data.mappers.HistoricalPriceAPIToDomainMapper
 import com.owusu.cryptosignalalert.data.models.api.CoinAPI
-import com.owusu.cryptosignalalert.domain.models.CoinDetailDomain
-import com.owusu.cryptosignalalert.domain.models.CoinDomain
-import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
-import com.owusu.cryptosignalalert.domain.models.HistoricPriceWrapperDomain
+import com.owusu.cryptosignalalert.domain.models.*
 import com.owusu.cryptosignalalert.domain.repository.AppPreferencesRepository
 import com.owusu.cryptosignalalert.domain.repository.CoinsRepository
 import kotlinx.coroutines.flow.Flow
@@ -31,9 +28,16 @@ class CoinsRepositoryImpl(
         recordsPerPage: Int,
         currencies: String,
         ids: String?
-    ): List<CoinDomain> {
-        val coinsApiList = coinsDataSource.getCoinsList(page, recordsPerPage, currencies, ids)
-        return dataAPIListMapper.transform(coinsApiList)
+    ): CoinsListResult {
+        return try {
+            val coinsApiList = coinsDataSource.getCoinsList(page, recordsPerPage, currencies, ids)
+            val result = dataAPIListMapper.transform(coinsApiList)
+            CoinsListResult.Success(coinDomainList = result)
+            //CoinsListResult.Error(coinsListResultErrorType = CoinsListResultErrorType.RateLimitReached)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            CoinsListResult.Error(coinsListResultErrorType = CoinsListResultErrorType.RateLimitReached)
+        }
     }
 
     override suspend fun getAllCoinIds(): List<CoinIdDomain> {

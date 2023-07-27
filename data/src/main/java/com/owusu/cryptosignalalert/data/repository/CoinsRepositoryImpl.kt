@@ -33,10 +33,13 @@ class CoinsRepositoryImpl(
             val coinsApiList = coinsDataSource.getCoinsList(page, recordsPerPage, currencies, ids)
             val result = dataAPIListMapper.transform(coinsApiList)
             CoinsListResult.Success(coinDomainList = result)
-            //CoinsListResult.Error(coinsListResultErrorType = CoinsListResultErrorType.RateLimitReached)
-        } catch (ex: Exception) {
+        } catch (ex: NoSuchElementException) {
             ex.printStackTrace()
             CoinsListResult.Error(coinsListResultErrorType = CoinsListResultErrorType.RateLimitReached)
+        }
+        catch (ex: Exception) {
+            ex.printStackTrace()
+            CoinsListResult.Error(coinsListResultErrorType = CoinsListResultErrorType.NetworkError)
         }
     }
 

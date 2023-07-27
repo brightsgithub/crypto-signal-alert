@@ -11,7 +11,8 @@ data class AppSnackBar(
     val shouldShowSnackBar: Boolean = false,
     val snackBarMessage: String = "",
     val actionLabel: String = "",
-    val actionCallback:() -> Unit
+    val actionCallback:() -> Unit,
+    val shouldShowIndefinite: Boolean = false
 )
 
 data class PurchasedState(

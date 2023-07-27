@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.views.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,6 +36,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.CoinUI
+import com.owusu.cryptosignalalert.models.CoinsListUiState
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.views.theme.percentage_gain_green
@@ -42,16 +45,22 @@ import org.koin.androidx.compose.getViewModel
 
 // https://developer.android.com/codelabs/jetpack-compose-state?continue=https%3A%2F%2Fdeveloper.android.com%2Fcourses%2Fpathways%2Fjetpack-compose-for-android-developers-1%23codelab-https%3A%2F%2Fdeveloper.android.com%2Fcodelabs%2Fjetpack-compose-state#9
 @Composable
-fun CoinsListScreen(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
-    //Surface(color = MaterialTheme.colors.background) {
-        ShowCoinsList(sharedViewModel, navigateToPriceTargetEntryScreen)
-   // }
+fun CoinsListScreen(
+    sharedViewModel: SharedViewModel,
+    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+) {
+    ShowCoinsList(sharedViewModel, navigateToPriceTargetEntryScreen, onShowSnackBar)
 }
 
 @Composable
-private fun ShowCoinsList(sharedViewModel: SharedViewModel, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
+private fun ShowCoinsList(
+    sharedViewModel: SharedViewModel,
+    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit) {
     val viewModel = getViewModel<CoinsListViewModel>()
     val lazyPagingItems = viewModel.coinsListFlow.collectAsLazyPagingItems()
+    val coinsListState = viewModel.viewState.collectAsState(initial = CoinsListUiState())
 
     // Remember our own LazyListState
     val listState = lazyPagingItems.rememberLazyListStateWorkAround()
@@ -68,31 +77,50 @@ private fun ShowCoinsList(sharedViewModel: SharedViewModel, navigateToPriceTarge
         state = isRefreshing,
         onRefresh = { lazyPagingItems.refresh() },
     ) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.padding(vertical = 4.dp),
-        ) {
-            items(lazyPagingItems) { coin ->
-                CoinItem(coin, navigateToPriceTargetEntryScreen = navigateToPriceTargetEntryScreen)
-            }
 
-            lazyPagingItems.apply {
-                when {
-                    loadState.refresh is LoadState.Loading -> {
-                        item {
-                            loading(boxModifier = Modifier.fillParentMaxSize())
-                        }
+        if (coinsListState.value.coinsListUiStateMessage.shouldShowMessage) {
+            onShowSnackBar(
+                coinsListState.value.coinsListUiStateMessage.message,
+                coinsListState.value.coinsListUiStateMessage.ctaText,
+                true,
+                {}
+            )
+            viewModel.hideSnackBar()
+
+        } else {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.padding(vertical = 4.dp),
+            ) {
+                items(lazyPagingItems) { coin ->
+
+                    if(!coin!!.id.equals("Rate_Limit_Reached")) {
+                        CoinItem(
+                            coin!!,
+                            navigateToPriceTargetEntryScreen = navigateToPriceTargetEntryScreen,
+                            onShowSnackBar = onShowSnackBar
+                        )
                     }
+                }
 
-                    loadState.append is LoadState.Loading -> {
-                        item {
-                            loading()
+                lazyPagingItems.apply {
+                    when {
+                        loadState.refresh is LoadState.Loading -> {
+                            item {
+                                loading(boxModifier = Modifier.fillParentMaxSize())
+                            }
                         }
-                    }
 
-                    loadState.prepend is LoadState.Loading -> {
-                        item {
-                            loading()
+                        loadState.append is LoadState.Loading -> {
+                            item {
+                                loading()
+                            }
+                        }
+
+                        loadState.prepend is LoadState.Loading -> {
+                            item {
+                                loading()
+                            }
                         }
                     }
                 }
@@ -102,7 +130,11 @@ private fun ShowCoinsList(sharedViewModel: SharedViewModel, navigateToPriceTarge
 }
 
 @Composable
-private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit) {
+private fun CoinItem(
+    coin: CoinUI,
+    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+) {
 
     val context = LocalContext.current
     val expanded = rememberSaveable { mutableStateOf(false) }
@@ -113,9 +145,11 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
         //containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         //contentColor = MaterialTheme.colorScheme.onTertiaryContainer
         color = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).clickable {
-            navigateToPriceTargetEntryScreen(coin!!)
-        }
+        modifier = Modifier
+            .padding(vertical = 4.dp, horizontal = 8.dp)
+            .clickable {
+                navigateToPriceTargetEntryScreen(coin!!)
+            }
     ) {
 
         ConstraintLayout(modifier = Modifier
@@ -164,7 +198,7 @@ private fun CoinItem(coin: CoinUI?, navigateToPriceTargetEntryScreen:(coin: Coin
                 contentDescription = stringResource(R.string.alert_icon),
                 modifier = Modifier
                     .size(25.dp)
-                    .constrainAs(alertImage){
+                    .constrainAs(alertImage) {
                         end.linkTo(parent.end, margin = 4.dp)
                         top.linkTo(coinName.top)
                     }

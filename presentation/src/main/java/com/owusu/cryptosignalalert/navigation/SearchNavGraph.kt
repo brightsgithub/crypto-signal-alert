@@ -11,7 +11,7 @@ import com.owusu.cryptosignalalert.views.screens.CoinSearchScreen
 fun NavGraphBuilder.coinSearchNavGraph(
     navHostController: NavHostController,
     sharedViewModel: SharedViewModel,
-    onShowSnackBar:(snackBarMsg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
 ) {
     navigation(
         route = Graphs.SEARCH_NAV_GRAPH,

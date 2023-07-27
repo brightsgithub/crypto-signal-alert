@@ -7,5 +7,6 @@ sealed class CoinsListResult() {
 
 sealed class CoinsListResultErrorType() {
     object RateLimitReached: CoinsListResultErrorType()
+    object NetworkError: CoinsListResultErrorType()
     // other errors
 }

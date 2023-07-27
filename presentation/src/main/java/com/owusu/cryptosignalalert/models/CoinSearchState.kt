@@ -13,7 +13,6 @@ data class CoinSearchState(val searchStr: String = "",
 
 data class CoinSearchStateMessage(
     val shouldShowMessage: Boolean = false,
-    val isError: Boolean = false,
     val message: String = "",
     val ctaText: String = ""
 )

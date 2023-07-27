@@ -41,7 +41,7 @@ fun PriceTargetEntryScreen(
     sharedViewModel: SharedViewModel,
     navigateToPurchaseScreen:() -> Unit,
     navigateToTargetsList:() -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
 ) {
 
   //  AppTheme {
@@ -68,6 +68,7 @@ fun PriceTargetEntryScreen(
             onShowSnackBar(
                 viewState.value.priceTargetsMessage.message,
                 viewState.value.priceTargetsMessage.ctaText,
+                false,
                 {
                   if (viewState.value.priceTargetsMessage.isError) {
                           navigateToPurchaseScreen()

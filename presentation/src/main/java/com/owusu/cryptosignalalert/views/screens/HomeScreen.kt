@@ -94,8 +94,9 @@ fun HomeScreen(
     }
 
 
-    val onShowSnackBar = { msg: String, actionLabel: String, actionCallback:() -> Unit ->
-        sharedViewModel.showSnackBar(msg, actionLabel, actionCallback)
+    val onShowSnackBar = {
+            msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback:() -> Unit ->
+        sharedViewModel.showSnackBar(msg, actionLabel, actionCallback, shouldShowIndefinite)
     }
 
     val onHideSnackBar = {  ->

@@ -68,13 +68,19 @@ class SharedViewModel(
         populateCoinIdsUseCase.invoke(PopulateCoinIdsUseCase.Params(currentTime = Calendar.getInstance()))
     }
 
-    fun showSnackBar(msg: String, actionLabel: String, actionCallback: () -> Unit) {
+    fun showSnackBar(
+        msg: String,
+        actionLabel: String,
+        actionCallback: () -> Unit,
+        shouldShowIndefinite: Boolean
+    ) {
         _sharedViewState.value = _sharedViewState.value.copy(
             appSnackBar = AppSnackBar(
                 shouldShowSnackBar = true,
                 snackBarMessage = msg,
                 actionLabel = actionLabel,
-                actionCallback = actionCallback
+                actionCallback = actionCallback,
+                shouldShowIndefinite = shouldShowIndefinite
             )
         )
     }
@@ -118,7 +124,7 @@ class SharedViewModel(
 
     private fun attemptToShowInterstitialAd() {
         Log.d(TAG, "attemptToShowInterstitialAd called")
-        callFunctionWithProbability(probability = 0.1) {
+        callFunctionWithProbability(probability = 0.05) {
             Log.d(TAG, "shouldShowInterstitialAd = true")
             _sharedViewState.value = _sharedViewState.value.copy(
                 shouldShowInterstitialAd = true

@@ -89,7 +89,7 @@ fun stopObservingWorkManagerStatus() {
 @Composable
 fun PriceTargetsScreen(
     onSearchBarClick: () -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
 ) {
     //CryptoSignalAlertTheme {
 
@@ -139,7 +139,7 @@ fun PriceTargetsScreen(
 private fun ShowPriceTargets(
     state: AlertListViewState,
     onSearchBarClick: () -> Unit,
-    onShowSnackBar:(snackBarMsg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
 ) {
 
     val viewModel = getViewModel<AlertListViewModel>()
@@ -245,7 +245,7 @@ private fun ShowPriceTargets(
                 items(items = state.priceTargets) { priceTarget ->
                     PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
                         if (state.shouldShowSyncState) {
-                            onShowSnackBar("Waiting for sync to complete", "Dismiss", {} )
+                            onShowSnackBar("Waiting for sync to complete", "Dismiss", false, {} )
                         } else {
                             viewModel.deletePriceTarget(userPriceTarget)
                         }
@@ -598,7 +598,7 @@ fun ShowListPriceTargetCardWithSyncPreview() {
         totalNumberOfTargets = 20,
         shouldShowSyncState = true
     )
-    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2, ac -> })
+    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2, b1, ac -> })
 }
 
 @Preview
@@ -609,7 +609,7 @@ fun ShowListPriceTargetCardPreview() {
         remainingSyncPercentageToBeUpdated = 0.50f,
         totalNumberOfTargets = 20
     )
-    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2, ac -> })
+    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2, b1, ac -> })
 }
 
 @Preview

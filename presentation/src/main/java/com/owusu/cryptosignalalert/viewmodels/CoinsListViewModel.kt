@@ -1,5 +1,6 @@
 package com.owusu.cryptosignalalert.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
@@ -8,9 +9,7 @@ import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinsListUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsThatHaveNotBeenHitUseCase
 import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
-import com.owusu.cryptosignalalert.models.AlertListViewState
-import com.owusu.cryptosignalalert.models.CoinUI
-import com.owusu.cryptosignalalert.models.CoinsListUiState
+import com.owusu.cryptosignalalert.models.*
 import com.owusu.cryptosignalalert.util.PriceDisplayUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
@@ -70,6 +69,17 @@ class CoinsListViewModel(
             coinsSource!!
         }.flow.map { pagingData ->
             pagingData.map { coinDomain ->
+                Log.v("CoinsListViewModel", "coinDomain = "+ coinDomain)
+
+                if (coinDomain.id.equals("Rate_Limit_Reached")) {
+                    _state.value = _state.value.copy(coinsListUiStateMessage = CoinsListUiStateMessage(
+                        shouldShowMessage = true,
+                        message = "Rate API limit reached. Try later.",
+                        ctaText = "Dismiss"
+                    ))
+                }
+
+
                 val pageNum = coinsSource!!.getCurrentPageNumber()
 
                 if(currentPage != pageNum) {
@@ -83,5 +93,9 @@ class CoinsListViewModel(
                 coinUI
             }
         }.cachedIn(viewModelScope) // cache data even for config change screen rotation.
+    }
+
+    fun hideSnackBar() {
+        _state.value = _state.value.copy(coinsListUiStateMessage = CoinsListUiStateMessage(shouldShowMessage = false))
     }
 }

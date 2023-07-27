@@ -95,7 +95,7 @@ class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase
 
                             val coinDomainUI = coinDomainToUIMapper.mapDomainToUI(it)
                             _coinSearchStateEvents.value = CoinSearchStateEvents.NavigateToPriceTargetEntryScreen(coinDomainUI)
-                            coinSearchStateMessage.value = CoinSearchStateMessage(shouldShowMessage = false)
+                            hideSnackBar()
                     }
                 }
             }
@@ -109,4 +109,7 @@ class CoinSearchViewModel(private val searchCoinIdsUseCase: SearchCoinIdsUseCase
         matchedCoinIds.value = arrayListOf()
     }
 
+    fun hideSnackBar() {
+        coinSearchStateMessage.value = CoinSearchStateMessage(shouldShowMessage = false)
+    }
 }

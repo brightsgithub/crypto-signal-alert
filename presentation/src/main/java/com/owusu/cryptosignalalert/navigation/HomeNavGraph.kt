@@ -25,7 +25,7 @@ import org.koin.androidx.compose.getViewModel
 fun HomeNavGraph(
     navHostController: NavHostController,
     onSearchBarClick: () -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, actionCallback: () -> Unit) -> Unit
+    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
 ) {
 
     val sharedViewModel = getViewModel<SharedViewModel>()
@@ -43,7 +43,7 @@ fun HomeNavGraph(
                 sharedViewModel.selectedCoinUI = selectedCoinUI
                 // i guess we can also nav to out coin entry which is not a bottom nav?
                 navHostController.navigate(route = Graphs.TARGETS_ENTRY_GRAPH)
-            })
+            }, onShowSnackBar = onShowSnackBar)
         }
         composable(NavigationItem.PriceTargets.route) {
             PriceTargetsScreen(onSearchBarClick = onSearchBarClick, onShowSnackBar = onShowSnackBar)

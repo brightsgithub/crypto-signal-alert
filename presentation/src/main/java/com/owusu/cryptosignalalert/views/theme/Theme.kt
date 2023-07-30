@@ -132,6 +132,7 @@ private val StocksDarkColorScheme = darkColorScheme (
     surfaceVariant = dark_coinRow,
    // onSurfaceVariant = md_theme_dark_onSurfaceVariant,
     primary = primaryColor,
+    onPrimary = white,
     secondary = secondaryColor,
 //    tertiary = StocksDarkSelectedCard,
     onSurface = md_theme_dark_onSurface,
@@ -146,11 +147,11 @@ fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) {
-        StocksDarkColorScheme
-    } else {
-        LightColorPalette
-    }
+//    val colors = if (darkTheme) {
+//        StocksDarkColorScheme
+//    } else {
+//        LightColorPalette
+//    }
 
     /*
     rememberSystemUiController().run {
@@ -172,7 +173,7 @@ fun AppTheme(
 
 
     MaterialTheme(
-        colorScheme = colors,
+        colorScheme = StocksDarkColorScheme,
 //        typography = Typography,
 //        shapes = Shapes,
         content = content

@@ -53,4 +53,8 @@
     <string name="search_scr_title">Search</string>
     <string name="privacy_policy_scr_title">Privacy Policy</string>
     <string name="price_target_entry_scr_title">Price Target Entry</string>
+
+    <!-- -->
+    <string name="btc_donate_address">bc1q73gl5yv348jyxazp49zftcv8lc7y5ucqgt507l</string>
+    <string name="eth_donate_address">0xFEF520063198E9F6e2e0000F157D1dBcA0ed7244</string>
 </resources>

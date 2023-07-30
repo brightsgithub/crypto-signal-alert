@@ -36,6 +36,16 @@ class LocalFixedSettingsDataSource(
                 title = "App Version",
                 subTitle = getAppVersion(),
                 //selectedValue = "Version 1.0.0"
+            ),
+            SettingDomain(
+                settingType = SettingType.DonateBTC,
+                title = "Donate BTC",
+                subTitle = "Please support development effort"
+            ),
+            SettingDomain(
+                settingType = SettingType.DonateETH,
+                title = "Donate ETH/ERC20",
+                subTitle = "Please support development effort"
             )
         )
     }

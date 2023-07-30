@@ -94,12 +94,14 @@ class SyncForPriceTargetsUseCase(
             // 2. update all price targets. At this point some may have met their price targets
             // and some will just have updated their current price updated
             updatePriceTargets(updatedPriceTargets1)
-            updateSyncState(totalPriceTargetsSize = priceTargets.size, numberOfItemsCompleted = currentPriceTargetBatch.size)
+
             if (index != batches.lastIndex) {
+                updateSyncState(totalPriceTargetsSize = priceTargets.size, numberOfItemsCompleted = currentPriceTargetBatch.size)
                 System.out.println("SyncForPriceTargetsUseCase before delay " + Date())
                 delay(delayInMilliSeconds)
                 System.out.println("SyncForPriceTargetsUseCase after delay " + Date())
             } else {
+                updateSyncState(totalPriceTargetsSize = 0, numberOfItemsCompleted = 0)
                 System.out.println("\nSyncForPriceTargetsUseCase OK, All BATCHES COMPLETED!!! ******** " + Date())
                 System.out.println("SyncForPriceTargetsUseCase ################################################")
             }

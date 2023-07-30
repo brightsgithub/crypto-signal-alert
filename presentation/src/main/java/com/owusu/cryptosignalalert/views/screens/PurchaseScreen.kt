@@ -106,6 +106,7 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
                 price,
                 description,
                 icon,
+                icon2,
                 buyBtn
             ) = createRefs()
 
@@ -116,19 +117,49 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
                 linkTo(parent.start, icon.start, bias = 0f) // opposing constraints
             }, fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
-            Image(
-                painter = rememberImagePainter(skuDetails.imageResId),
-                contentDescription = stringResource(R.string.buy_all_icon),
-                modifier = Modifier
-                    // Set image size to 40 dp
-                    .size(70.dp)
-                    // Clip image to be shaped as a circle
-                    .clip(CircleShape)
-                    .constrainAs(icon) {
-                        end.linkTo(parent.end, margin = 16.dp)
-                        top.linkTo(title.top)
-                    }
-            )
+            if (skuDetails.purchaseTypeUI.equals(PurchaseTypeUI.BuyAll)) {
+                Image(
+                    painter = rememberImagePainter(R.drawable.ic_alart_set),
+                    contentDescription = skuDetails.title,
+                    modifier = Modifier
+                        // Set image size to 40 dp
+                        .size(40.dp)
+                        // Clip image to be shaped as a circle
+                        .clip(CircleShape)
+                        .constrainAs(icon) {
+                            end.linkTo(icon2.start, margin = 16.dp)
+                            top.linkTo(title.top)
+                        }
+                )
+                Image(
+                    painter = rememberImagePainter(R.drawable.noads),
+                    contentDescription = skuDetails.title,
+                    modifier = Modifier
+                        // Set image size to 40 dp
+                        .size(40.dp)
+                        // Clip image to be shaped as a circle
+                        .clip(CircleShape)
+                        .constrainAs(icon2) {
+                            end.linkTo(parent.end, margin = 16.dp)
+                            top.linkTo(title.top)
+                        }
+                )
+            } else {
+                Image(
+                    painter = rememberImagePainter(skuDetails.imageResId),
+                    contentDescription = skuDetails.title,
+                    modifier = Modifier
+                        // Set image size to 40 dp
+                        .size(70.dp)
+                        // Clip image to be shaped as a circle
+                        .clip(CircleShape)
+                        .constrainAs(icon) {
+                            end.linkTo(parent.end, margin = 16.dp)
+                            top.linkTo(title.top)
+                        }
+                )
+            }
+
 
             Text(text = skuDetails.subTitle, modifier = Modifier.constrainAs(subTitle) {
                 start.linkTo(title.start)

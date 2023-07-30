@@ -36,7 +36,7 @@ class SkuMapper {
                 SkuDetailsDomain(
                     pos = 1,
                     sku = skuDetails.sku,
-                    title = "Set unlimited alerts",
+                    title = "Unlimited Alerts",
                     subTitle = "Unlimited alerts",
                     description = skuDetails.description,
                     price = skuDetails.price,
@@ -62,7 +62,7 @@ class SkuMapper {
                 SkuDetailsDomain(
                     pos = 0,
                     sku = skuDetails.sku,
-                    title = "Buy All Bundle",
+                    title = "Buy All bundle",
                     subTitle = "Purchase all discount",
                     description = skuDetails.description,
                     price = skuDetails.price,

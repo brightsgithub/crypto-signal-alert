@@ -4,7 +4,7 @@ import com.owusu.cryptosignalalert.domain.models.SettingDomain
 import com.owusu.cryptosignalalert.domain.models.SettingType
 import com.owusu.cryptosignalalert.models.SettingTypeUI
 import com.owusu.cryptosignalalert.models.SettingUI
-
+import com.owusu.cryptosignalalert.R
 object SettingDomainToUIMapper {
 
     fun toUI(settingDomains: List<SettingDomain>): List<SettingUI> {
@@ -22,8 +22,19 @@ object SettingDomainToUIMapper {
             subTitle = settingDomain.subTitle,
             selectedValue = settingDomain.selectedValue,
             isFirstSetting = settingDomain.isFirstSetting,
-            isLastSetting = settingDomain.isLastSetting
+            isLastSetting = settingDomain.isLastSetting,
+            iconId = getIconId(settingDomain)
         )
+    }
+
+    private fun getIconId(settingDomain: SettingDomain): Int? {
+        return if (settingDomain.settingType.equals(SettingType.DonateBTC)) {
+                R.drawable.btc_icon
+        } else if (settingDomain.settingType.equals(SettingType.DonateETH)) {
+            R.drawable.eth_icon
+        } else {
+            null
+        }
     }
 
     fun toDomain(settingUIList: List<SettingUI>): List<SettingDomain> {
@@ -51,9 +62,9 @@ object SettingDomainToUIMapper {
             SettingType.PrivacyPolicy -> SettingTypeUI.PrivacyPolicy
             SettingType.RateTheApp -> SettingTypeUI.RateTheApp
             SettingType.ShareApp -> SettingTypeUI.ShareApp
-            else -> {
-                SettingTypeUI.Nothing
-            }
+            SettingType.DonateBTC -> SettingTypeUI.DonateBTC
+            SettingType.DonateETH -> SettingTypeUI.DonateETH
+            SettingType.Nothing -> SettingTypeUI.Nothing
         }
     }
 
@@ -63,9 +74,9 @@ object SettingDomainToUIMapper {
             SettingTypeUI.PrivacyPolicy -> SettingType.PrivacyPolicy
             SettingTypeUI.RateTheApp -> SettingType.RateTheApp
             SettingTypeUI.ShareApp -> SettingType.ShareApp
-            else -> {
-                SettingType.Nothing
-            }
+            SettingTypeUI.DonateBTC -> SettingType.DonateBTC
+            SettingTypeUI.DonateETH -> SettingType.DonateETH
+            SettingTypeUI.Nothing -> SettingType.Nothing
         }
     }
 }

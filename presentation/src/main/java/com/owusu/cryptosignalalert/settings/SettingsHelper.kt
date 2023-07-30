@@ -47,8 +47,12 @@ class SettingsHelper {
     }
 
     fun openAppOnGooglePlayStore(context: Context) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.setData(Uri.parse("market://details?id=com.owusu.cryptosignalalert"))
-        context.startActivity(intent)
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setData(Uri.parse("market://details?id=com.owusu.cryptosignalalert"))
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

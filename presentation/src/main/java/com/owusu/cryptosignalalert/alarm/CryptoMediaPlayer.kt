@@ -5,9 +5,11 @@ import android.net.Uri
 import android.util.Log
 import com.owusu.cryptosignalalert.CryptoSignalAlertApp
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.data.datasource.AppPreferences
+import com.owusu.cryptosignalalert.domain.usecase.IsSirenEnabledUseCase
 import java.util.*
 
-class CryptoMediaPlayer {
+class CryptoMediaPlayer(private val isSirenEnabledUseCase: IsSirenEnabledUseCase) {
 
     private lateinit var mp: MediaPlayer
     private var alarmTimer: Timer? = null
@@ -18,20 +20,24 @@ class CryptoMediaPlayer {
 
     @Synchronized
     fun startAlarmSounds() {
-        isVibrateRunning = true
-        stopAlarmSounds()
-        cancelTimerTask()
-        alarmTimer = Timer()
-        stopAlarmTimerTask = StopAlarmTimerTask()
-        alarmTimer?.schedule(stopAlarmTimerTask, 60000L)
-        playMediaFile()
-        Thread(VibrateRunner()).start()
+        if (isSirenEnabledUseCase.execute()) {
+            isVibrateRunning = true
+            stopAlarmSounds()
+            cancelTimerTask()
+            alarmTimer = Timer()
+            stopAlarmTimerTask = StopAlarmTimerTask()
+            alarmTimer?.schedule(stopAlarmTimerTask, 60000L)
+            playMediaFile()
+            Thread(VibrateRunner()).start()
+        }
     }
 
     @Synchronized
     fun stopAlarmSounds() {
-        stopMediaFile()
-        isVibrateRunning = false
+        if (isSirenEnabledUseCase.execute()) {
+            stopMediaFile()
+            isVibrateRunning = false
+        }
     }
 
     private inner class StopAlarmTimerTask : TimerTask() {

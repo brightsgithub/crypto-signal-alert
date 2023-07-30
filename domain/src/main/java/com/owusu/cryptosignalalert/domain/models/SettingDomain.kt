@@ -14,6 +14,7 @@ sealed class SettingType {
     object ShareApp: SettingType()
     object ContactDeveloper: SettingType()
     object RateTheApp: SettingType()
+    object Siren: SettingType()
     object DonateBTC: SettingType()
     object DonateETH: SettingType()
     object Nothing: SettingType()

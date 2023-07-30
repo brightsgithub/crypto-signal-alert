@@ -1,12 +1,15 @@
 package com.owusu.cryptosignalalert.data.datasource.settings
 
 import android.content.Context
+import com.owusu.cryptosignalalert.data.datasource.AppPreferences
 import com.owusu.cryptosignalalert.domain.models.SettingDomain
 import com.owusu.cryptosignalalert.domain.models.SettingType
+import com.owusu.cryptosignalalert.domain.repository.AppPreferencesRepository
 
 class LocalFixedSettingsDataSource(
     private val context: Context,
-    private val settingsUtils: SettingsUtils
+    private val settingsUtils: SettingsUtils,
+    private val appPreferences: AppPreferencesRepository
     ): SettingsDataSource {
     override suspend fun getSettings(): List<SettingDomain> {
         return listOf(
@@ -31,6 +34,12 @@ class LocalFixedSettingsDataSource(
                 settingType = SettingType.RateTheApp,
                 title = "Rate App",
                 subTitle = "Add a review to the Google Play Store",
+            ),
+            SettingDomain(
+                settingType = SettingType.Siren,
+                title = "Siren",
+                subTitle = "When enabled, a siren sound will play when price target has been met",
+                selectedValue = "Siren is " + if (appPreferences.isSirenEnabled()) {"enabled"} else {"disabled"}
             ),
             SettingDomain(
                 title = "App Version",

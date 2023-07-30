@@ -23,6 +23,7 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
     private val isVibrate = "vibraedssddsdsddsddsds"
     private val coinIdLastUpdated = "dfdfdgghfghfghgfhhfgdxxxxxzadddddx"
     private val isWorkManagerExecuting = "qqqqqqpppppooooibcbcbjhjhwehbchwbechjkk"
+    private val isSirenEnabled = "sirensoundasdasdasdasd"
 
 
     private val sharedPreferences = context.getSharedPreferences(myPref, Context.MODE_PRIVATE)
@@ -77,6 +78,18 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
 
     fun isOnBoadingScrFinished() : Boolean {
         return getBoolean(isOnBoadingScrCompleted, false)
+    }
+
+    override fun isSirenEnabled(): Boolean {
+        return getBoolean(isSirenEnabled, false)
+    }
+
+    override fun allowSirenSound() {
+        putBoolean(isSirenEnabled, true)
+    }
+
+    override fun disableSirenSound() {
+        putBoolean(isSirenEnabled, false)
     }
 
     override fun isAppFree(): Boolean {

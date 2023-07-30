@@ -4,6 +4,8 @@ import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
+import com.owusu.cryptosignalalert.domain.usecase.DisableSirenSettingUseCase
+import com.owusu.cryptosignalalert.domain.usecase.EnableSirenSettingUseCase
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.mappers.*
@@ -127,11 +129,14 @@ val uiModule = module() {
     }
 
     viewModel {
-        SettingsViewModel(
+        SettingsViewModel (
             loadSettingsUseCase = get(),
             settingDomainToUIMapper = get(),
             dispatcherBackground = get(named(IO)),
-            dispatcherMain = get(named(MAIN))
+            dispatcherMain = get(named(MAIN)),
+            isSirenEnabledUseCase = get(),
+            enableSirenSettingUseCase = get(),
+            disableSirenSettingUseCase = get()
         )
     }
 
@@ -154,7 +159,7 @@ val uiModule = module() {
     }
 
     single {
-        CryptoMediaPlayer()
+        CryptoMediaPlayer(isSirenEnabledUseCase = get())
     }
 
     single {

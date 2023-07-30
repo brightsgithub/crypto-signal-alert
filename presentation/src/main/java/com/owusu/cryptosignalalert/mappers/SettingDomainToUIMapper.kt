@@ -65,6 +65,7 @@ object SettingDomainToUIMapper {
             SettingType.DonateBTC -> SettingTypeUI.DonateBTC
             SettingType.DonateETH -> SettingTypeUI.DonateETH
             SettingType.Nothing -> SettingTypeUI.Nothing
+            SettingType.Siren -> SettingTypeUI.Siren
         }
     }
 
@@ -77,6 +78,7 @@ object SettingDomainToUIMapper {
             SettingTypeUI.DonateBTC -> SettingType.DonateBTC
             SettingTypeUI.DonateETH -> SettingType.DonateETH
             SettingTypeUI.Nothing -> SettingType.Nothing
+            SettingTypeUI.Siren -> SettingType.Siren
         }
     }
 }

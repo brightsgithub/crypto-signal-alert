@@ -34,27 +34,32 @@ import com.owusu.cryptosignalalert.settings.ContactDeveloperHelper
 import com.owusu.cryptosignalalert.settings.SettingsHelper
 import org.koin.androidx.compose.get
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.views.theme.primaryColor
 
 @Composable
 fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
-   // AppTheme {
-        val settingsHelper = get<SettingsHelper>()
-        val contactDeveloperHelper = get<ContactDeveloperHelper>()
-        val context = LocalContext.current
-        val settingsViewModel = getViewModel<SettingsViewModel>()
+    val settingsHelper = get<SettingsHelper>()
+    val contactDeveloperHelper = get<ContactDeveloperHelper>()
+    val context = LocalContext.current
+    val settingsViewModel = getViewModel<SettingsViewModel>()
+    LaunchedEffect(settingsViewModel) {
         settingsViewModel.loadSettings()
-        settingsViewModel.viewState.collectAsState(initial = SettingsViewState()).value.let {
-  //          Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowSettings(
-                    it.settings,
-                    settingsHelper,
-                    contactDeveloperHelper,
-                    context,
-                    onNavigateToWebView = onNavigateToWebView
-                )
-        //    }
-        }
-   // }
+    }
+
+    val toggle: () -> Unit = {
+        settingsViewModel.toggle()
+    }
+
+    settingsViewModel.viewState.collectAsState(initial = SettingsViewState()).value.let {
+        ShowSettings (
+            it.settings,
+            settingsHelper,
+            contactDeveloperHelper,
+            context,
+            onNavigateToWebView = onNavigateToWebView,
+            toggle = toggle
+        )
+    }
 }
 
 @Composable
@@ -63,7 +68,8 @@ fun ShowSettings(
     settingsHelper: SettingsHelper,
     contactDeveloperHelper: ContactDeveloperHelper,
     context: Context,
-    onNavigateToWebView:(url: String) -> Unit
+    onNavigateToWebView:(url: String) -> Unit,
+    toggle: () -> Unit
 ) {
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(items = settings) { settingUI ->
@@ -73,8 +79,9 @@ fun ShowSettings(
                     SettingTypeUI.PrivacyPolicy -> { onNavigateToWebView("https://sites.google.com/view/crypto-price-target-alerts-pri") }
                     SettingTypeUI.RateTheApp -> { settingsHelper.openAppOnGooglePlayStore(context) }
                     SettingTypeUI.ShareApp -> { settingsHelper.shareApp(context)}
+                    SettingTypeUI.Siren -> { toggle() }
                     else -> {
-                        SettingTypeUI.Nothing
+
                     }
                 }
             })
@@ -142,7 +149,7 @@ fun ShowSetting(settingUI: SettingUI, onSettingClicked:(settingUI: SettingUI) ->
         }
 
         Text(text = settingUI.title, modifier = Modifier.constrainAs(title) {
-            if (settingUI.settingTypeUI == SettingTypeUI.DonateBTC || settingUI.settingTypeUI == SettingTypeUI.DonateETH){
+            if (settingUI.settingTypeUI == SettingTypeUI.DonateBTC || settingUI.settingTypeUI == SettingTypeUI.DonateETH) {
                 start.linkTo(icon.end, margin = 8.dp)
             } else {
                 start.linkTo(parent.start, margin = 8.dp)
@@ -162,7 +169,7 @@ fun ShowSetting(settingUI: SettingUI, onSettingClicked:(settingUI: SettingUI) ->
             Text(text = settingUI.selectedValue, modifier = Modifier.constrainAs(settingsValue) {
                 start.linkTo(title.start)
                 top.linkTo(subTitle.bottom, margin = 2.dp)
-            })
+            }, color = primaryColor, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier
@@ -275,6 +282,7 @@ fun ShowSettingsPreview() {
         settingsHelper = settingsHelper,
         context = context,
         contactDeveloperHelper = contactDeveloperHelper,
-        onNavigateToWebView = {}
+        onNavigateToWebView = {},
+        toggle = {}
     )
 }

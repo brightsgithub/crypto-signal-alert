@@ -29,6 +29,9 @@ import com.owusu.cryptosignalalert.domain.models.CoinIdDomain
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.PriceWrapperDomain
 import com.owusu.cryptosignalalert.domain.repository.*
+import com.owusu.cryptosignalalert.domain.usecase.DisableSirenSettingUseCase
+import com.owusu.cryptosignalalert.domain.usecase.EnableSirenSettingUseCase
+import com.owusu.cryptosignalalert.domain.usecase.IsSirenEnabledUseCase
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.*
@@ -125,7 +128,8 @@ open class DataModuleWrapper(private val context: Context) {
         factory <SettingsDataSource>{
             LocalFixedSettingsDataSource(
                 context = context,
-                settingsUtils = get()
+                settingsUtils = get(),
+                appPreferences = get()
             )
         }
 
@@ -151,6 +155,18 @@ open class DataModuleWrapper(private val context: Context) {
 
         factory {
             SkuMapper()
+        }
+
+        factory {
+            EnableSirenSettingUseCase(appPreferencesRepository = get())
+        }
+
+        factory {
+            DisableSirenSettingUseCase(appPreferencesRepository = get())
+        }
+
+        factory {
+            IsSirenEnabledUseCase(appPreferencesRepository = get())
         }
 
         single {

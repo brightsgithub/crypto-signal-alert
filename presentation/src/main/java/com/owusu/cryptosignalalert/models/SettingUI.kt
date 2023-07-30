@@ -23,4 +23,5 @@ sealed class SettingTypeUI {
     object Nothing: SettingTypeUI()
     object DonateBTC: SettingTypeUI()
     object DonateETH: SettingTypeUI()
+    object Siren: SettingTypeUI()
 }

@@ -25,4 +25,7 @@ interface AppPreferencesRepository {
     fun workManagerHasFinishedExecuting()
 
     fun listenForPurchasedDataState(): Flow<PurchasedStateDomain>
+    fun isSirenEnabled(): Boolean
+    fun allowSirenSound()
+    fun disableSirenSound()
 }

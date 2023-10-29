@@ -18,11 +18,11 @@ try {
 android {
     //testBuildType "release"
 
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         minSdk 23
-        targetSdk 32
+        targetSdk 33
 
         testInstrumentationRunner "com.owusu.cryptosignalalert.data.MyTestRunner"
         consumerProguardFiles "consumer-rules.pro"

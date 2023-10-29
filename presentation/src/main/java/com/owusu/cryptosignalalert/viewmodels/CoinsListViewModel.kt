@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
@@ -69,7 +68,6 @@ class CoinsListViewModel(
             coinsSource!!
         }.flow.map { pagingData ->
             pagingData.map { coinDomain ->
-                Log.v("CoinsListViewModel", "coinDomain = "+ coinDomain)
 
                 if (coinDomain.id.equals("Rate_Limit_Reached")) {
                     _state.value = _state.value.copy(coinsListUiStateMessage = CoinsListUiStateMessage(

@@ -18,10 +18,11 @@ class StartupBillingUseCase(
     private val appPreferences: AppPreferencesRepository):
     UseCase<CoroutineScope, Flow<StartUpBillingState>> {
 
-    private val state = MutableStateFlow<StartUpBillingState>(StartUpBillingState.NotReady)
+    private val state = MutableStateFlow<StartUpBillingState>(StartUpBillingState.ReadyToListen)
 
     override fun invoke(scope: CoroutineScope): Flow<StartUpBillingState> {
         scope.launch {
+            System.out.println("StartupBillingUseCase >> billingRepository.observeBillingReadyStateFlow().collect")
             billingRepository.observeBillingReadyStateFlow().collect { billingReadyState ->
                 when(billingReadyState) {
                     is BillingReadyState.NoSkusExist -> state.emit(StartUpBillingState.Finished) // should be used only for startup billing usecase

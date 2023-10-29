@@ -101,6 +101,7 @@ val uiModule = module() {
             startupBillingUseCase = get(),
             populateCoinIdsUseCase = get(),
             savedPurchasedStateChangesUseCase = get(),
+            refreshSkuDetailsUseCase = get(),
             appStringProvider = get(),
             toolBarHelper = get()
         )

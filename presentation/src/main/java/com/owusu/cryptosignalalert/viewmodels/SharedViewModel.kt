@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.owusu.cryptosignalalert.domain.models.states.PurchasedStateDomain
 import com.owusu.cryptosignalalert.domain.models.states.StartUpBillingState
 import com.owusu.cryptosignalalert.domain.usecase.PopulateCoinIdsUseCase
+import com.owusu.cryptosignalalert.domain.usecase.RefreshSkuDetailsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.SavedPurchasedStateChangesUseCase
 import com.owusu.cryptosignalalert.domain.usecase.StartupBillingUseCase
 import com.owusu.cryptosignalalert.models.AppSnackBar
@@ -25,6 +26,7 @@ class SharedViewModel(
     private val startupBillingUseCase: StartupBillingUseCase,
     private val populateCoinIdsUseCase: PopulateCoinIdsUseCase,
     private val savedPurchasedStateChangesUseCase: SavedPurchasedStateChangesUseCase,
+    private val refreshSkuDetailsUseCase: RefreshSkuDetailsUseCase,
     private val appStringProvider: AppStringProvider,
     private val toolBarHelper: ToolBarHelper
     ): ViewModel() {
@@ -104,6 +106,11 @@ class SharedViewModel(
                 }
                 StartUpBillingState.Finished -> {
                     Log.d("SharedViewModel", "BillingReadyState.Ready")
+                }
+                StartUpBillingState.ReadyToListen -> {
+                    Log.d("SharedViewModel", "BillingReadyState.ReadyToListen")
+                    Log.d("SharedViewModel", "calling refreshSkuDetailsUseCase.invoke()")
+                    refreshSkuDetailsUseCase.invoke()
                 }
             }
         }

@@ -18,7 +18,7 @@ class StartupBillingUseCase(
     private val appPreferences: AppPreferencesRepository):
     UseCase<CoroutineScope, Flow<StartUpBillingState>> {
 
-    private val state = MutableStateFlow<StartUpBillingState>(StartUpBillingState.ReadyToListen)
+    private val state = MutableStateFlow<StartUpBillingState>(StartUpBillingState.NotReady)
 
     override fun invoke(scope: CoroutineScope): Flow<StartUpBillingState> {
         scope.launch {

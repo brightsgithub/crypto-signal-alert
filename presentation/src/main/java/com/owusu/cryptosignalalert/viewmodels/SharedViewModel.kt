@@ -16,6 +16,7 @@ import com.owusu.cryptosignalalert.resource.AppStringProvider
 import com.owusu.cryptosignalalert.viewmodels.helpers.ToolBarHelper
 import com.owusu.cryptosignalalert.views.screens.TAG
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -36,20 +37,48 @@ class SharedViewModel(
 
     init {
         toolBarHelper.initToolBarHelper(state = _sharedViewState)
+        startCollectingPurchasedState()
+        startCollectingBillingState()
     }
 
     fun initApp() {
-        viewModelScope.launch {
-            populateCoinIds()
+        refreshBillingState()
+        populateCoinIds()
+    }
 
-            launch {
-                savedPurchasedStateChangesUseCase.invoke().collect { purchasedStateDomain ->
-                    updatePurchasedState(purchasedStateDomain)
-                    printCurrentState()
+    private fun startCollectingPurchasedState() {
+        viewModelScope.launch {
+            Log.d("SharedViewModel", "calling startCollectingPurchasedState")
+            savedPurchasedStateChangesUseCase.invoke().collect { purchasedStateDomain ->
+                updatePurchasedState(purchasedStateDomain)
+                printCurrentState()
+            }
+        }
+    }
+
+    /**
+     * Do what we need to do in terms of show hide based on the state of iap.
+     */
+    private fun startCollectingBillingState() {
+        viewModelScope.launch {
+            Log.d("SharedViewModel", "calling startCollectingBillingState")
+            startupBillingUseCase.invoke(this).collect { startUpBillingState ->
+                when (startUpBillingState) {
+                    StartUpBillingState.NotReady -> {
+                        Log.d("SharedViewModel", "BillingReadyState.NotReady")
+                    }
+                    StartUpBillingState.Finished -> {
+                        Log.d("SharedViewModel", "BillingReadyState.Ready")
+                    }
                 }
             }
+        }
+    }
 
-            initBillingOnStartUp(this)
+    private fun refreshBillingState() {
+        viewModelScope.launch {
+            Log.d("SharedViewModel", "calling refreshBillingState")
+            refreshSkuDetailsUseCase.invoke()
         }
     }
 
@@ -66,8 +95,10 @@ class SharedViewModel(
         Log.d("SharedViewModel", "updatePurchasedState2 = "+ _sharedViewState.value)
     }
 
-    private suspend fun populateCoinIds() {
-        populateCoinIdsUseCase.invoke(PopulateCoinIdsUseCase.Params(currentTime = Calendar.getInstance()))
+    private fun populateCoinIds() {
+        viewModelScope.launch {
+            populateCoinIdsUseCase.invoke(PopulateCoinIdsUseCase.Params(currentTime = Calendar.getInstance()))
+        }
     }
 
     fun showSnackBar(
@@ -87,33 +118,10 @@ class SharedViewModel(
         )
     }
 
-
-
     fun hideSnackBar() {
         _sharedViewState.value = _sharedViewState.value.copy(
             appSnackBar = _sharedViewState.value.appSnackBar.copy(shouldShowSnackBar = false)
         )
-    }
-
-    /**
-     * Do what we need to do in terms of show hide based on the state of iap.
-     */
-    private suspend fun initBillingOnStartUp(scope: CoroutineScope) {
-        startupBillingUseCase.invoke(scope).collect { startUpBillingState ->
-            when (startUpBillingState) {
-                StartUpBillingState.NotReady -> {
-                    Log.d("SharedViewModel", "BillingReadyState.NotReady")
-                }
-                StartUpBillingState.Finished -> {
-                    Log.d("SharedViewModel", "BillingReadyState.Ready")
-                }
-                StartUpBillingState.ReadyToListen -> {
-                    Log.d("SharedViewModel", "BillingReadyState.ReadyToListen")
-                    Log.d("SharedViewModel", "calling refreshSkuDetailsUseCase.invoke()")
-                    refreshSkuDetailsUseCase.invoke()
-                }
-            }
-        }
     }
 
     // nav arguments - where we don't need our app to react to any real time changes
@@ -153,5 +161,4 @@ class SharedViewModel(
            function()
         }
     }
-
 }

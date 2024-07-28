@@ -20,7 +20,6 @@ class PriceTargetsDataSourceImpl(
         }
     }
 
-    @Synchronized
     override suspend fun getPriceTargetsCount(): Int {
         return priceTargetDao.getPriceTargetsCount()
     }

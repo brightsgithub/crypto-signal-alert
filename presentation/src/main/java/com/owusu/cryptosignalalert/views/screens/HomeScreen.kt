@@ -51,7 +51,7 @@ fun HomeScreen(
     preselectedScreen: MutableState<String?>,
     adRequest: AdRequest
 ) {
-    val interstitialAd = rememberSaveable { mutableStateOf<InterstitialAd?>(null) }
+    val interstitialAd = remember { mutableStateOf<InterstitialAd?>(null) }
 
     val sharedViewModel = getViewModel<SharedViewModel>()
     val destinationChangeListener = rememberDestinationChangeListener(navController, sharedViewModel)
@@ -220,7 +220,7 @@ private fun ShowInterstitialAd(
                         Log.d(TAG, "onAdFailedToLoad")
                     }
 
-                    override fun onAdLoaded(interAd_: InterstitialAd?) {
+                    override fun onAdLoaded(interAd_: InterstitialAd) {
                         interstitialAd.value = interAd_
 
                         interstitialAd.value?.fullScreenContentCallback =
@@ -236,7 +236,7 @@ private fun ShowInterstitialAd(
                                     interstitialAd.value = null
                                 }
 
-                                override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+                                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                                     // Called when ad fails to show.
                                     Log.e(TAG, "Ad failed to show fullscreen content.")
                                     interstitialAd.value = null
@@ -277,8 +277,9 @@ fun BannerAdView() {
     }
 
     AndroidView(factory = {
+
         AdView(it).apply {
-            adSize = AdSize.BANNER
+            setAdSize(AdSize.BANNER)
             adUnitId = bannerId
             loadAd(AdRequest.Builder().build())
         }

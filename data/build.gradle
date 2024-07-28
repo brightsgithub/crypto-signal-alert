@@ -18,11 +18,11 @@ try {
 android {
     //testBuildType "release"
 
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 23
-        targetSdk 33
+        targetSdk 34
 
         testInstrumentationRunner "com.owusu.cryptosignalalert.data.MyTestRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -68,8 +68,8 @@ dependencies {
     var room_version = "2.4.3"
     def koinVersion = "2.0.1"
     def koinComposeVersion = "3.2.0"
-    def billing_version = "4.1.0"
-    
+    def billingVersion = "6.0.0"
+
     kapt "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
     implementation "androidx.room:room-common:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
@@ -115,7 +115,7 @@ dependencies {
     implementation "androidx.paging:paging-compose:1.0.0-alpha15"
 
     // Google billing
-    implementation "com.android.billingclient:billing-ktx:$billing_version"
+    implementation "com.android.billingclient:billing-ktx:$billingVersion"
 
     // MockK
     // The latest version of MockK depends on: org.junit.jupiter:junit-jupiter-api:5.8.2

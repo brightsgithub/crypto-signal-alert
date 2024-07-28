@@ -1,11 +1,11 @@
 package com.owusu.cryptosignalalert.data.mappers
 
-import com.android.billingclient.api.SkuDetails
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.ProductDetails
 import com.owusu.cryptosignalalert.data.models.SkuWrapper
 import com.owusu.cryptosignalalert.data.models.skus.Skus
 import com.owusu.cryptosignalalert.domain.models.PurchaseType
 import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
-import com.owusu.cryptosignalalert.domain.models.states.NewPurchasesState
 
 class SkuMapper {
     fun transform(skuWrapper: SkuWrapper, isPurchased: Boolean, skus: Skus): SkuDetailsDomain {
@@ -23,23 +23,23 @@ class SkuMapper {
         val newPurchasedSku = skuWrapper.newPurchasedSku
         return if (newPurchasedSku == null) {
             isPurchased
-        } else if (newPurchasedSku!!.equals(skuWrapper.skuDetails.sku)) {
+        } else if (newPurchasedSku!!.equals(skuWrapper.skuDetails.productId)) {
             true // it means there has just been a purchase
         } else  {
             return isPurchased
         }
     }
 
-    private fun createSkuDetailsDomain(skuDetails: SkuDetails, skus: Skus, isPurchased: Boolean): SkuDetailsDomain {
-        return when (skuDetails.sku) {
+    private fun createSkuDetailsDomain(productDetails: ProductDetails, skus: Skus, isPurchased: Boolean): SkuDetailsDomain {
+        return when (productDetails.productId) {
             skus.SKU_UNLIMITED_ALERTS -> {
                 SkuDetailsDomain(
                     pos = 1,
-                    sku = skuDetails.sku,
+                    sku = productDetails.productId,
                     title = "Unlimited Alerts",
                     subTitle = "Unlimited alerts",
-                    description = skuDetails.description,
-                    price = skuDetails.price,
+                    description = productDetails.description,
+                    price = getPrice(productDetails),
                     isPurchased = isPurchased,
                     isBundleBuyAll = false,
                     purchaseType = PurchaseType.UnlimitedAlerts
@@ -48,11 +48,11 @@ class SkuMapper {
             skus.SKU_REMOVE_ADS -> {
                 SkuDetailsDomain(
                     pos = 2,
-                    sku = skuDetails.sku,
+                    sku = productDetails.productId,
                     title = "Remove Ads",
                     subTitle = "Remove those annoying ads",
-                    description = skuDetails.description,
-                    price = skuDetails.price,
+                    description = productDetails.description,
+                    price = getPrice(productDetails),
                     isPurchased = isPurchased,
                     isBundleBuyAll = false,
                     purchaseType = PurchaseType.RemoveAds
@@ -61,16 +61,25 @@ class SkuMapper {
             else -> {
                 SkuDetailsDomain(
                     pos = 0,
-                    sku = skuDetails.sku,
+                    sku = productDetails.productId,
                     title = "Buy All bundle",
                     subTitle = "Purchase all discount",
-                    description = skuDetails.description,
-                    price = skuDetails.price,
+                    description = productDetails.description,
+                    price = getPrice(productDetails),
                     isPurchased = isPurchased,
                     isBundleBuyAll = true,
                     purchaseType = PurchaseType.BuyAll
                 )
             }
+        }
+    }
+
+    private fun getPrice(productDetails: ProductDetails): String {
+        return if (productDetails.productType == BillingClient.ProductType.INAPP) {
+            productDetails.oneTimePurchaseOfferDetails?.formattedPrice?:""
+        } else {
+            // TODO manage subscription type
+            ""
         }
     }
 }

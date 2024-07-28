@@ -125,12 +125,12 @@ fun HomeScreen(
 
                 if (!sharedViewState.value.purchasedState.isAdsPurchased) {
 
-                    ShowInterstitialAd(
-                        sharedViewState,
-                        interstitialAd,
-                        onShowInterstitialAdAttempted,
-                        adRequest
-                    )
+//                    ShowInterstitialAd(
+//                        sharedViewState,
+//                        interstitialAd,
+//                        onShowInterstitialAdAttempted,
+//                        adRequest
+//                    )
 
                     Column() {
                         Row(modifier = Modifier.weight(0.9f)) {
@@ -336,8 +336,6 @@ fun TopBar(onSearchBarClick: () -> Unit, onSettingsClicked: () -> Unit, sharedVi
             }
         )
     }
-
-
 }
 
 @Preview(showBackground = true)

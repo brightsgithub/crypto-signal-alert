@@ -134,7 +134,7 @@ class SharedViewModel(
 
     fun onDestinationChanged(route: String?) {
         toolBarHelper.handleToolBarVisibility(route)
-        attemptToShowInterstitialAd()
+        //attemptToShowInterstitialAd()
     }
 
     private fun attemptToShowInterstitialAd() {

@@ -2,8 +2,8 @@ package com.owusu.cryptosignalalert.mappers
 
 import com.owusu.cryptosignalalert.domain.models.SettingDomain
 import com.owusu.cryptosignalalert.domain.models.SettingType
-import com.owusu.cryptosignalalert.models.SettingTypeUI
-import com.owusu.cryptosignalalert.models.SettingUI
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingTypeUI
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingUI
 import com.owusu.cryptosignalalert.R
 object SettingDomainToUIMapper {
 

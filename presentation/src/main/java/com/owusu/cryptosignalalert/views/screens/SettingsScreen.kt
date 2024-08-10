@@ -13,13 +13,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.owusu.cryptosignalalert.models.SettingUI
 import com.owusu.cryptosignalalert.viewmodels.SettingsViewModel
-import com.owusu.cryptosignalalert.views.theme.AppTheme
 import org.koin.androidx.compose.getViewModel
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -28,12 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ChainStyle
 import coil.compose.rememberImagePainter
-import com.owusu.cryptosignalalert.models.SettingTypeUI
-import com.owusu.cryptosignalalert.models.SettingsViewState
 import com.owusu.cryptosignalalert.settings.ContactDeveloperHelper
 import com.owusu.cryptosignalalert.settings.SettingsHelper
 import org.koin.androidx.compose.get
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.*
 import com.owusu.cryptosignalalert.views.theme.primaryColor
 
 @Composable
@@ -42,22 +38,43 @@ fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
     val contactDeveloperHelper = get<ContactDeveloperHelper>()
     val context = LocalContext.current
     val settingsViewModel = getViewModel<SettingsViewModel>()
+
     LaunchedEffect(settingsViewModel) {
         settingsViewModel.loadSettings()
     }
 
-    val toggle: () -> Unit = {
-        settingsViewModel.toggle()
+    // Collect the actions emitted by the ViewModel
+    val action by settingsViewModel.action.collectAsState(initial = SettingsUdfAction.ActionNothing)
+
+    // Handle the action
+    LaunchedEffect(action) {
+        when (action) {
+            is SettingsUdfAction.ActionContactDeveloper -> {
+                // Call your contact developer logic
+                contactDeveloperHelper.provideFeedback(context as Activity)
+            }
+            is SettingsUdfAction.ActionNavigateToWebView -> {
+                // Handle navigation to a web view
+                onNavigateToWebView((action as SettingsUdfAction.ActionNavigateToWebView).url)
+            }
+            is SettingsUdfAction.ActionOpenGooglePlayStore -> {
+                // Handle opening the Google Play Store
+                settingsHelper.openAppOnGooglePlayStore(context)
+            }
+            is SettingsUdfAction.ActionShareApp -> {
+                // Handle app sharing
+                settingsHelper.shareApp(context)
+            }
+            else -> {
+                // Handle other or no actions
+            }
+        }
     }
 
-    settingsViewModel.viewState.collectAsState(initial = SettingsViewState()).value.let {
+    settingsViewModel.uiState.collectAsState(initial = SettingsViewUiState()).value.let {
         ShowSettings (
             it.settings,
-            settingsHelper,
-            contactDeveloperHelper,
-            context,
-            onNavigateToWebView = onNavigateToWebView,
-            toggle = toggle
+            handleEvent = settingsViewModel::handleEvent
         )
     }
 }
@@ -65,32 +82,27 @@ fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
 @Composable
 fun ShowSettings(
     settings: List<SettingUI>,
-    settingsHelper: SettingsHelper,
-    contactDeveloperHelper: ContactDeveloperHelper,
-    context: Context,
-    onNavigateToWebView:(url: String) -> Unit,
-    toggle: () -> Unit
+    handleEvent: (SettingsUdfEvent) -> Unit
 ) {
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(items = settings) { settingUI ->
-            ShowSetting(settingUI, onSettingClicked = { settingUI ->
-                when (settingUI.settingTypeUI) {
-                    SettingTypeUI.ContactDeveloper -> { contactDeveloperHelper.provideFeedback(context as Activity)}
-                    SettingTypeUI.PrivacyPolicy -> { onNavigateToWebView("https://sites.google.com/view/crypto-price-target-alerts-pri") }
-                    SettingTypeUI.RateTheApp -> { settingsHelper.openAppOnGooglePlayStore(context) }
-                    SettingTypeUI.ShareApp -> { settingsHelper.shareApp(context)}
-                    SettingTypeUI.Siren -> { toggle() }
-                    else -> {
 
-                    }
-                }
-            })
+            val settingsUdfEvent = when (settingUI.settingTypeUI) {
+                SettingTypeUI.ContactDeveloper -> { SettingsUdfEvent.ContactDeveloper }
+                SettingTypeUI.PrivacyPolicy -> { SettingsUdfEvent.PrivacyPolicy }
+                SettingTypeUI.RateTheApp -> { SettingsUdfEvent.RateTheApp }
+                SettingTypeUI.ShareApp -> { SettingsUdfEvent.ShareApp }
+                SettingTypeUI.Siren -> { SettingsUdfEvent.ToggleSiren }
+                else -> { SettingsUdfEvent.Nothing }
+            }
+
+            ShowSetting(settingUI, handleEvent = handleEvent, event = settingsUdfEvent)
         }
     }
 }
 
 @Composable
-fun ShowSetting(settingUI: SettingUI, onSettingClicked:(settingUI: SettingUI) -> Unit) {
+fun ShowSetting(settingUI: SettingUI, handleEvent: (SettingsUdfEvent) -> Unit, event: SettingsUdfEvent) {
 
     var showPopup = rememberSaveable { mutableStateOf(false) }
 
@@ -109,7 +121,7 @@ fun ShowSetting(settingUI: SettingUI, onSettingClicked:(settingUI: SettingUI) ->
             ) {
                 showPopup.value = true
             } else {
-                onSettingClicked(settingUI)
+                handleEvent(event)
             }
         }
         .fillMaxWidth()
@@ -248,10 +260,6 @@ fun LargeImagePopup(
 @Preview
 @Composable
 fun ShowSettingsPreview() {
-
-    val settingsHelper = get<SettingsHelper>()
-    val contactDeveloperHelper = get<ContactDeveloperHelper>()
-    val context = LocalContext.current
     val settings = listOf(
         SettingUI(
             isFirstSetting = true,
@@ -279,10 +287,8 @@ fun ShowSettingsPreview() {
 
     ShowSettings(
         settings = settings,
-        settingsHelper = settingsHelper,
-        context = context,
-        contactDeveloperHelper = contactDeveloperHelper,
-        onNavigateToWebView = {},
-        toggle = {}
+        handleEvent = {
+
+        }
     )
 }

@@ -1,6 +1,7 @@
-package com.owusu.cryptosignalalert.models
+package com.owusu.cryptosignalalert.viewmodels.udf.settings
 
 import android.os.Parcelable
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfUiState
 import kotlinx.android.parcel.RawValue
 import kotlinx.parcelize.Parcelize
 
@@ -13,7 +14,7 @@ data class SettingUI(
     val isFirstSetting: Boolean = false,
     val isLastSetting: Boolean = false,
     val iconId: Int? = null
-    ): Parcelable
+    ): UdfUiState, Parcelable
 
 sealed class SettingTypeUI {
     object PrivacyPolicy: SettingTypeUI()

@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owusu.cryptosignalalert.domain.models.SettingDomain
 import com.owusu.cryptosignalalert.domain.usecase.DisableSirenSettingUseCase
@@ -8,13 +7,13 @@ import com.owusu.cryptosignalalert.domain.usecase.EnableSirenSettingUseCase
 import com.owusu.cryptosignalalert.domain.usecase.IsSirenEnabledUseCase
 import com.owusu.cryptosignalalert.domain.usecase.LoadSettingsUseCase
 import com.owusu.cryptosignalalert.mappers.SettingDomainToUIMapper
-import com.owusu.cryptosignalalert.models.SettingTypeUI
-import com.owusu.cryptosignalalert.models.SettingsViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingTypeUI
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingsUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingsUdfEvent
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingsViewUiState
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SettingsViewModel(
     private val loadSettingsUseCase: LoadSettingsUseCase,
@@ -24,10 +23,9 @@ class SettingsViewModel(
     private val disableSirenSettingUseCase: DisableSirenSettingUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher
-): ViewModel() {
-
-    private val _state = MutableStateFlow(SettingsViewState()) // for emitting
-    val viewState: Flow<SettingsViewState> = _state // for clients to listen to
+): UdfViewModel<SettingsUdfEvent, SettingsViewUiState, SettingsUdfAction>(
+    initialUiState = SettingsViewUiState()
+) {
 
     fun loadSettings() {
         viewModelScope.launch(dispatcherBackground) {
@@ -38,45 +36,60 @@ class SettingsViewModel(
 
     private suspend fun displaySettings(settings: List<SettingDomain>) {
         val settingsUI = settingDomainToUIMapper.toUI(settings)
-        withContext(dispatcherMain) {
-            _state.value = _state.value.copy(settings = settingsUI)
+
+        setUiState {
+            copy(settings = settingsUI)
         }
+
+
+//        withContext(dispatcherMain) {
+//            _state.value = _state.value.copy(settings = settingsUI)
+//        }
     }
 
-    fun toggle() {
+    private fun toggle() {
         if (isSirenEnabled()) {
-            disableSirenSetting()
+            disableSirenSettingUseCase.execute()
+            updateSirenUIState()
         } else {
-            enableSirenSetting()
+            enableSirenSettingUseCase.execute()
+            updateSirenUIState()
         }
-    }
-
-    private fun enableSirenSetting() {
-        enableSirenSettingUseCase.execute()
-        updateSirenUIState()
-    }
-
-    private fun disableSirenSetting() {
-        disableSirenSettingUseCase.execute()
-        updateSirenUIState()
     }
 
     private fun isSirenEnabled(): Boolean {
         return isSirenEnabledUseCase.execute()
     }
-
     private fun updateSirenUIState() {
         val isSirenEnabled = isSirenEnabled()
-        val settings = _state.value.settings.map { setting ->
+        // Create a new list with updated settings
+        val updatedSettings = uiState.value.settings.map { setting ->
             if (setting.settingTypeUI == SettingTypeUI.Siren) {
                 setting.copy(
-                    selectedValue = "Siren is " + if (isSirenEnabled) {"enabled"} else {"disabled"}
+                    selectedValue = "Siren is " + if (isSirenEnabled) "enabled" else "disabled"
                 )
             } else {
                 setting
             }
         }
 
-        _state.value = _state.value.copy(settings = settings)
+        // Update the UI state with the new settings list
+        setUiState {
+            copy(settings = updatedSettings)
+        }
+    }
+
+    override fun handleEvent(event: SettingsUdfEvent) {
+        when(event) {
+            is SettingsUdfEvent.ContactDeveloper -> sendAction { SettingsUdfAction.ActionContactDeveloper }
+            SettingsUdfEvent.Nothing -> sendAction { SettingsUdfAction.ActionNothing }
+            SettingsUdfEvent.PrivacyPolicy -> {
+                sendAction { SettingsUdfAction.ActionNavigateToWebView("https://sites.google.com/view/crypto-price-target-alerts-pri")}
+            }
+            SettingsUdfEvent.RateTheApp -> sendAction { SettingsUdfAction.ActionOpenGooglePlayStore }
+            SettingsUdfEvent.ShareApp -> sendAction { SettingsUdfAction.ActionShareApp }
+            SettingsUdfEvent.ToggleSiren -> toggle()
+            else -> { }
+        }
     }
 }

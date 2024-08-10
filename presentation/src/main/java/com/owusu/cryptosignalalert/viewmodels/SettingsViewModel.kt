@@ -47,7 +47,7 @@ class SettingsViewModel(
 //        }
     }
 
-    private fun toggle() {
+    private fun toggleSiren() {
         if (isSirenEnabled()) {
             disableSirenSettingUseCase.execute()
             updateSirenUIState()
@@ -88,7 +88,7 @@ class SettingsViewModel(
             }
             SettingsUdfEvent.RateTheApp -> sendAction { SettingsUdfAction.ActionOpenGooglePlayStore }
             SettingsUdfEvent.ShareApp -> sendAction { SettingsUdfAction.ActionShareApp }
-            SettingsUdfEvent.ToggleSiren -> toggle()
+            SettingsUdfEvent.ToggleSiren -> toggleSiren()
             else -> { }
         }
     }

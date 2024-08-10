@@ -81,7 +81,7 @@ class AppPreferences constructor(val context: Context): AppPreferencesRepository
     }
 
     override fun isSirenEnabled(): Boolean {
-        return getBoolean(isSirenEnabled, false)
+        return getBoolean(isSirenEnabled, true)
     }
 
     override fun allowSirenSound() {

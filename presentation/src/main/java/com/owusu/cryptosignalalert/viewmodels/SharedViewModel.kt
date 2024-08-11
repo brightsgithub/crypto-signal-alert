@@ -100,7 +100,7 @@ class SharedViewModel(
         }
     }
 
-    fun showSnackBar(
+    private fun showSnackBar(
         msg: String,
         actionLabel: String,
         actionCallback: () -> Unit,
@@ -172,6 +172,27 @@ class SharedViewModel(
     }
 
     override fun handleEvent(event: HomeUdfEvent) {
+        println("Testing_udf_HomeUdfEvent_SharedViewModel action $event")
+        when (event) {
+            is HomeUdfEvent.OnCoinRowClicked -> {
+                selectedCoinUI = event.selectedCoinUI
+                sendAction { HomeUdfAction.NavigateToPriceTargetEntry }
+            }
+            is HomeUdfEvent.OnSearchBarClicked -> sendAction { HomeUdfAction.NavigateToSearch }
+            is HomeUdfEvent.OnSettingsClicked -> sendAction { HomeUdfAction.NavigateToSettings }
+            is HomeUdfEvent.ShowSnackBar -> {
+                event.apply {
+                    showSnackBar(
+                        actionCallback = actionCallback,
+                        actionLabel = actionLabel,
+                        msg = msg,
+                        shouldShowIndefinite = shouldShowIndefinite
+                    )
+                }
+            }
+            else -> {
 
+            }
+        }
     }
 }

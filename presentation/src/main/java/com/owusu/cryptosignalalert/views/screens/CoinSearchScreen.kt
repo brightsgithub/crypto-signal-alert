@@ -24,6 +24,7 @@ import com.owusu.cryptosignalalert.models.*
 import com.owusu.cryptosignalalert.viewmodels.CoinSearchViewModel
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.views.screens.widgets.SearchBarUI
 import org.koin.androidx.compose.getViewModel
 
@@ -32,8 +33,7 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun CoinSearchScreen(
     sharedViewModel: SharedViewModel,
-    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val searchViewModel = getViewModel<CoinSearchViewModel>()
@@ -62,13 +62,16 @@ fun CoinSearchScreen(
     }
 
     if (coinSearchState.value.coinSearchStateMessage.shouldShowMessage) {
-
-        onShowSnackBar(
-            coinSearchState.value.coinSearchStateMessage.message,
-            coinSearchState.value.coinSearchStateMessage.ctaText,
-            false,
-            { }
+        val handleEvent = sharedViewModel::handleEvent
+        handleEvent(
+            HomeUdfEvent.ShowSnackBar(
+                msg = coinSearchState.value.coinSearchStateMessage.message,
+                actionLabel = coinSearchState.value.coinSearchStateMessage.ctaText,
+                shouldShowIndefinite = false,
+                actionCallback = {}
+            )
         )
+
         searchViewModel.hideSnackBar()
     }
 

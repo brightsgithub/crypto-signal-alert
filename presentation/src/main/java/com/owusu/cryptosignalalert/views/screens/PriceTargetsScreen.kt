@@ -44,6 +44,8 @@ import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
 import com.owusu.cryptosignalalert.models.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
+import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.views.theme.*
 import com.owusu.cryptosignalalert.workmanager.Constants
 import kotlinx.coroutines.Job
@@ -87,10 +89,7 @@ fun stopObservingWorkManagerStatus() {
 }
 
 @Composable
-fun PriceTargetsScreen(
-    onSearchBarClick: () -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
-) {
+fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
     //CryptoSignalAlertTheme {
 
         val viewModel = getViewModel<AlertListViewModel>()
@@ -100,7 +99,8 @@ fun PriceTargetsScreen(
 
         viewModel.viewState.collectAsState(initial = AlertListViewState()).value.let {
             //Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowPriceTargets(it, onSearchBarClick = onSearchBarClick, onShowSnackBar = onShowSnackBar)
+            val handleEvent = sharedViewModel::handleEvent
+                ShowPriceTargets(it, handleEvent)
             //}
         }
 
@@ -138,8 +138,7 @@ fun PriceTargetsScreen(
 @Composable
 private fun ShowPriceTargets(
     state: AlertListViewState,
-    onSearchBarClick: () -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+    handleEvent: (HomeUdfEvent) -> Unit
 ) {
 
     val viewModel = getViewModel<AlertListViewModel>()
@@ -158,7 +157,7 @@ private fun ShowPriceTargets(
                 },
                 shape = CircleShape,
                 onClick = {
-                          onSearchBarClick()
+                    handleEvent(HomeUdfEvent.OnSearchBarClicked)
                 },
                containerColor = MaterialTheme.colorScheme.primary,
               //  contentColor = MaterialTheme.colorScheme.onTertiaryContainer
@@ -245,7 +244,12 @@ private fun ShowPriceTargets(
                 items(items = state.priceTargets) { priceTarget ->
                     PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
                         if (state.shouldShowSyncState) {
-                            onShowSnackBar("Waiting for sync to complete", "Dismiss", false, {} )
+                            handleEvent(HomeUdfEvent.ShowSnackBar(
+                                shouldShowIndefinite = false,
+                                msg = "Waiting for sync to complete",
+                                actionLabel = "Dismiss",
+                                actionCallback = {}
+                            ))
                         } else {
                             viewModel.deletePriceTarget(userPriceTarget)
                         }
@@ -598,7 +602,7 @@ fun ShowListPriceTargetCardWithSyncPreview() {
         totalNumberOfTargets = 20,
         shouldShowSyncState = true
     )
-    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2, b1, ac -> })
+    ShowPriceTargets(state = state, handleEvent = { })
 }
 
 @Preview
@@ -609,7 +613,7 @@ fun ShowListPriceTargetCardPreview() {
         remainingSyncPercentageToBeUpdated = 0.50f,
         totalNumberOfTargets = 20
     )
-    ShowPriceTargets(state = state, onSearchBarClick = { }, onShowSnackBar = { s1, s2, b1, ac -> })
+    ShowPriceTargets(state = state, handleEvent = { })
 }
 
 @Preview

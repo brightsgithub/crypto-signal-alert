@@ -3,8 +3,7 @@ package com.owusu.cryptosignalalert.navigation
 import android.app.Activity
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
@@ -16,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfAction
 import com.owusu.cryptosignalalert.views.screens.*
 import org.koin.androidx.compose.getViewModel
 
@@ -23,9 +23,7 @@ import org.koin.androidx.compose.getViewModel
 // https://developer.android.com/jetpack/compose/navigation#create-navhost
 @Composable
 fun HomeNavGraph(
-    navHostController: NavHostController,
-    onSearchBarClick: () -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+    navHostController: NavHostController
 ) {
 
     val sharedViewModel = getViewModel<SharedViewModel>()
@@ -39,14 +37,10 @@ fun HomeNavGraph(
     ) {
 
         composable(NavigationItem.Home.route) {
-            CoinsListScreen(sharedViewModel, navigateToPriceTargetEntryScreen = { selectedCoinUI ->
-                sharedViewModel.selectedCoinUI = selectedCoinUI
-                // i guess we can also nav to out coin entry which is not a bottom nav?
-                navHostController.navigate(route = Graphs.TARGETS_ENTRY_GRAPH)
-            }, onShowSnackBar = onShowSnackBar)
+            CoinsListScreen(sharedViewModel)
         }
         composable(NavigationItem.PriceTargets.route) {
-            PriceTargetsScreen(onSearchBarClick = onSearchBarClick, onShowSnackBar = onShowSnackBar)
+            PriceTargetsScreen(sharedViewModel)
         }
 
         composable(NavigationItem.Purchase.route) {
@@ -56,8 +50,8 @@ fun HomeNavGraph(
 
 
         // nested graph
-        targetsEntryGraph(navHostController, sharedViewModel, onShowSnackBar = onShowSnackBar)
-        coinSearchNavGraph(navHostController, sharedViewModel, onShowSnackBar = onShowSnackBar)
+        targetsEntryGraph(navHostController, sharedViewModel)
+        coinSearchNavGraph(navHostController, sharedViewModel)
         settingsNavGraph(navHostController, sharedViewModel, onNavigateToWebView = { url ->
             sharedViewModel.webViewUrl = url
             navHostController.navigate(route = Graphs.WEB_VIEW_NAV_GRAPH)

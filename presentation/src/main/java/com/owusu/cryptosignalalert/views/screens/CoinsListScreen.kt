@@ -39,6 +39,7 @@ import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.CoinsListUiState
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.views.theme.percentage_gain_green
 import com.owusu.cryptosignalalert.views.theme.red
 import org.koin.androidx.compose.getViewModel
@@ -47,20 +48,22 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun CoinsListScreen(
     sharedViewModel: SharedViewModel,
-    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+//    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
+//    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
 ) {
-    ShowCoinsList(sharedViewModel, navigateToPriceTargetEntryScreen, onShowSnackBar)
+    ShowCoinsList(sharedViewModel)
 }
 
 @Composable
 private fun ShowCoinsList(
     sharedViewModel: SharedViewModel,
-    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit) {
+//    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
+//    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+) {
     val viewModel = getViewModel<CoinsListViewModel>()
     val lazyPagingItems = viewModel.coinsListFlow.collectAsLazyPagingItems()
     val coinsListState = viewModel.viewState.collectAsState(initial = CoinsListUiState())
+    val handleEvent = sharedViewModel::handleEvent
 
     // Remember our own LazyListState
     val listState = lazyPagingItems.rememberLazyListStateWorkAround()
@@ -79,12 +82,16 @@ private fun ShowCoinsList(
     ) {
 
         if (coinsListState.value.coinsListUiStateMessage.shouldShowMessage) {
-            onShowSnackBar(
-                coinsListState.value.coinsListUiStateMessage.message,
-                coinsListState.value.coinsListUiStateMessage.ctaText,
-                true,
-                {}
+
+            handleEvent(
+                HomeUdfEvent.ShowSnackBar(
+                    msg = coinsListState.value.coinsListUiStateMessage.message,
+                    actionLabel = coinsListState.value.coinsListUiStateMessage.ctaText,
+                    shouldShowIndefinite = true,
+                    actionCallback = {}
+                )
             )
+
             viewModel.hideSnackBar()
 
         } else {
@@ -97,8 +104,7 @@ private fun ShowCoinsList(
                     if(!coin!!.id.equals("Rate_Limit_Reached")) {
                         CoinItem(
                             coin!!,
-                            navigateToPriceTargetEntryScreen = navigateToPriceTargetEntryScreen,
-                            onShowSnackBar = onShowSnackBar
+                            handleEvent
                         )
                     }
                 }
@@ -132,8 +138,7 @@ private fun ShowCoinsList(
 @Composable
 private fun CoinItem(
     coin: CoinUI,
-    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+    handleEvent: (event: HomeUdfEvent) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -148,7 +153,7 @@ private fun CoinItem(
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp)
             .clickable {
-                navigateToPriceTargetEntryScreen(coin!!)
+                handleEvent(HomeUdfEvent.OnCoinRowClicked(coin!!))
             }
     ) {
 
@@ -203,7 +208,7 @@ private fun CoinItem(
                         top.linkTo(coinName.top)
                     }
                     .clickable {
-                        navigateToPriceTargetEntryScreen(coin)
+                        handleEvent(HomeUdfEvent.OnCoinRowClicked(coin!!))
                     }
             )
 

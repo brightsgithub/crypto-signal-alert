@@ -32,6 +32,7 @@ import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.PriceTargetEntryViewState
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.views.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.getViewModel
@@ -41,7 +42,6 @@ fun PriceTargetEntryScreen(
     sharedViewModel: SharedViewModel,
     navigateToPurchaseScreen:() -> Unit,
     navigateToTargetsList:() -> Unit,
-    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
 ) {
 
   //  AppTheme {
@@ -65,15 +65,18 @@ fun PriceTargetEntryScreen(
         //}
 
         if (viewState.value.priceTargetsMessage.shouldShowMessage) {
-            onShowSnackBar(
-                viewState.value.priceTargetsMessage.message,
-                viewState.value.priceTargetsMessage.ctaText,
-                false,
-                {
-                  if (viewState.value.priceTargetsMessage.isError) {
-                          navigateToPurchaseScreen()
-                  }
-                }
+            val handleEvent = sharedViewModel::handleEvent
+            handleEvent(
+                HomeUdfEvent.ShowSnackBar(
+                    msg = viewState.value.priceTargetsMessage.message,
+                    actionCallback = {
+                        if (viewState.value.priceTargetsMessage.isError) {
+                            navigateToPurchaseScreen()
+                        }
+                    },
+                    actionLabel = viewState.value.priceTargetsMessage.ctaText,
+                    shouldShowIndefinite = false
+                )
             )
         }
 

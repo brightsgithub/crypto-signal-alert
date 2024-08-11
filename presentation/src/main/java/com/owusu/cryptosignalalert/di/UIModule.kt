@@ -4,8 +4,6 @@ import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.alarm.CryptoAlarmManager
 import com.owusu.cryptosignalalert.alarm.CryptoMediaPlayer
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
-import com.owusu.cryptosignalalert.domain.usecase.DisableSirenSettingUseCase
-import com.owusu.cryptosignalalert.domain.usecase.EnableSirenSettingUseCase
 import com.owusu.cryptosignalalert.notification.NotificationUtil
 import com.owusu.cryptosignalalert.domain.utils.CryptoDateUtils
 import com.owusu.cryptosignalalert.mappers.*

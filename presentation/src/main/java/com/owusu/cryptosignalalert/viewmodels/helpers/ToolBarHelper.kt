@@ -6,13 +6,16 @@ import com.owusu.cryptosignalalert.models.SharedViewState
 import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.resource.AppStringProvider
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class ToolBarHelper(private val appStringProvider: AppStringProvider) {
 
-    private lateinit var _sharedViewState: MutableStateFlow<SharedViewState>
+    private lateinit var uiState: StateFlow<SharedViewState>
+    private lateinit var setTheUiState: (uiState: SharedViewState) -> Unit
 
-    fun initToolBarHelper(state: MutableStateFlow<SharedViewState>) {
-        _sharedViewState = state
+    fun initToolBarHelper(uiState: StateFlow<SharedViewState>, setTheUiState: (uiState: SharedViewState) -> Unit) {
+        this.uiState = uiState
+        this.setTheUiState = setTheUiState
     }
 
     fun handleToolBarVisibility(route: String?) {
@@ -66,74 +69,142 @@ class ToolBarHelper(private val appStringProvider: AppStringProvider) {
     }
 
     private fun hideSettingsIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowSettingsIcon = false
             )
         )
+        setTheUiState(newUiState)
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowSettingsIcon = false
+//            )
+//        )
     }
 
     private fun showSettingsIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowSettingsIcon = true
             )
         )
+        setTheUiState(newUiState)
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowSettingsIcon = true
+//            )
+//        )
     }
 
     private fun showSearchIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowSearchIcon = true
             )
         )
+        setTheUiState(newUiState)
+
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowSearchIcon = true
+//            )
+//        )
     }
 
     private fun hideSearchIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowSearchIcon = false
             )
         )
+        setTheUiState(newUiState)
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowSearchIcon = false
+//            )
+//        )
     }
 
     private fun showUpBtnIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowUpButtonIcon = true
             )
         )
+        setTheUiState(newUiState)
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowUpButtonIcon = true
+//            )
+//        )
     }
 
     private fun hideUpBtnIcon() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowUpButtonIcon = false
             )
         )
+        setTheUiState(newUiState)
+
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowUpButtonIcon = false
+//            )
+//        )
     }
 
     private fun showToolBar() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowToolTar = true
             )
         )
+        setTheUiState(newUiState)
+
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowToolTar = true
+//            )
+//        )
     }
 
     private fun hideToolBar() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 shouldShowToolTar = false
             )
         )
+        setTheUiState(newUiState)
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                shouldShowToolTar = false
+//            )
+//        )
     }
     private fun setTitle(@StringRes resId: Int) {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+
+
+        val newUiState = uiState.value.copy(
+            actionButtonState = uiState.value.actionButtonState.copy(
                 title = appStringProvider.getString(resId)
             )
         )
+        setTheUiState(newUiState)
+//        _sharedViewState.value = _sharedViewState.value.copy(
+//            actionButtonState = _sharedViewState.value.actionButtonState.copy(
+//                title = appStringProvider.getString(resId)
+//            )
+//        )
     }
 
     private fun showAllActionItems() {

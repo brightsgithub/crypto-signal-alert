@@ -1,11 +1,13 @@
 package com.owusu.cryptosignalalert.models
 
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfUiState
+
 data class SharedViewState(
     val appSnackBar: AppSnackBar = AppSnackBar(actionCallback = {}),
     val purchasedState: PurchasedState = PurchasedState(),
     val actionButtonState: ActionButtonState = ActionButtonState(),
     val shouldShowInterstitialAd: Boolean = false
-)
+): UdfUiState
 
 data class AppSnackBar(
     val shouldShowSnackBar: Boolean = false,

@@ -55,9 +55,9 @@ class StartupBillingUseCase(
         val skuList = billingRepository.getSkuDetails()
         val skuIdsMap = billingRepository.getSkuIdsMap()
 
-        System.out.println("StartupBillingUseCase_1 "+ appPreferences.isAppFree())
-        System.out.println("StartupBillingUseCase_1 "+ appPreferences.isPriceTargetLimitPurchased())
-        System.out.println("StartupBillingUseCase_1 "+ appPreferences.isAdsPurchased())
+        println("StartupBillingUseCase_1 appPreferences.isAppFree() "+ appPreferences.isAppFree())
+        println("StartupBillingUseCase_1 appPreferences.isPriceTargetLimitPurchased() "+ appPreferences.isPriceTargetLimitPurchased())
+        println("StartupBillingUseCase_1 appPreferences.isAdsPurchased() "+ appPreferences.isAdsPurchased())
 
         for(skuDetail: SkuDetailsDomain in skuList) {
             when(skuDetail.sku) {
@@ -93,9 +93,9 @@ class StartupBillingUseCase(
         // ############################## REMOVE!!!!!!
         //makeEverythingFree()
 
-        System.out.println("StartupBillingUseCase_2 "+ appPreferences.isAppFree())
-        System.out.println("StartupBillingUseCase_2 "+ appPreferences.isPriceTargetLimitPurchased())
-        System.out.println("StartupBillingUseCase_2 "+ appPreferences.isAdsPurchased())
+        println("StartupBillingUseCase_2 appPreferences.isAppFree() "+ appPreferences.isAppFree())
+        println("StartupBillingUseCase_2 appPreferences.isPriceTargetLimitPurchased() "+ appPreferences.isPriceTargetLimitPurchased())
+        println("StartupBillingUseCase_2 appPreferences.isAdsPurchased() "+ appPreferences.isAdsPurchased())
     }
 
     private fun makeEverythingFree() {

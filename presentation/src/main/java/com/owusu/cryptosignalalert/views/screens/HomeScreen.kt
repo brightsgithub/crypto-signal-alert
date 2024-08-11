@@ -66,7 +66,7 @@ fun HomeScreen(
         }
     }
 
-    val sharedViewState = sharedViewModel.sharedViewState.collectAsState(initial = SharedViewState())
+    val sharedViewState = sharedViewModel.uiState.collectAsState(initial = SharedViewState())
 
     //val scaffoldState = rememberScaffoldState()
     val snackbarHostState = remember { SnackbarHostState() }

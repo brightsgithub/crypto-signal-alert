@@ -1,7 +1,6 @@
 package com.owusu.cryptosignalalert.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owusu.cryptosignalalert.domain.models.states.PurchasedStateDomain
 import com.owusu.cryptosignalalert.domain.models.states.StartUpBillingState
@@ -14,11 +13,10 @@ import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.SharedViewState
 import com.owusu.cryptosignalalert.resource.AppStringProvider
 import com.owusu.cryptosignalalert.viewmodels.helpers.ToolBarHelper
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.views.screens.TAG
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.random.Random
@@ -30,13 +28,13 @@ class SharedViewModel(
     private val refreshSkuDetailsUseCase: RefreshSkuDetailsUseCase,
     private val appStringProvider: AppStringProvider,
     private val toolBarHelper: ToolBarHelper
-    ): ViewModel() {
+    ): UdfViewModel<HomeUdfEvent, SharedViewState, HomeUdfAction>(initialUiState = SharedViewState()) {
 
-    private val _sharedViewState = MutableStateFlow(SharedViewState()) // for emitting
-    val sharedViewState: Flow<SharedViewState> = _sharedViewState // for clients to listen to
+//    private val _sharedViewState = MutableStateFlow(SharedViewState()) // for emitting
+//    val sharedViewState: Flow<SharedViewState> = _sharedViewState // for clients to listen to
 
     init {
-        toolBarHelper.initToolBarHelper(state = _sharedViewState)
+        toolBarHelper.initToolBarHelper(uiState, ::setTheUiState)
         startCollectingPurchasedState()
         startCollectingBillingState()
     }
@@ -84,15 +82,16 @@ class SharedViewModel(
 
     private fun updatePurchasedState(purchasedStateDomain: PurchasedStateDomain) {
         Log.d("SharedViewModel", "updatePurchasedState1 = "+ purchasedStateDomain)
-        _sharedViewState.value = _sharedViewState.value.copy(
-            purchasedState = _sharedViewState.value.purchasedState.copy(
+        val newState = uiState.value.copy(
+            purchasedState = uiState.value.purchasedState.copy(
                 isAppFree = purchasedStateDomain.isAppFree,
                 isAdsPurchased = purchasedStateDomain.isAdsPurchased,
                 isPriceTargetLimitPurchased = purchasedStateDomain.isPriceTargetLimitPurchased
             )
         )
+        setTheUiState(newState)
 
-        Log.d("SharedViewModel", "updatePurchasedState2 = "+ _sharedViewState.value)
+        Log.d("SharedViewModel", "updatePurchasedState2 = "+ uiState.value)
     }
 
     private fun populateCoinIds() {
@@ -107,7 +106,7 @@ class SharedViewModel(
         actionCallback: () -> Unit,
         shouldShowIndefinite: Boolean
     ) {
-        _sharedViewState.value = _sharedViewState.value.copy(
+        val newState = uiState.value.copy(
             appSnackBar = AppSnackBar(
                 shouldShowSnackBar = true,
                 snackBarMessage = msg,
@@ -116,12 +115,14 @@ class SharedViewModel(
                 shouldShowIndefinite = shouldShowIndefinite
             )
         )
+        setTheUiState(newState)
     }
 
     fun hideSnackBar() {
-        _sharedViewState.value = _sharedViewState.value.copy(
-            appSnackBar = _sharedViewState.value.appSnackBar.copy(shouldShowSnackBar = false)
+        val newState = uiState.value.copy(
+            appSnackBar = uiState.value.appSnackBar.copy(shouldShowSnackBar = false)
         )
+        setTheUiState(newState)
     }
 
     // nav arguments - where we don't need our app to react to any real time changes
@@ -129,7 +130,7 @@ class SharedViewModel(
     var webViewUrl: String = ""
 
     private fun printCurrentState() {
-        Log.v("SharedViewModel", "Current SharedViewState = "+ _sharedViewState.value)
+        Log.v("SharedViewModel", "Current SharedViewState = "+ uiState.value)
     }
 
     fun onDestinationChanged(route: String?) {
@@ -141,16 +142,18 @@ class SharedViewModel(
         Log.d(TAG, "attemptToShowInterstitialAd called")
         callFunctionWithProbability(probability = 0.1) {
             Log.d(TAG, "shouldShowInterstitialAd = true")
-            _sharedViewState.value = _sharedViewState.value.copy(
+            val newState = uiState.value.copy(
                 shouldShowInterstitialAd = true
             )
+            setTheUiState(newState)
         }
     }
 
     fun showInterstitialAdAttempted() {
-        _sharedViewState.value = _sharedViewState.value.copy(
+        val newState = uiState.value.copy(
             shouldShowInterstitialAd = false
         )
+        setTheUiState(newState)
     }
 
     // 0.2 probability is a 20% chance of calling the supplied function.
@@ -160,5 +163,15 @@ class SharedViewModel(
         if (randomValue <= probability) {
            function()
         }
+    }
+
+    private fun setTheUiState(uiState: SharedViewState) {
+        setUiState {
+            uiState
+        }
+    }
+
+    override fun handleEvent(event: HomeUdfEvent) {
+
     }
 }

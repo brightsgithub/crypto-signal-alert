@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,28 +28,37 @@ import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.models.CoinDetailUI
 import com.owusu.cryptosignalalert.models.CoinUI
-import com.owusu.cryptosignalalert.models.PriceTargetEntryViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetentry.PriceTargetEntryViewState
 import com.owusu.cryptosignalalert.viewmodels.PriceTargetEntryViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetentry.PriceTargetEntryUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetentry.PriceTargetEntryUdfEvent
 import com.owusu.cryptosignalalert.views.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun PriceTargetEntryScreen(
-    sharedViewModel: SharedViewModel,
-    navigateToPurchaseScreen:() -> Unit,
-    navigateToTargetsList:() -> Unit,
+    sharedViewModel: SharedViewModel
 ) {
 
   //  AppTheme {
         val coinUI = sharedViewModel.selectedCoinUI
         val viewModel = getViewModel<PriceTargetEntryViewModel>()
-        val viewState = viewModel.viewState.collectAsState(initial = PriceTargetEntryViewState())
+        val handleSharedEvent = sharedViewModel::handleEvent
+        val handlePriceTargetEvent = viewModel::handleEvent
+        val viewState = viewModel.uiState.collectAsState(initial = PriceTargetEntryViewState())
 
-        LaunchedEffect(viewModel) {
-            viewModel.getCoinDetails(coinUI = coinUI)
+        LaunchedEffect(Unit) {
+            handlePriceTargetEvent(PriceTargetEntryUdfEvent.GetCoinDetails(coinUI = coinUI))
+            viewModel.action.collect { action ->
+                when (action) {
+                    is PriceTargetEntryUdfAction.NavigateToPriceTargetsAppEntry -> {
+                        handleSharedEvent(HomeUdfEvent.NavigateToPriceTargets)
+                    }
+                }
+            }
         }
 
         //Surface(color = MaterialTheme.colors.background) {
@@ -59,8 +67,7 @@ fun PriceTargetEntryScreen(
                 viewState,
                 coinUI
             ) { userPriceTarget ->
-                viewModel.saveNewPriceTarget(coinUI, userPriceTarget)
-                navigateToTargetsList()
+                handlePriceTargetEvent(PriceTargetEntryUdfEvent.SaveNewPriceTarget(coinUI, userPriceTarget))
             }
         //}
 
@@ -70,8 +77,8 @@ fun PriceTargetEntryScreen(
                 HomeUdfEvent.ShowSnackBar(
                     msg = viewState.value.priceTargetsMessage.message,
                     actionCallback = {
-                        if (viewState.value.priceTargetsMessage.isError) {
-                            navigateToPurchaseScreen()
+                        if (viewState.value.priceTargetsMessage.isError) run {
+                            handleSharedEvent(HomeUdfEvent.NavigateToPurchase)
                         }
                     },
                     actionLabel = viewState.value.priceTargetsMessage.ctaText,
@@ -91,7 +98,7 @@ fun LoadingWidget3(boxModifier: Modifier? = null){
     val modifier = boxModifier ?: Modifier
         .fillMaxWidth()
 
-    val alpha = if (viewModel.viewState.collectAsState(initial = PriceTargetEntryViewState()).value.isLoading) 1.0f else 0.0f
+    val alpha = if (viewModel.uiState.collectAsState(initial = PriceTargetEntryViewState()).value.isLoading) 1.0f else 0.0f
 
     Box(modifier = modifier
         .padding(16.dp)
@@ -250,7 +257,8 @@ private fun ShowPriceTargetEntryScreen(
                     }
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-                    .border(width = 1.dp,
+                    .border(
+                        width = 1.dp,
                         color = Color.White,
                         shape = RoundedCornerShape(8.dp)
                     )
@@ -289,7 +297,8 @@ fun PriceTargetEntryScreenPreview() {
                         "\n" +
                         "The cryptocurrency then took off with the innovation of the turing-complete smart contract by <a href=\"https://www.coingecko.com/en/coins/ethereum\">Ethereum</a> which led to the development of other amazing projects such as <a href=\"https://www.coingecko.com/en/coins/eos\">EOS</a>, <a href=\"https://www.coingecko.com/en/coins/tron\">Tron</a>, and even crypto-collectibles such as <a href=\"https://www.coingecko.com/buzz/ethereum-still-king-dapps-cryptokitties-need-1-billion-on-eos\">CryptoKitties</a>.",
             id = "bitcoin")
-        )) // for emitting
+        )
+        ) // for emitting
         val viewState: MutableStateFlow<PriceTargetEntryViewState> = _state // for clients to listen to
 
         ShowPriceTargetEntryScreen(
@@ -324,7 +333,8 @@ fun PriceTargetEntryScreenPreviewNoDesc() {
                     name = "Bitcoin",
                     symbol = "BTC",
                     id = "bitcoin")
-            )) // for emitting
+            )
+        ) // for emitting
         val viewState: MutableStateFlow<PriceTargetEntryViewState> = _state // for clients to listen to
 
         ShowPriceTargetEntryScreen(

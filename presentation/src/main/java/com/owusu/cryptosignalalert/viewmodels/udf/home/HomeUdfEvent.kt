@@ -14,4 +14,7 @@ sealed class HomeUdfEvent: UdfEvent {
         val shouldShowIndefinite: Boolean
     ): HomeUdfEvent()
     object EventNothing: HomeUdfEvent()
+    object NavigateToPriceTargets: HomeUdfEvent()
+    object NavigateToPurchase: HomeUdfEvent()
+
 }

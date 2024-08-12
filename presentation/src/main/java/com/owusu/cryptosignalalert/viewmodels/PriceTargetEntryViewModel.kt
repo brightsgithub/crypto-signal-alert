@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owusu.cryptosignalalert.domain.models.PurchaseConstants.MIN_PRICE_TARGET_RECORDS_ALLOWED
 import com.owusu.cryptosignalalert.domain.usecase.GetCoinDetailUseCase
@@ -8,12 +7,13 @@ import com.owusu.cryptosignalalert.domain.usecase.SaveNewPriceTargetsWithLimitUs
 import com.owusu.cryptosignalalert.mappers.CoinDetailToUIMapper
 import com.owusu.cryptosignalalert.mappers.CoinUIToPriceTargetDomainMapper
 import com.owusu.cryptosignalalert.models.CoinUI
-import com.owusu.cryptosignalalert.models.PriceTargetEntryViewState
-import com.owusu.cryptosignalalert.models.PriceTargetsMessage
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetentry.PriceTargetEntryViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetentry.PriceTargetsMessage
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetentry.PriceTargetEntryUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetentry.PriceTargetEntryUdfEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class PriceTargetEntryViewModel(
@@ -23,25 +23,35 @@ class PriceTargetEntryViewModel(
     private val coinDetailToUIMapper: CoinDetailToUIMapper,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher
-): ViewModel() {
+) : UdfViewModel<PriceTargetEntryUdfEvent, PriceTargetEntryViewState, PriceTargetEntryUdfAction>(
+    initialUiState = PriceTargetEntryViewState()
+) {
 
-    private val _state = MutableStateFlow(PriceTargetEntryViewState()) // for emitting
-    val viewState: Flow<PriceTargetEntryViewState> = _state // for clients to listen to
-    fun getCoinDetails(scope: CoroutineScope = viewModelScope, coinUI: CoinUI) {
+    private fun getCoinDetails(scope: CoroutineScope = viewModelScope, coinUI: CoinUI) {
         scope.launch(dispatcherBackground) {
-            _state.value = _state.value.copy(isLoading = true)
-            val coinDetailDomain = getCoinDetailUseCase.invoke(GetCoinDetailUseCase.Params(coinUI.id))
+            setUiState {
+                val newUIState = uiState.value.copy(isLoading = true)
+                newUIState
+            }
+            val coinDetailDomain =
+                getCoinDetailUseCase.invoke(GetCoinDetailUseCase.Params(coinUI.id))
             val coinDetailUI = coinDetailToUIMapper.map(coinDetailDomain)
-            _state.value = PriceTargetEntryViewState(coinDetailUI = coinDetailUI, isLoading = false)
+
+            setUiState {
+                val newUIState =
+                    PriceTargetEntryViewState(coinDetailUI = coinDetailUI, isLoading = false)
+                newUIState
+            }
         }
     }
 
-    fun saveNewPriceTarget(coinUI: CoinUI, userPriceTarget: String) {
+    private fun saveNewPriceTarget(coinUI: CoinUI, userPriceTarget: String) {
 
         if (userPriceTarget.isBlank()) return
 
         viewModelScope.launch {
-            val priceTargetDomain = coinUIToPriceTargetDomainMapper.mapUIToDomain(coinUI, userPriceTarget)
+            val priceTargetDomain =
+                coinUIToPriceTargetDomainMapper.mapUIToDomain(coinUI, userPriceTarget)
             val priceTargetDomainList = listOf(priceTargetDomain)
             val params = SaveNewPriceTargetsWithLimitUseCase.Params(priceTargetDomainList)
             val wasPriceTargetSaved = saveNewPriceTargetsWithLimitUseCase.invoke(params = params)
@@ -51,23 +61,37 @@ class PriceTargetEntryViewModel(
 
     private fun publishSaveStatus(wasPriceTargetSaved: Boolean) {
         if (wasPriceTargetSaved) {
-            _state.value = _state.value.copy(
-                priceTargetsMessage = PriceTargetsMessage (
+            val newUIState = uiState.value.copy(
+                priceTargetsMessage = PriceTargetsMessage(
                     shouldShowMessage = true,
                     isError = false,
                     message = "Price target added",
                     ctaText = "Dismiss"
                 )
             )
+            setUiState { newUIState }
         } else {
-            _state.value = _state.value.copy(
-                priceTargetsMessage = PriceTargetsMessage (
+            val newUIState = uiState.value.copy(
+                priceTargetsMessage = PriceTargetsMessage(
                     shouldShowMessage = true,
                     isError = true,
-                    message = "Max limit of "+MIN_PRICE_TARGET_RECORDS_ALLOWED+" targets",
+                    message = "Max limit of " + MIN_PRICE_TARGET_RECORDS_ALLOWED + " targets",
                     ctaText = "Unlock?"
                 )
             )
+            setUiState { newUIState }
+        }
+    }
+
+    override fun handleEvent(event: PriceTargetEntryUdfEvent) {
+        when(event) {
+            is PriceTargetEntryUdfEvent.GetCoinDetails -> {
+                getCoinDetails(coinUI = event.coinUI)
+            }
+            is PriceTargetEntryUdfEvent.SaveNewPriceTarget -> {
+                saveNewPriceTarget(coinUI = event.coinUI, userPriceTarget = event.userPriceTarget)
+                sendAction { PriceTargetEntryUdfAction.NavigateToPriceTargetsAppEntry }
+            }
         }
     }
 }

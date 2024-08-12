@@ -2,9 +2,9 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.7">
-      <module name="CryptoSignalAlert.data" target="11" />
-      <module name="CryptoSignalAlert.presentation" target="11" />
-      <module name="CryptoSignalAlert.testutils" target="11" />
+      <module name="CryptoSignalAlert.data" target="17" />
+      <module name="CryptoSignalAlert.presentation" target="17" />
+      <module name="CryptoSignalAlert.testutils" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

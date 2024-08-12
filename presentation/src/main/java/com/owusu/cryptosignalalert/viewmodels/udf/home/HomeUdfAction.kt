@@ -6,6 +6,7 @@ sealed class HomeUdfAction: UdfAction {
     object NavigateToPriceTargetEntry: HomeUdfAction()
     object NavigateToSearch: HomeUdfAction()
     object NavigateToSettings: HomeUdfAction()
-    object ShowSnackBar: HomeUdfAction()
+    object NavigateToPriceTargets: HomeUdfAction()
+    object NavigateToPurchase: HomeUdfAction()
     object ActionNothing: HomeUdfAction()
 }

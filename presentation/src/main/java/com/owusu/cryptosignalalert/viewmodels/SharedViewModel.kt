@@ -8,9 +8,9 @@ import com.owusu.cryptosignalalert.domain.usecase.PopulateCoinIdsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.RefreshSkuDetailsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.SavedPurchasedStateChangesUseCase
 import com.owusu.cryptosignalalert.domain.usecase.StartupBillingUseCase
-import com.owusu.cryptosignalalert.models.AppSnackBar
+import com.owusu.cryptosignalalert.viewmodels.udf.home.AppSnackBar
 import com.owusu.cryptosignalalert.models.CoinUI
-import com.owusu.cryptosignalalert.models.SharedViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.home.SharedViewState
 import com.owusu.cryptosignalalert.resource.AppStringProvider
 import com.owusu.cryptosignalalert.viewmodels.helpers.ToolBarHelper
 import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
@@ -190,6 +190,8 @@ class SharedViewModel(
                     )
                 }
             }
+            is HomeUdfEvent.NavigateToPriceTargets -> sendAction { HomeUdfAction.NavigateToPriceTargets }
+            is HomeUdfEvent.NavigateToPurchase -> sendAction { HomeUdfAction.NavigateToPurchase }
             else -> {
 
             }

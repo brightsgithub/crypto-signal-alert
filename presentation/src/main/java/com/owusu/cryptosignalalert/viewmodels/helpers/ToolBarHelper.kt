@@ -2,10 +2,9 @@ package com.owusu.cryptosignalalert.viewmodels.helpers
 
 import androidx.annotation.StringRes
 import com.owusu.cryptosignalalert.R
-import com.owusu.cryptosignalalert.models.SharedViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.home.SharedViewState
 import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.resource.AppStringProvider
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class ToolBarHelper(private val appStringProvider: AppStringProvider) {

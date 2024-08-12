@@ -5,7 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import com.owusu.cryptosignalalert.views.screens.CoinSearchScreen
 import com.owusu.cryptosignalalert.views.screens.SettingsScreen
 
 fun NavGraphBuilder.settingsNavGraph(

@@ -11,15 +11,11 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -28,7 +24,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.owusu.cryptosignalalert.models.SharedViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.home.SharedViewState
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.*
@@ -40,8 +36,6 @@ import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfAction
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
-import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingsUdfAction
-import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingsViewUiState
 import com.owusu.cryptosignalalert.views.activities.MainActivity
 import com.owusu.cryptosignalalert.views.theme.*
 import org.koin.androidx.compose.getViewModel
@@ -109,6 +103,20 @@ fun HomeScreen(
                 is HomeUdfAction.NavigateToPriceTargetEntry -> {
                     // i guess we can also nav to out coin entry which is not a bottom nav?
                     navController.navigate(route = Graphs.TARGETS_ENTRY_GRAPH)
+                }
+                is HomeUdfAction.NavigateToPriceTargets -> {
+                    navController.navigate(route = NavigationItem.PriceTargets.route) {
+
+                        // remove the PriceTargetEntryScreen when moving to the next destination
+                        // https://stackoverflow.com/questions/66845899/compose-navigation-remove-previous-composable-from-stack-before-navigating
+                        popUpTo(route = Graphs.TARGETS_ENTRY_GRAPH) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+                is HomeUdfAction.NavigateToPurchase -> {
+                    navController.navigate(route = NavigationItem.Purchase.route)
                 }
                 else -> { }
             }

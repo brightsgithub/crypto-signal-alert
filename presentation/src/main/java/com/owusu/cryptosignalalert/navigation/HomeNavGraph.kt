@@ -1,10 +1,7 @@
 package com.owusu.cryptosignalalert.navigation
 
-import android.app.Activity
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -12,10 +9,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
-import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfAction
 import com.owusu.cryptosignalalert.views.screens.*
 import org.koin.androidx.compose.getViewModel
 
@@ -46,8 +41,6 @@ fun HomeNavGraph(
         composable(NavigationItem.Purchase.route) {
             PurchaseScreen()
         }
-
-
 
         // nested graph
         targetsEntryGraph(navHostController, sharedViewModel)

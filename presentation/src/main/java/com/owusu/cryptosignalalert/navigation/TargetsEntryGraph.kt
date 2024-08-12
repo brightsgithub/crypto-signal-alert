@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.navigation
 
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -17,20 +16,7 @@ fun NavGraphBuilder.targetsEntryGraph(
         startDestination = TargetEntryScreens.PriceTargetEntry.route,
         builder = {
             composable(route = TargetEntryScreens.PriceTargetEntry.route) {
-                PriceTargetEntryScreen(sharedViewModel = sharedViewModel, navigateToTargetsList = {
-                    navHostController.navigate(route = NavigationItem.PriceTargets.route) {
-
-                        // remove the PriceTargetEntryScreen when moving to the next destination
-                        // https://stackoverflow.com/questions/66845899/compose-navigation-remove-previous-composable-from-stack-before-navigating
-                        popUpTo(route = Graphs.TARGETS_ENTRY_GRAPH) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                },
-                    navigateToPurchaseScreen = {
-                    navHostController.navigate(route = NavigationItem.Purchase.route)
-                })
+                PriceTargetEntryScreen(sharedViewModel = sharedViewModel)
             }
         }
     )

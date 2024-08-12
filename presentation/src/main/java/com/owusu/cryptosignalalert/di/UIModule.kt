@@ -15,6 +15,7 @@ import com.owusu.cryptosignalalert.util.PriceDisplayUtils
 import com.owusu.cryptosignalalert.util.PriceUtils
 import com.owusu.cryptosignalalert.viewmodels.*
 import com.owusu.cryptosignalalert.viewmodels.helpers.ToolBarHelper
+import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.workmanager.Constants
 import com.owusu.cryptosignalalert.workmanager.PriceNotificationHelper
 import com.owusu.cryptosignalalert.workmanager.WorkManagerStarter

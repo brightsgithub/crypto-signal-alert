@@ -12,6 +12,8 @@ import com.owusu.cryptosignalalert.util.PriceDisplayUtils
 import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
 import com.owusu.cryptosignalalert.viewmodels.udf.coinslist.CoinsListUdfAction
 import com.owusu.cryptosignalalert.viewmodels.udf.coinslist.CoinsListUdfEvent
+import com.owusu.cryptosignalalert.viewmodels.udf.coinslist.CoinsListUiState
+import com.owusu.cryptosignalalert.viewmodels.udf.coinslist.CoinsListUiStateMessage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -73,7 +75,8 @@ class CoinsListViewModel(
                             shouldShowMessage = true,
                             message = "Rate API limit reached. Try later.",
                             ctaText = "Dismiss"
-                        ))
+                        )
+                        )
                         newUiState
                     }
                 }

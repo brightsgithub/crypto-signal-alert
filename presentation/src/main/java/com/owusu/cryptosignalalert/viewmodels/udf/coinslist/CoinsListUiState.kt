@@ -1,4 +1,4 @@
-package com.owusu.cryptosignalalert.models
+package com.owusu.cryptosignalalert.viewmodels.udf.coinslist
 
 import com.owusu.cryptosignalalert.viewmodels.udf.UdfUiState
 

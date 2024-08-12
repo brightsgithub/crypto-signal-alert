@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfAction
 import com.owusu.cryptosignalalert.views.screens.*
 import org.koin.androidx.compose.getViewModel
 
@@ -45,12 +46,70 @@ fun HomeNavGraph(
         // nested graph
         targetsEntryGraph(navHostController, sharedViewModel)
         coinSearchNavGraph(navHostController, sharedViewModel)
-        settingsNavGraph(navHostController, sharedViewModel, onNavigateToWebView = { url ->
-            sharedViewModel.webViewUrl = url
-            navHostController.navigate(route = Graphs.WEB_VIEW_NAV_GRAPH)
-        })
+        settingsNavGraph(navHostController, sharedViewModel)
         webViewNavGraph(navHostController, sharedViewModel)
     }
+
+
+    // Not collecting as state, since I always want to listen in to the the flow, not just
+    // state changes, as the user could click the same action multiple times
+    LaunchedEffect(Unit) {
+        sharedViewModel.action.collect{ action ->
+            when (action) {
+                is HomeUdfAction.NavigateToSearch -> {
+                    navHostController.navigate(route = CoinSearchScreens.CoinSearch.route) {
+                        // Navigate to the "search” destination only if we’re not already on
+                        // the "search" destination, avoiding multiple copies on the top of the
+                        // back stack
+                        // YOU MUST USE ROUTE NOT GRAPH!
+                        launchSingleTop = true
+                    }
+                }
+                is HomeUdfAction.NavigateToSettings -> {
+                    navHostController.navigate(route = SettingsScreens.Settings.route) {
+                        // Navigate to the "settings” destination only if we’re not already on
+                        // the "settings" destination, avoiding multiple copies on the top of the
+                        // back stack
+                        // YOU MUST USE ROUTE NOT GRAPH!
+                        launchSingleTop = true
+                    }
+                }
+                is HomeUdfAction.NavigateToPriceTargetEntry -> {
+                    // i guess we can also nav to out coin entry which is not a bottom nav?
+                    navHostController.navigate(route = Graphs.TARGETS_ENTRY_GRAPH)
+                }
+                is HomeUdfAction.NavigateToPriceTargets -> {
+                    navHostController.navigate(route = NavigationItem.PriceTargets.route) {
+
+                        // remove the PriceTargetEntryScreen when moving to the next destination
+                        // https://stackoverflow.com/questions/66845899/compose-navigation-remove-previous-composable-from-stack-before-navigating
+                        popUpTo(route = Graphs.TARGETS_ENTRY_GRAPH) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+                is HomeUdfAction.NavigateToPurchase -> {
+                    navHostController.navigate(route = NavigationItem.Purchase.route)
+                }
+                is HomeUdfAction.NavigateToPriceTargetEntryFromSearch -> {
+                    navHostController.navigate(route = TargetEntryScreens.PriceTargetEntry.route) {
+                        // remove the SearchScreen when moving to the next destination
+                        // https://stackoverflow.com/questions/66845899/compose-navigation-remove-previous-composable-from-stack-before-navigating
+                        popUpTo(route = Graphs.SEARCH_NAV_GRAPH) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+                is HomeUdfAction.NavigateToWebView -> {
+                    navHostController.navigate(route = Graphs.WEB_VIEW_NAV_GRAPH)
+                }
+                else -> { }
+            }
+        }
+    }
+
 }
 
 @Composable

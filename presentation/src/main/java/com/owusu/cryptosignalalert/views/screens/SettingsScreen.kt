@@ -29,17 +29,19 @@ import com.owusu.cryptosignalalert.settings.ContactDeveloperHelper
 import com.owusu.cryptosignalalert.settings.SettingsHelper
 import org.koin.androidx.compose.get
 import com.owusu.cryptosignalalert.R
+import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.viewmodels.udf.settings.*
 import com.owusu.cryptosignalalert.views.theme.primaryColor
 import kotlinx.coroutines.flow.collect
 
 @Composable
-fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
+fun SettingsScreen(sharedViewModel: SharedViewModel) {
     val settingsHelper = get<SettingsHelper>()
     val contactDeveloperHelper = get<ContactDeveloperHelper>()
     val context = LocalContext.current
     val settingsViewModel = getViewModel<SettingsViewModel>()
-
+    val handleSharedEvent = sharedViewModel::handleEvent
     // Handle the action
     LaunchedEffect(Unit) {
 
@@ -54,7 +56,8 @@ fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
                 }
                 is SettingsUdfAction.ActionNavigateToWebView -> {
                     // Handle navigation to a web view
-                    onNavigateToWebView(action.url)
+                    //onNavigateToWebView(action.url)
+                    handleSharedEvent(HomeUdfEvent.NavigateToWebView(action.url))
                 }
                 is SettingsUdfAction.ActionOpenGooglePlayStore -> {
                     // Handle opening the Google Play Store

@@ -77,63 +77,6 @@ fun HomeScreen(
         sharedViewModel.showInterstitialAdAttempted()
     }
 
-    // Not collecting as state, since I always want to listen in to the the flow, not just
-    // state changes, as the user could click the same action multiple times
-    LaunchedEffect(Unit) {
-        sharedViewModel.action.collect{ action ->
-            when (action) {
-                is HomeUdfAction.NavigateToSearch -> {
-                    navController.navigate(route = CoinSearchScreens.CoinSearch.route) {
-                        // Navigate to the "search” destination only if we’re not already on
-                        // the "search" destination, avoiding multiple copies on the top of the
-                        // back stack
-                        // YOU MUST USE ROUTE NOT GRAPH!
-                        launchSingleTop = true
-                    }
-                }
-                is HomeUdfAction.NavigateToSettings -> {
-                    navController.navigate(route = SettingsScreens.Settings.route) {
-                        // Navigate to the "settings” destination only if we’re not already on
-                        // the "settings" destination, avoiding multiple copies on the top of the
-                        // back stack
-                        // YOU MUST USE ROUTE NOT GRAPH!
-                        launchSingleTop = true
-                    }
-                }
-                is HomeUdfAction.NavigateToPriceTargetEntry -> {
-                    // i guess we can also nav to out coin entry which is not a bottom nav?
-                    navController.navigate(route = Graphs.TARGETS_ENTRY_GRAPH)
-                }
-                is HomeUdfAction.NavigateToPriceTargets -> {
-                    navController.navigate(route = NavigationItem.PriceTargets.route) {
-
-                        // remove the PriceTargetEntryScreen when moving to the next destination
-                        // https://stackoverflow.com/questions/66845899/compose-navigation-remove-previous-composable-from-stack-before-navigating
-                        popUpTo(route = Graphs.TARGETS_ENTRY_GRAPH) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
-                is HomeUdfAction.NavigateToPurchase -> {
-                    navController.navigate(route = NavigationItem.Purchase.route)
-                }
-                is HomeUdfAction.NavigateToPriceTargetEntryFromSearch -> {
-                    navController.navigate(route = TargetEntryScreens.PriceTargetEntry.route) {
-                        // remove the SearchScreen when moving to the next destination
-                        // https://stackoverflow.com/questions/66845899/compose-navigation-remove-previous-composable-from-stack-before-navigating
-                        popUpTo(route = Graphs.SEARCH_NAV_GRAPH) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
-                }
-                else -> { }
-            }
-        }
-    }
-
-
     // Show any snack bar message
     ShowSnackBarMessage(sharedViewState, snackbarHostState, onHideSnackBar)
 

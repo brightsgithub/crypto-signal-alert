@@ -9,15 +9,14 @@ import com.owusu.cryptosignalalert.views.screens.SettingsScreen
 
 fun NavGraphBuilder.settingsNavGraph(
     navHostController: NavHostController,
-    sharedViewModel: SharedViewModel,
-    onNavigateToWebView:(url: String) -> Unit
+    sharedViewModel: SharedViewModel
 ) {
     navigation(
         route = Graphs.SETTINGS_NAV_GRAPH,
         startDestination = SettingsScreens.Settings.route,
         builder = {
             composable(route = SettingsScreens.Settings.route) {
-                SettingsScreen(onNavigateToWebView = onNavigateToWebView)
+                SettingsScreen(sharedViewModel = sharedViewModel)
             }
         }
     )

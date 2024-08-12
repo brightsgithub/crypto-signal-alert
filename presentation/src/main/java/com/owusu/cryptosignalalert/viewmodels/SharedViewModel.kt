@@ -196,6 +196,10 @@ class SharedViewModel(
                 selectedCoinUI = event.selectedCoinUI
                 sendAction { HomeUdfAction.NavigateToPriceTargetEntryFromSearch }
             }
+            is HomeUdfEvent.NavigateToWebView -> {
+                webViewUrl = event.webViewUrl
+                sendAction { HomeUdfAction.NavigateToWebView(webViewUrl) }
+            }
             else -> {
 
             }

@@ -10,4 +10,5 @@ sealed class HomeUdfAction: UdfAction {
     object NavigateToPriceTargets: HomeUdfAction()
     object NavigateToPurchase: HomeUdfAction()
     object ActionNothing: HomeUdfAction()
+    data class NavigateToWebView(val webViewUrl: String): HomeUdfAction()
 }

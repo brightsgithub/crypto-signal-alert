@@ -8,12 +8,13 @@ import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
 import com.owusu.cryptosignalalert.mappers.CoinIdToUIMapper
 import com.owusu.cryptosignalalert.models.*
 import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchState
+import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchStateMessage
 import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchUdfAction
 import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchUdfEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CoinSearchViewModel(
@@ -102,7 +103,8 @@ class CoinSearchViewModel(
 
     private fun hideSnackBar() {
          val newUiState = uiState.value.copy(
-             coinSearchStateMessage = CoinSearchStateMessage(shouldShowMessage = false))
+             coinSearchStateMessage = CoinSearchStateMessage(shouldShowMessage = false)
+         )
         setUiState { newUiState }
     }
 

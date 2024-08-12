@@ -1,5 +1,7 @@
-package com.owusu.cryptosignalalert.models
+package com.owusu.cryptosignalalert.viewmodels.udf.coinserach
 
+import com.owusu.cryptosignalalert.models.CoinIdUI
+import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.viewmodels.udf.UdfUiState
 
 data class CoinSearchState(val searchStr: String = "",

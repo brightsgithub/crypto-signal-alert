@@ -11,13 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.owusu.cryptosignalalert.models.*
 import com.owusu.cryptosignalalert.viewmodels.CoinSearchViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchState
 import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchUdfAction
 import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchUdfEvent
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent

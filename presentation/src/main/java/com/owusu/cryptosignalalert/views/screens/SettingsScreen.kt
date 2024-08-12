@@ -31,6 +31,7 @@ import org.koin.androidx.compose.get
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.viewmodels.udf.settings.*
 import com.owusu.cryptosignalalert.views.theme.primaryColor
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
@@ -39,34 +40,33 @@ fun SettingsScreen(onNavigateToWebView:(url: String) -> Unit) {
     val context = LocalContext.current
     val settingsViewModel = getViewModel<SettingsViewModel>()
 
-    LaunchedEffect(settingsViewModel) {
-        settingsViewModel.loadSettings()
-    }
-
-    // Collect the actions emitted by the ViewModel
-    val action by settingsViewModel.action.collectAsState(initial = SettingsUdfAction.ActionNothing)
-
     // Handle the action
-    LaunchedEffect(action) {
-        when (action) {
-            is SettingsUdfAction.ActionContactDeveloper -> {
-                // Call your contact developer logic
-                contactDeveloperHelper.provideFeedback(context as Activity)
-            }
-            is SettingsUdfAction.ActionNavigateToWebView -> {
-                // Handle navigation to a web view
-                onNavigateToWebView((action as SettingsUdfAction.ActionNavigateToWebView).url)
-            }
-            is SettingsUdfAction.ActionOpenGooglePlayStore -> {
-                // Handle opening the Google Play Store
-                settingsHelper.openAppOnGooglePlayStore(context)
-            }
-            is SettingsUdfAction.ActionShareApp -> {
-                // Handle app sharing
-                settingsHelper.shareApp(context)
-            }
-            else -> {
-                // Handle other or no actions
+    LaunchedEffect(Unit) {
+
+        settingsViewModel.loadSettings()
+        // Not collecting as state, since I always want to listen in to the the flow, not just
+        // state changes, as the user could click the same action multiple times
+        settingsViewModel.action.collect { action ->
+            when (action) {
+                is SettingsUdfAction.ActionContactDeveloper -> {
+                    // Call your contact developer logic
+                    contactDeveloperHelper.provideFeedback(context as Activity)
+                }
+                is SettingsUdfAction.ActionNavigateToWebView -> {
+                    // Handle navigation to a web view
+                    onNavigateToWebView(action.url)
+                }
+                is SettingsUdfAction.ActionOpenGooglePlayStore -> {
+                    // Handle opening the Google Play Store
+                    settingsHelper.openAppOnGooglePlayStore(context)
+                }
+                is SettingsUdfAction.ActionShareApp -> {
+                    // Handle app sharing
+                    settingsHelper.shareApp(context)
+                }
+                else -> {
+                    // Handle other or no actions
+                }
             }
         }
     }

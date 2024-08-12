@@ -39,6 +39,7 @@ import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.models.CoinsListUiState
 import com.owusu.cryptosignalalert.viewmodels.CoinsListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.coinslist.CoinsListUdfEvent
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.views.theme.percentage_gain_green
 import com.owusu.cryptosignalalert.views.theme.red
@@ -47,23 +48,20 @@ import org.koin.androidx.compose.getViewModel
 // https://developer.android.com/codelabs/jetpack-compose-state?continue=https%3A%2F%2Fdeveloper.android.com%2Fcourses%2Fpathways%2Fjetpack-compose-for-android-developers-1%23codelab-https%3A%2F%2Fdeveloper.android.com%2Fcodelabs%2Fjetpack-compose-state#9
 @Composable
 fun CoinsListScreen(
-    sharedViewModel: SharedViewModel,
-//    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
-//    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+    sharedViewModel: SharedViewModel
 ) {
     ShowCoinsList(sharedViewModel)
 }
 
 @Composable
 private fun ShowCoinsList(
-    sharedViewModel: SharedViewModel,
-//    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit,
-//    onShowSnackBar: (msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback: () -> Unit) -> Unit
+    sharedViewModel: SharedViewModel
 ) {
     val viewModel = getViewModel<CoinsListViewModel>()
     val lazyPagingItems = viewModel.coinsListFlow.collectAsLazyPagingItems()
-    val coinsListState = viewModel.viewState.collectAsState(initial = CoinsListUiState())
-    val handleEvent = sharedViewModel::handleEvent
+    val coinsListState = viewModel.uiState.collectAsState(initial = CoinsListUiState())
+    val handleSharedEvent = sharedViewModel::handleEvent
+    val handleCoinsListEvent = viewModel::handleEvent
 
     // Remember our own LazyListState
     val listState = lazyPagingItems.rememberLazyListStateWorkAround()
@@ -80,10 +78,9 @@ private fun ShowCoinsList(
         state = isRefreshing,
         onRefresh = { lazyPagingItems.refresh() },
     ) {
-
         if (coinsListState.value.coinsListUiStateMessage.shouldShowMessage) {
 
-            handleEvent(
+            handleSharedEvent(
                 HomeUdfEvent.ShowSnackBar(
                     msg = coinsListState.value.coinsListUiStateMessage.message,
                     actionLabel = coinsListState.value.coinsListUiStateMessage.ctaText,
@@ -92,7 +89,7 @@ private fun ShowCoinsList(
                 )
             )
 
-            viewModel.hideSnackBar()
+            handleCoinsListEvent(CoinsListUdfEvent.HideSnackBar)
 
         } else {
             LazyColumn(
@@ -104,7 +101,7 @@ private fun ShowCoinsList(
                     if(!coin!!.id.equals("Rate_Limit_Reached")) {
                         CoinItem(
                             coin!!,
-                            handleEvent
+                            handleSharedEvent
                         )
                     }
                 }
@@ -138,10 +135,8 @@ private fun ShowCoinsList(
 @Composable
 private fun CoinItem(
     coin: CoinUI,
-    handleEvent: (event: HomeUdfEvent) -> Unit
+    handleSharedEvent: (event: HomeUdfEvent) -> Unit
 ) {
-
-    val context = LocalContext.current
     val expanded = rememberSaveable { mutableStateOf(false) }
 
     val extraPadding = if (expanded.value) 48.dp else 0.dp
@@ -153,7 +148,7 @@ private fun CoinItem(
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp)
             .clickable {
-                handleEvent(HomeUdfEvent.OnCoinRowClicked(coin!!))
+                handleSharedEvent(HomeUdfEvent.OnCoinRowClicked(coin!!))
             }
     ) {
 
@@ -208,7 +203,7 @@ private fun CoinItem(
                         top.linkTo(coinName.top)
                     }
                     .clickable {
-                        handleEvent(HomeUdfEvent.OnCoinRowClicked(coin!!))
+                        handleSharedEvent(HomeUdfEvent.OnCoinRowClicked(coin!!))
                     }
             )
 

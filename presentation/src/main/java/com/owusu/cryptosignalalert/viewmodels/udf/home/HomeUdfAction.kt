@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.viewmodels.udf.home
 
-import com.owusu.cryptosignalalert.models.CoinUI
 import com.owusu.cryptosignalalert.viewmodels.udf.UdfAction
 
 sealed class HomeUdfAction: UdfAction {
@@ -9,5 +8,4 @@ sealed class HomeUdfAction: UdfAction {
     object NavigateToSettings: HomeUdfAction()
     object ShowSnackBar: HomeUdfAction()
     object ActionNothing: HomeUdfAction()
-
 }

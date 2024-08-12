@@ -40,11 +40,14 @@ import com.owusu.cryptosignalalert.navigation.*
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfAction
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingsUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.settings.SettingsViewUiState
 import com.owusu.cryptosignalalert.views.activities.MainActivity
 import com.owusu.cryptosignalalert.views.theme.*
 import org.koin.androidx.compose.getViewModel
 
 const val TAG = "HomeScreen"
+
 // Since bottom bar uses its own NavHost, we have to pass it a new NavHostController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,9 +59,10 @@ fun HomeScreen(
     val interstitialAd = remember { mutableStateOf<InterstitialAd?>(null) }
 
     val sharedViewModel = getViewModel<SharedViewModel>()
-    val destinationChangeListener = rememberDestinationChangeListener(navController, sharedViewModel)
+    val destinationChangeListener =
+        rememberDestinationChangeListener(navController, sharedViewModel)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val action by sharedViewModel.action.collectAsState(initial = HomeUdfAction.ActionNothing)
+    val sharedViewState = sharedViewModel.uiState.collectAsState(initial = SharedViewState())
 
     DisposableEffect(Unit) {
         lifecycle.addObserver(destinationChangeListener)
@@ -70,40 +74,8 @@ fun HomeScreen(
         }
     }
 
-    val sharedViewState = sharedViewModel.uiState.collectAsState(initial = SharedViewState())
-
-    //val scaffoldState = rememberScaffoldState()
     val snackbarHostState = remember { SnackbarHostState() }
-    //val snackbarHostState = scaffoldState.snackbarHostState
-
-//    // https://developer.android.com/jetpack/compose/navigation
-//    val onSearchBarClick = {
-//        navController.navigate(route = CoinSearchScreens.CoinSearch.route) {
-//            // Navigate to the "search” destination only if we’re not already on
-//            // the "search" destination, avoiding multiple copies on the top of the
-//            // back stack
-//            // YOU MUST USE ROUTE NOT GRAPH!
-//            launchSingleTop = true
-//        }
-//    }
-
-//    val onSettingsClicked = {
-//        navController.navigate(route = SettingsScreens.Settings.route) {
-//            // Navigate to the "settings” destination only if we’re not already on
-//            // the "settings" destination, avoiding multiple copies on the top of the
-//            // back stack
-//            // YOU MUST USE ROUTE NOT GRAPH!
-//            launchSingleTop = true
-//        }
-//    }
-
-
-//    val onShowSnackBar = {
-//            msg: String, actionLabel: String, shouldShowIndefinite: Boolean, actionCallback:() -> Unit ->
-//        sharedViewModel.showSnackBar(msg, actionLabel, actionCallback, shouldShowIndefinite)
-//    }
-
-    val onHideSnackBar = {  ->
+    val onHideSnackBar = { ->
         sharedViewModel.hideSnackBar()
     }
 
@@ -111,57 +83,34 @@ fun HomeScreen(
         sharedViewModel.showInterstitialAdAttempted()
     }
 
-
-    // Handle the action
-    LaunchedEffect(action) {
-        when (action) {
-            is HomeUdfAction.NavigateToSearch -> {
-                println("Testing_udf_HomeUdfAction_HomeNavGraph action $action")
-                navController.navigate(route = CoinSearchScreens.CoinSearch.route) {
-                    // Navigate to the "search” destination only if we’re not already on
-                    // the "search" destination, avoiding multiple copies on the top of the
-                    // back stack
-                    // YOU MUST USE ROUTE NOT GRAPH!
-                    launchSingleTop = true
+    // Not collecting as state, since I always want to listen in to the the flow, not just
+    // state changes, as the user could click the same action multiple times
+    LaunchedEffect(Unit) {
+        sharedViewModel.action.collect{ action ->
+            when (action) {
+                is HomeUdfAction.NavigateToSearch -> {
+                    navController.navigate(route = CoinSearchScreens.CoinSearch.route) {
+                        // Navigate to the "search” destination only if we’re not already on
+                        // the "search" destination, avoiding multiple copies on the top of the
+                        // back stack
+                        // YOU MUST USE ROUTE NOT GRAPH!
+                        launchSingleTop = true
+                    }
                 }
-            }
-            is HomeUdfAction.NavigateToSettings -> {
-                println("Testing_udf_HomeUdfAction_HomeScreen action $action")
-                navController.navigate(route = SettingsScreens.Settings.route) {
-                    // Navigate to the "settings” destination only if we’re not already on
-                    // the "settings" destination, avoiding multiple copies on the top of the
-                    // back stack
-                    // YOU MUST USE ROUTE NOT GRAPH!
-                    launchSingleTop = true
+                is HomeUdfAction.NavigateToSettings -> {
+                    navController.navigate(route = SettingsScreens.Settings.route) {
+                        // Navigate to the "settings” destination only if we’re not already on
+                        // the "settings" destination, avoiding multiple copies on the top of the
+                        // back stack
+                        // YOU MUST USE ROUTE NOT GRAPH!
+                        launchSingleTop = true
+                    }
                 }
-            }
-            is HomeUdfAction.NavigateToPriceTargetEntry -> {
-                println("Testing_udf_HomeUdfAction_HomeScreen action $action")
-                // i guess we can also nav to out coin entry which is not a bottom nav?
-                navController.navigate(route = Graphs.TARGETS_ENTRY_GRAPH)
-            }
-            is HomeUdfAction.NavigateToSearch -> {
-                println("Testing_udf_HomeUdfAction_HomeScreen action $action")
-                navController.navigate(route = CoinSearchScreens.CoinSearch.route) {
-                    // Navigate to the "search” destination only if we’re not already on
-                    // the "search" destination, avoiding multiple copies on the top of the
-                    // back stack
-                    // YOU MUST USE ROUTE NOT GRAPH!
-                    launchSingleTop = true
+                is HomeUdfAction.NavigateToPriceTargetEntry -> {
+                    // i guess we can also nav to out coin entry which is not a bottom nav?
+                    navController.navigate(route = Graphs.TARGETS_ENTRY_GRAPH)
                 }
-            }
-            is HomeUdfAction.NavigateToSettings -> {
-                println("Testing_udf_HomeUdfAction_HomeScreen action $action")
-                navController.navigate(route = SettingsScreens.Settings.route) {
-                    // Navigate to the "settings” destination only if we’re not already on
-                    // the "settings" destination, avoiding multiple copies on the top of the
-                    // back stack
-                    // YOU MUST USE ROUTE NOT GRAPH!
-                    launchSingleTop = true
-                }
-            }
-            else -> {
-                println("Testing_udf_HomeUdfAction_HomeScreen action $action")
+                else -> { }
             }
         }
     }
@@ -174,9 +123,11 @@ fun HomeScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-        topBar = { TopBar(
-            sharedViewModel,
-        ) },
+        topBar = {
+            TopBar(
+                sharedViewModel,
+            )
+        },
         bottomBar = { BottomNavigationBar(navController, preselectedScreen) },
         content = { padding -> // We have to pass the scaffold inner padding to our content. That's why we use Box.
             Box(modifier = Modifier.padding(padding)) {
@@ -348,9 +299,14 @@ fun TopBar(sharedViewModel: SharedViewModel) {
 
     if (sharedViewState.value.actionButtonState.shouldShowToolTar) {
         TopAppBar(
-            title = { Text(text = sharedViewState.value.actionButtonState.title, fontSize = 18.sp) },
+            title = {
+                Text(
+                    text = sharedViewState.value.actionButtonState.title,
+                    fontSize = 18.sp
+                )
+            },
             //backgroundColor = colorResource(id = R.color.colorPrimary),
-           // contentColor = Color.White,
+            // contentColor = Color.White,
             navigationIcon = {
                 if (sharedViewState.value.actionButtonState.shouldShowUpButtonIcon) {
                     IconButton(
@@ -389,8 +345,12 @@ fun TopBar(sharedViewModel: SharedViewModel) {
         )
     }
 }
+
 @Composable
-fun BottomNavigationBar(navController: NavHostController, preselectedScreen: MutableState<String?>) {
+fun BottomNavigationBar(
+    navController: NavHostController,
+    preselectedScreen: MutableState<String?>
+) {
     val items = listOf(
         NavigationItem.Home,
         NavigationItem.PriceTargets,
@@ -418,7 +378,12 @@ fun BottomNavigationBar(navController: NavHostController, preselectedScreen: Mut
                     indicatorColor = primaryColor,
                     selectedIconColor = white
                 ),
-                icon = { Icon(painterResource(id = screen.icon), contentDescription = screen.title) },
+                icon = {
+                    Icon(
+                        painterResource(id = screen.icon),
+                        contentDescription = screen.title
+                    )
+                },
                 label = { Text(text = screen.title) },
                 alwaysShowLabel = true,
                 selected = selectedScreen == screen.route, //currentDestination?.hierarchy?.any { it.route == screen.route } == true,
@@ -460,7 +425,10 @@ fun BottomNavigationBar(navController: NavHostController, preselectedScreen: Mut
 }
 
 @Composable
-fun rememberDestinationChangeListener(navController: NavController, sharedViewModel: SharedViewModel): DestinationChangeListener {
+fun rememberDestinationChangeListener(
+    navController: NavController,
+    sharedViewModel: SharedViewModel
+): DestinationChangeListener {
     val destinationChangeListener = remember {
         DestinationChangeListener(sharedViewModel)
     }

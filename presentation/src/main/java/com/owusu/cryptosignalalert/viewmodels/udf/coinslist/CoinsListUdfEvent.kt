@@ -1,5 +1,7 @@
 package com.owusu.cryptosignalalert.viewmodels.udf.coinslist
 
-sealed class CoinsListUdfEvent {
-    object OnRowClicked: CoinsListUdfEvent()
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfEvent
+
+sealed class CoinsListUdfEvent: UdfEvent {
+    object HideSnackBar: CoinsListUdfEvent()
 }

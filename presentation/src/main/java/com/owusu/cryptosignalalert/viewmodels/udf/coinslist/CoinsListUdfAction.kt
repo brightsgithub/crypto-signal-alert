@@ -1,4 +1,5 @@
 package com.owusu.cryptosignalalert.viewmodels.udf.coinslist
 
-class CoinsListUdfAction {
-}
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfAction
+
+sealed class CoinsListUdfAction: UdfAction

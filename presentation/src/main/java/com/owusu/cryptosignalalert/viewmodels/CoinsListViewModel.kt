@@ -1,6 +1,5 @@
 package com.owusu.cryptosignalalert.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.owusu.cryptosignalalert.data.datasource.coingecko.paging.CoinsSource
@@ -10,6 +9,9 @@ import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsThatHaveNotBeen
 import com.owusu.cryptosignalalert.mappers.CoinDomainToUIMapper
 import com.owusu.cryptosignalalert.models.*
 import com.owusu.cryptosignalalert.util.PriceDisplayUtils
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.coinslist.CoinsListUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.coinslist.CoinsListUdfEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -21,10 +23,7 @@ class CoinsListViewModel(
     private val priceDisplayUtils: PriceDisplayUtils,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher
-): ViewModel() {
-
-    private val _state = MutableStateFlow(CoinsListUiState()) // for emitting
-    val viewState: Flow<CoinsListUiState> = _state // for clients to listen to
+): UdfViewModel<CoinsListUdfEvent, CoinsListUiState, CoinsListUdfAction>(initialUiState = CoinsListUiState()) {
 
     private var currentPage = -1
     private val entireLoadedCoinMap = mutableListOf<CoinUI>()
@@ -68,15 +67,16 @@ class CoinsListViewModel(
             coinsSource!!
         }.flow.map { pagingData ->
             pagingData.map { coinDomain ->
-
                 if (coinDomain.id.equals("Rate_Limit_Reached")) {
-                    _state.value = _state.value.copy(coinsListUiStateMessage = CoinsListUiStateMessage(
-                        shouldShowMessage = true,
-                        message = "Rate API limit reached. Try later.",
-                        ctaText = "Dismiss"
-                    ))
+                    setUiState {
+                        val newUiState = uiState.value.copy(coinsListUiStateMessage = CoinsListUiStateMessage(
+                            shouldShowMessage = true,
+                            message = "Rate API limit reached. Try later.",
+                            ctaText = "Dismiss"
+                        ))
+                        newUiState
+                    }
                 }
-
 
                 val pageNum = coinsSource!!.getCurrentPageNumber()
 
@@ -93,7 +93,16 @@ class CoinsListViewModel(
         }.cachedIn(viewModelScope) // cache data even for config change screen rotation.
     }
 
-    fun hideSnackBar() {
-        _state.value = _state.value.copy(coinsListUiStateMessage = CoinsListUiStateMessage(shouldShowMessage = false))
+    private fun hideSnackBar() {
+        val newUiState = uiState.value.copy(coinsListUiStateMessage = CoinsListUiStateMessage(shouldShowMessage = false))
+        setUiState { newUiState }
+    }
+
+    override fun handleEvent(event: CoinsListUdfEvent) {
+        when(event) {
+            CoinsListUdfEvent.HideSnackBar -> {
+                hideSnackBar()
+            }
+        }
     }
 }

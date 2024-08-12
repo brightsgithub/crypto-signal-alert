@@ -1,7 +1,6 @@
 package com.owusu.cryptosignalalert.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.domain.models.SkuDetailsDomain
@@ -10,12 +9,11 @@ import com.owusu.cryptosignalalert.domain.usecase.BuySkyUseCase
 import com.owusu.cryptosignalalert.domain.usecase.GetSkuDetailsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.RefreshSkuDetailsUseCase
 import com.owusu.cryptosignalalert.mappers.SkuDetailsDomainToUIMapper
-import com.owusu.cryptosignalalert.models.PurchaseViewState
-import com.owusu.cryptosignalalert.models.SkuDetailsUI
+import com.owusu.cryptosignalalert.viewmodels.udf.purchase.PurchaseViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.purchase.PurchaseUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.purchase.PurchaseUdfEvent
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -26,17 +24,11 @@ class PurchaseViewModel(
     private val skuDetailsDomainToUIMapper: SkuDetailsDomainToUIMapper,
     private val dispatcherBackground: CoroutineDispatcher,
     private val dispatcherMain: CoroutineDispatcher
-): ViewModel() {
+): UdfViewModel<PurchaseUdfEvent, PurchaseViewState, PurchaseUdfAction>(initialUiState = PurchaseViewState()) {
 
     init {
         Log.v("PurchaseViewModel", "PurchaseViewModel CREATED!")
     }
-
-    private val _state = MutableStateFlow(PurchaseViewState()) // for emitting
-    val viewState: Flow<PurchaseViewState> = _state // for clients to listen to
-
-    private val _loadingState = MutableStateFlow(true) // for emitting
-    val loadingState: Flow<Boolean> = _loadingState // for clients to listen to
 
     fun loadSkuDetails() {
 
@@ -69,21 +61,35 @@ class PurchaseViewModel(
         withContext(dispatcherMain) {
             hideLoading()
             val skuUIList = skuDetailsDomainToUIMapper.mapToUI(skuList)
-            _state.value = _state.value.copy(skuDetailsList = skuUIList)
+            val newUiState = uiState.value.copy(skuDetailsList = skuUIList)
+            setUiState { newUiState }
         }
     }
 
-    fun buyProduct(screenProxy: ScreenProxy, sku: String) {
+    private fun buyProduct(screenProxy: ScreenProxy, sku: String) {
         viewModelScope.launch {
             buySkyUseCase.invoke(BuySkyUseCase.Params(screenProxy, sku))
         }
     }
 
     private fun showLoading() {
-        _loadingState.value = true
+        val newUiState = uiState.value.copy(isLoading = true)
+        setUiState { newUiState }
     }
 
     private fun hideLoading() {
-        _loadingState.value = false
+        val newUiState = uiState.value.copy(isLoading = false)
+        setUiState { newUiState }
+    }
+
+    override fun handleEvent(event: PurchaseUdfEvent) {
+        when(event) {
+            is PurchaseUdfEvent.OnPurchaseClicked -> {
+                buyProduct(event.screenProxy, event.sku)
+            }
+            is PurchaseUdfEvent.LoadSkuDetails -> {
+                loadSkuDetails()
+            }
+        }
     }
 }

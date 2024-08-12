@@ -5,21 +5,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,41 +27,48 @@ import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.domain.models.ScreenProxy
 import com.owusu.cryptosignalalert.models.PurchaseTypeUI
-import com.owusu.cryptosignalalert.models.PurchaseViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.purchase.PurchaseViewState
 import com.owusu.cryptosignalalert.models.SkuDetailsUI
 import com.owusu.cryptosignalalert.viewmodels.PurchaseViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.purchase.PurchaseUdfEvent
 import com.owusu.cryptosignalalert.views.theme.AppTheme
 import com.owusu.cryptosignalalert.views.theme.white
 import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun PurchaseScreen() {
-    //AppTheme {
 
-        val purchaseViewModel = getViewModel<PurchaseViewModel>()
-        purchaseViewModel.loadSkuDetails()
-        purchaseViewModel.viewState.collectAsState(initial = PurchaseViewState()).value.let {
-           // Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-                ShowPriceList(it.skuDetailsList)
-         //   }
-        }
+    val purchaseViewModel = getViewModel<PurchaseViewModel>()
+    val handleEvent = purchaseViewModel::handleEvent
+    val uiState = purchaseViewModel.uiState.collectAsState(initial = PurchaseViewState())
 
-        LoadingWidget2(boxModifier = Modifier.fillMaxSize())
-    //}
+    LaunchedEffect(Unit) {
+        handleEvent(PurchaseUdfEvent.LoadSkuDetails)
+    }
+
+    ShowPriceList(uiState.value.skuDetailsList, handleEvent)
+    LoadingWidget2(boxModifier = Modifier.fillMaxSize(), uiState)
 }
 
 @Composable
-fun LoadingWidget2(boxModifier: Modifier? = null){
+fun LoadingWidget2(boxModifier: Modifier? = null, uiState: State<PurchaseViewState>) {
     val purchaseViewModel = getViewModel<PurchaseViewModel>()
 
     val modifier = boxModifier ?: Modifier
         .fillMaxWidth()
 
-    val alpha = if (purchaseViewModel.loadingState.collectAsState(initial = false).value) 1.0f else 0.0f
+    //val alpha = if (purchaseViewModel.loadingState.collectAsState(initial = false).value) 1.0f else 0.0f
+    val alpha = if (uiState.value.isLoading) {
+        1.0f
+    } else {
+        0.0f
+    }
 
-    Box(modifier = modifier
-        .padding(16.dp)
-        .alpha(alpha)) {
+    Box(
+        modifier = modifier
+            .padding(16.dp)
+            .alpha(alpha)
+    ) {
         CircularProgressIndicator(
             modifier = Modifier
                 .padding(12.dp)
@@ -73,7 +78,7 @@ fun LoadingWidget2(boxModifier: Modifier? = null){
 }
 
 @Composable
-fun ShowPriceList(skuDetailsList: List<SkuDetailsUI>) {
+fun ShowPriceList(skuDetailsList: List<SkuDetailsUI>, handleEvent: (PurchaseUdfEvent) -> Unit) {
 
     val purchaseViewModel = getViewModel<PurchaseViewModel>()
     val screenProxy = LocalContext.current as ScreenProxy
@@ -81,7 +86,7 @@ fun ShowPriceList(skuDetailsList: List<SkuDetailsUI>) {
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
         items(items = skuDetailsList) { skuDetails ->
             PurchaseItem(skuDetails, onBuyClicked = { sku ->
-                purchaseViewModel.buyProduct(screenProxy, sku.sku)
+                handleEvent(PurchaseUdfEvent.OnPurchaseClicked(screenProxy,sku.sku))
             })
         }
     }
@@ -89,16 +94,18 @@ fun ShowPriceList(skuDetailsList: List<SkuDetailsUI>) {
 
 // https://www.answertopia.com/jetpack-compose/jetpack-compose-constraintlayout-examples/
 @Composable
-fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> Unit) {
+fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked: (sku: SkuDetailsUI) -> Unit) {
     Card(
-       // backgroundColor = colorResource(id = R.color.dark_coin_row),
+        // backgroundColor = colorResource(id = R.color.dark_coin_row),
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp),
-       // elevation = 10.dp
+        // elevation = 10.dp
     ) {
-        ConstraintLayout(modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()) {
+        ConstraintLayout(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+        ) {
             // Create references for the composables to constrain
             val (
                 title,
@@ -181,13 +188,13 @@ fun PurchaseItem(skuDetails: SkuDetailsUI, onBuyClicked:(sku: SkuDetailsUI) -> U
                         end.linkTo(parent.end)
                     }
                     .fillMaxWidth(),
-                    //.background(getProgressColor(skuDetailsUI = skuDetails)),
+                //.background(getProgressColor(skuDetailsUI = skuDetails)),
                 enabled = !skuDetails.isPurchased
 
             ) {
                 if (!skuDetails.isPurchased) {
                     Text(
-                        text = "Buy "+skuDetails.price,
+                        text = "Buy " + skuDetails.price,
                         fontWeight = FontWeight.Bold,
                         color = white
                     )

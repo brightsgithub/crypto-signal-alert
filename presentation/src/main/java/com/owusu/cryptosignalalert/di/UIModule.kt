@@ -65,10 +65,6 @@ val uiModule = module() {
             deletePriceTargetsUseCase = get(),
             isSyncRunningUseCase = get(),
             dispatcherBackground = get(named(IO)),
-            dispatcherMain = get(named(MAIN)),
-            workerTag = Constants.SYNC_PRICES_WORKER_TAG,
-            app = appContext,
-            WorkManager.getInstance(appContext),
             listenToSyncPriceTargetsUpdatesUseCase = get()
         )
     }

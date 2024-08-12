@@ -1,8 +1,6 @@
 package com.owusu.cryptosignalalert.views.screens
 
-import android.app.Activity
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -22,7 +20,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -36,71 +33,31 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.lifecycleScope
-import androidx.work.WorkInfo
 import coil.compose.rememberImagePainter
 import com.owusu.cryptosignalalert.R
 import com.owusu.cryptosignalalert.mappers.PriceTargetDirectionUI
-import com.owusu.cryptosignalalert.models.AlertListViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetlist.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
 import com.owusu.cryptosignalalert.viewmodels.AlertListViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetlist.PriceTargetListUdfEvent
 import com.owusu.cryptosignalalert.views.theme.*
-import com.owusu.cryptosignalalert.workmanager.Constants
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-
-private var workManagerJob: Job? = null
-
-fun observeWorkManagerStatus(activity: ComponentActivity, viewModel: AlertListViewModel) {
-    workManagerJob = activity.lifecycleScope.launch {
-        viewModel.workInfoLiveData.observe(activity) { workInfoList ->
-            Log.v("My_Sync_FragAlertList", "START")
-            if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.RUNNING)) {
-
-                Log.v("My_Sync_FragAlertList", "Sync is Running!")
-                // since we can be blocked for a while while syncing is taking place, lets not
-                // show an empty screen and at least display something in the meantime
-                viewModel.loadAlertList()
-
-            } else if ((workInfoList != null) &&  workInfoList.isNotEmpty() &&(workInfoList.first().state == WorkInfo.State.ENQUEUED)) {
-                // If the sync is NOT running then it is enqueued and will enter here immediatley.
-                // If the sync IS running then this won't get called until the sync is finished, hence why above
-                // we load the list if viewModel.isSyncRunning()
-                val workInfo =workInfoList.first()
-                Log.v("My_Sync_FragAlertList", "state" + workInfo.state.toString())
-                val myOutputData = workInfo.outputData.getString(Constants.KEY_PRICE_TARGET_UPDATED_STATUS)
-                //Log.v("My_Sync_FragAlertList", "myOutputData  = "+ myOutputData)
-                //if (myOutputData == DISPLAY_LATEST_DATA) { // only seems to work with one time req. maybe for chained workers?
-                Log.v("My_Sync_FragAlertList", Constants.DISPLAY_LATEST_DATA)
-                // When a sync has occurred, refresh the screen
-                viewModel.loadAlertList()
-                // }
-            }
-            Log.v("My_Sync_FragAlertList", "END")
-        }
-    }
-}
-
-fun stopObservingWorkManagerStatus() {
-    workManagerJob?.cancel()
-}
 
 @Composable
 fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
     //CryptoSignalAlertTheme {
 
         val viewModel = getViewModel<AlertListViewModel>()
-        val activity = LocalContext.current as Activity
+        val handleHomeEvent = sharedViewModel::handleEvent
+        val handlePriceTargetEvent = viewModel::handleEvent
         val lifecycleOwner = LocalLifecycleOwner.current
 
 
-        viewModel.viewState.collectAsState(initial = AlertListViewState()).value.let {
+        viewModel.uiState.collectAsState(initial = AlertListViewState()).value.let {
             //Surface(color = MaterialTheme.colors.background, modifier = Modifier.fillMaxSize()) {
-            val handleEvent = sharedViewModel::handleEvent
-                ShowPriceTargets(it, handleEvent)
+                ShowPriceTargets(it, handleHomeEvent, handlePriceTargetEvent)
             //}
         }
 
@@ -112,13 +69,7 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
                 Log.v("The_current_life", event.toString())
 
                 if(event == Lifecycle.Event.ON_CREATE) {
-                    viewModel.listenToUpdateSyncState()
-
-                    // only observe when in onCreate() has been called
-                    // observeWorkManagerStatus(activity as ComponentActivity, viewModel) // no longer needed. we listen via flow
-                    // listen in for any changes to the list as we are now using a flow.
-                    // When a sync occurs and this table changes, we will know about it
-                    viewModel.loadAlertList()
+                    handlePriceTargetEvent(PriceTargetListUdfEvent.Initialize)
                 }
             }
 
@@ -127,7 +78,6 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
             // compose is done so the below is called
             onDispose {
                 Log.v("The_current_life", "onDispose() called")
-                stopObservingWorkManagerStatus()
                 lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
@@ -138,7 +88,8 @@ fun PriceTargetsScreen(sharedViewModel: SharedViewModel) {
 @Composable
 private fun ShowPriceTargets(
     state: AlertListViewState,
-    handleEvent: (HomeUdfEvent) -> Unit
+    handleHomeEvent: (HomeUdfEvent) -> Unit,
+    handlePriceTargetEvent: (PriceTargetListUdfEvent) -> Unit
 ) {
 
     val viewModel = getViewModel<AlertListViewModel>()
@@ -157,7 +108,7 @@ private fun ShowPriceTargets(
                 },
                 shape = CircleShape,
                 onClick = {
-                    handleEvent(HomeUdfEvent.OnSearchBarClicked)
+                    handleHomeEvent(HomeUdfEvent.OnSearchBarClicked)
                 },
                containerColor = MaterialTheme.colorScheme.primary,
               //  contentColor = MaterialTheme.colorScheme.onTertiaryContainer
@@ -244,14 +195,14 @@ private fun ShowPriceTargets(
                 items(items = state.priceTargets) { priceTarget ->
                     PriceTargetCard(priceTarget, onDeleteClicked = { userPriceTarget ->
                         if (state.shouldShowSyncState) {
-                            handleEvent(HomeUdfEvent.ShowSnackBar(
+                            handleHomeEvent(HomeUdfEvent.ShowSnackBar(
                                 shouldShowIndefinite = false,
                                 msg = "Waiting for sync to complete",
                                 actionLabel = "Dismiss",
                                 actionCallback = {}
                             ))
                         } else {
-                            viewModel.deletePriceTarget(userPriceTarget)
+                            handlePriceTargetEvent(PriceTargetListUdfEvent.DeletePriceTarget(userPriceTarget))
                         }
                     })
                 }
@@ -534,9 +485,11 @@ fun CircularProgressClock(
 @Preview
 @Composable
 fun CircularProgressClockPreview() {
-    CircularProgressClock(AlertListViewState(
+    CircularProgressClock(
+        AlertListViewState(
         remainingSyncPercentageToBeUpdated = 0.80f,
-        shouldShowSyncState = true))
+        shouldShowSyncState = true)
+    )
 }
 
 @Composable
@@ -602,7 +555,7 @@ fun ShowListPriceTargetCardWithSyncPreview() {
         totalNumberOfTargets = 20,
         shouldShowSyncState = true
     )
-    ShowPriceTargets(state = state, handleEvent = { })
+    ShowPriceTargets(state = state, handleHomeEvent = { }, handlePriceTargetEvent = {})
 }
 
 @Preview
@@ -613,7 +566,7 @@ fun ShowListPriceTargetCardPreview() {
         remainingSyncPercentageToBeUpdated = 0.50f,
         totalNumberOfTargets = 20
     )
-    ShowPriceTargets(state = state, handleEvent = { })
+    ShowPriceTargets(state = state, handleHomeEvent = { }, handlePriceTargetEvent = {})
 }
 
 @Preview

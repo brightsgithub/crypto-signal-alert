@@ -1,12 +1,6 @@
 package com.owusu.cryptosignalalert.viewmodels
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.owusu.cryptosignalalert.domain.models.PriceTargetDomain
 import com.owusu.cryptosignalalert.domain.models.states.UpdateSyncState
 import com.owusu.cryptosignalalert.domain.usecase.DeletePriceTargetsUseCase
@@ -14,15 +8,14 @@ import com.owusu.cryptosignalalert.domain.usecase.GetPriceTargetsUseCase
 import com.owusu.cryptosignalalert.domain.usecase.IsSyncRunningUseCase
 import com.owusu.cryptosignalalert.domain.usecase.ListenToSyncPriceTargetsUpdatesUseCase
 import com.owusu.cryptosignalalert.mappers.UIMapper
-import com.owusu.cryptosignalalert.models.AlertListViewState
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetlist.AlertListViewState
 import com.owusu.cryptosignalalert.models.PriceTargetUI
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetlist.PriceTargetListUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.pricetargetlist.PriceTargetListUdfEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AlertListViewModel(
     private val priceTargetsMapper: UIMapper<PriceTargetDomain, PriceTargetUI>,
@@ -30,30 +23,18 @@ class AlertListViewModel(
     private val deletePriceTargetsUseCase: DeletePriceTargetsUseCase,
     private val isSyncRunningUseCase: IsSyncRunningUseCase,
     private val dispatcherBackground: CoroutineDispatcher,
-    private val dispatcherMain: CoroutineDispatcher,
-    private val workerTag: String,
-    private val app: Application,
-    private val workManager: WorkManager,
     private val listenToSyncPriceTargetsUpdatesUseCase: ListenToSyncPriceTargetsUpdatesUseCase
-): AndroidViewModel(app) {
-
-    var workInfoLiveData: LiveData<List<WorkInfo>> // <-- ADD THIS
-
-    private val _state = MutableStateFlow(AlertListViewState()) // for emitting
-    val viewState: Flow<AlertListViewState> = _state // for clients to listen to
-
-    // WorkManager in AndroidViewModel https://developer.android.com/codelabs/android-adv-workmanager#3
-    init {
-        // we won't observe here since we don't want to pass in the lifecycleScope.
-        // let the view observe and let it call back the viewmodel.
-        workInfoLiveData = workManager.getWorkInfosForUniqueWorkLiveData(workerTag)
-    }
+): UdfViewModel<PriceTargetListUdfEvent, AlertListViewState, PriceTargetListUdfAction>(initialUiState = AlertListViewState()) {
 
     fun isSyncRunning(): Boolean {
         return isSyncRunningUseCase.execute()
     }
 
-    fun loadAlertList(scope: CoroutineScope = viewModelScope) {
+    private fun init() {
+        loadAlertList()
+        listenToUpdateSyncState()
+    }
+    private fun loadAlertList(scope: CoroutineScope = viewModelScope) {
         scope.launch(dispatcherBackground) {
             showLoadingState()
             getPriceTargetsUseCase.invoke().collect { alertList ->
@@ -62,7 +43,7 @@ class AlertListViewModel(
         }
     }
 
-    fun listenToUpdateSyncState(scope: CoroutineScope = viewModelScope) {
+    private fun listenToUpdateSyncState(scope: CoroutineScope = viewModelScope) {
         scope.launch(dispatcherBackground) {
             listenToSyncPriceTargetsUpdatesUseCase.invoke().collect {
                 showRemainingSyncWorkToBeDone(it)
@@ -72,13 +53,14 @@ class AlertListViewModel(
 
     private fun showRemainingSyncWorkToBeDone(updateSyncState: UpdateSyncState) {
         val shouldShowSyncState = (updateSyncState.remainingPercentageOfWorkToBeDone > 0 && updateSyncState.remainingPercentageOfWorkToBeDone < 1)
-        _state.value = _state.value.copy(
+        val newUiState = uiState.value.copy(
             remainingSyncPercentageToBeUpdated = updateSyncState.remainingPercentageOfWorkToBeDone,
             shouldShowSyncState = shouldShowSyncState
         )
+        setUiState { newUiState }
     }
 
-    fun deletePriceTarget(priceTargetUI: PriceTargetUI) {
+    private fun deletePriceTarget(priceTargetUI: PriceTargetUI) {
         viewModelScope.launch(dispatcherBackground) {
             val targets = priceTargetsMapper.mapUIListToDomainList(listOf(priceTargetUI))
             deletePriceTargetsUseCase.invoke(DeletePriceTargetsUseCase.Params(targets))
@@ -86,21 +68,24 @@ class AlertListViewModel(
     }
 
     private fun showLoadingState() {
-        _state.value = _state.value.copy(isLoading = true)
+        val newUiState = uiState.value.copy(isLoading = true)
+        setUiState { newUiState }
     }
 
     private fun hideLoadingState() {
-        _state.value = _state.value.copy(isLoading = false)
+        val newUiState = uiState.value.copy(isLoading = false)
+        setUiState { newUiState }
     }
 
     private fun handleAlertList(priceTargetsDomainList: List<PriceTargetDomain>) {
         val priceTargets = priceTargetsMapper.mapDomainListToUIList(priceTargetsDomainList)
         val numOfTargetsMet = calculateNumberOfTargetsMet(priceTargets)
-        _state.value = _state.value.copy(
+        val newUiState = uiState.value.copy(
             priceTargets = priceTargets,
             numberOfTargetsMet = numOfTargetsMet,
             totalNumberOfTargets = priceTargets.size
         )
+        setUiState { newUiState }
     }
 
     private fun calculateNumberOfTargetsMet(priceTargetsList: List<PriceTargetUI>): Int {
@@ -111,5 +96,17 @@ class AlertListViewModel(
             }
         }
         return numOfTargetsMet
+    }
+
+    override fun handleEvent(event: PriceTargetListUdfEvent) {
+        when (event) {
+            is PriceTargetListUdfEvent.DeletePriceTarget -> {
+                deletePriceTarget(event.priceTargetUI)
+            }
+
+            is PriceTargetListUdfEvent.Initialize -> {
+                init()
+            }
+        }
     }
 }

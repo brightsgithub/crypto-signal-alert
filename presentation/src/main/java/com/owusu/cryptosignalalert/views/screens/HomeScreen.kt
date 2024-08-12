@@ -118,6 +118,16 @@ fun HomeScreen(
                 is HomeUdfAction.NavigateToPurchase -> {
                     navController.navigate(route = NavigationItem.Purchase.route)
                 }
+                is HomeUdfAction.NavigateToPriceTargetEntryFromSearch -> {
+                    navController.navigate(route = TargetEntryScreens.PriceTargetEntry.route) {
+                        // remove the SearchScreen when moving to the next destination
+                        // https://stackoverflow.com/questions/66845899/compose-navigation-remove-previous-composable-from-stack-before-navigating
+                        popUpTo(route = Graphs.SEARCH_NAV_GRAPH) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
                 else -> { }
             }
         }

@@ -16,5 +16,5 @@ sealed class HomeUdfEvent: UdfEvent {
     object EventNothing: HomeUdfEvent()
     object NavigateToPriceTargets: HomeUdfEvent()
     object NavigateToPurchase: HomeUdfEvent()
-
+    data class NavigateToPriceTargetEntryFromSearch(val selectedCoinUI: CoinUI): HomeUdfEvent()
 }

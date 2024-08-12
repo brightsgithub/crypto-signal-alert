@@ -192,6 +192,10 @@ class SharedViewModel(
             }
             is HomeUdfEvent.NavigateToPriceTargets -> sendAction { HomeUdfAction.NavigateToPriceTargets }
             is HomeUdfEvent.NavigateToPurchase -> sendAction { HomeUdfAction.NavigateToPurchase }
+            is HomeUdfEvent.NavigateToPriceTargetEntryFromSearch -> {
+                selectedCoinUI = event.selectedCoinUI
+                sendAction { HomeUdfAction.NavigateToPriceTargetEntryFromSearch }
+            }
             else -> {
 
             }

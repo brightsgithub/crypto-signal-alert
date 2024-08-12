@@ -4,6 +4,7 @@ import com.owusu.cryptosignalalert.viewmodels.udf.UdfAction
 
 sealed class HomeUdfAction: UdfAction {
     object NavigateToPriceTargetEntry: HomeUdfAction()
+    object NavigateToPriceTargetEntryFromSearch: HomeUdfAction()
     object NavigateToSearch: HomeUdfAction()
     object NavigateToSettings: HomeUdfAction()
     object NavigateToPriceTargets: HomeUdfAction()

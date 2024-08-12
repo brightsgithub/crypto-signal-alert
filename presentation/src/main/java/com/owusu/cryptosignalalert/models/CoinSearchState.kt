@@ -1,11 +1,13 @@
 package com.owusu.cryptosignalalert.models
 
+import com.owusu.cryptosignalalert.viewmodels.udf.UdfUiState
+
 data class CoinSearchState(val searchStr: String = "",
                            val coinIds: List<CoinIdUI> = arrayListOf(),
                            val showProgressBar: Boolean = false,
                            val resultSize:Int = 0,
                            val coinSearchStateMessage: CoinSearchStateMessage = CoinSearchStateMessage()
-) {
+): UdfUiState {
     companion object {
         val Empty = CoinSearchState()
     }

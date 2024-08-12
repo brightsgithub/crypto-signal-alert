@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import com.owusu.cryptosignalalert.models.*
 import com.owusu.cryptosignalalert.viewmodels.CoinSearchViewModel
 import com.owusu.cryptosignalalert.viewmodels.SharedViewModel
+import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchUdfAction
+import com.owusu.cryptosignalalert.viewmodels.udf.coinserach.CoinSearchUdfEvent
 import com.owusu.cryptosignalalert.viewmodels.udf.home.HomeUdfEvent
 import com.owusu.cryptosignalalert.views.screens.widgets.SearchBarUI
 import org.koin.androidx.compose.getViewModel
@@ -26,38 +28,27 @@ import org.koin.androidx.compose.getViewModel
 //@ExperimentalAnimationApi
 @Composable
 fun CoinSearchScreen(
-    sharedViewModel: SharedViewModel,
-    navigateToPriceTargetEntryScreen:(coin: CoinUI) -> Unit
+    sharedViewModel: SharedViewModel
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val searchViewModel = getViewModel<CoinSearchViewModel>()
+    val coinSearchState = searchViewModel.uiState.collectAsState(initial = CoinSearchState.Empty)
+    val handleSearchViewModelEvent = searchViewModel::handleEvent
 
-    val coinSearchState = searchViewModel.coinIdSearchModelState.collectAsState(initial = CoinSearchState.Empty)
-
-    /*
-     * https://www.droidcon.com/2022/05/20/a-cleaner-way-to-interact-between-composable-and-viewmodel-in-jetpack-compose/
-     * https://github.com/aqua30/FormValidation
-     *
-     * When listening for EVENTS from the viewModel do NOT use collect AS State, since when using this
-     * kept calling NavigateToPriceTargetEntryScreen and opening the targets screen multiple times ina loop.
-     * maybe I could use collectAsState inside LaunchedEffect? but decided to go with above example and
-     * stick with the usual collect and listen for events
-     */
-    val context = LocalContext.current
-    LaunchedEffect(key1 = context) {
-        searchViewModel.coinSearchStateEvents.collect {
-            when (it) {
-                is CoinSearchStateEvents.NOTHING -> {}
-                is CoinSearchStateEvents.NavigateToPriceTargetEntryScreen -> {
-                    navigateToPriceTargetEntryScreen(it.coinUI)
+    LaunchedEffect(Unit) {
+        searchViewModel.action.collect { action ->
+            when (action) {
+                is CoinSearchUdfAction.NavigateToPriceTargetEntryScreen -> {
+                    sharedViewModel.handleEvent(HomeUdfEvent.NavigateToPriceTargetEntryFromSearch(action.coinUI))
                 }
+                else -> {}
             }
         }
     }
 
     if (coinSearchState.value.coinSearchStateMessage.shouldShowMessage) {
-        val handleEvent = sharedViewModel::handleEvent
-        handleEvent(
+        val handleSharedViewModelEvent = sharedViewModel::handleEvent
+        handleSharedViewModelEvent(
             HomeUdfEvent.ShowSnackBar(
                 msg = coinSearchState.value.coinSearchStateMessage.message,
                 actionLabel = coinSearchState.value.coinSearchStateMessage.ctaText,
@@ -66,14 +57,15 @@ fun CoinSearchScreen(
             )
         )
 
-        searchViewModel.hideSnackBar()
+        //searchViewModel.hideSnackBar()
+        handleSearchViewModelEvent(CoinSearchUdfEvent.HideSnackBar)
     }
 
     SearchBarUI(
         searchText = coinSearchState.value.searchStr,
         placeholderText = "Search coins",
-        onSearchTextChanged = { searchViewModel.onSearchTextChanged(it) },
-        onClearClick = { searchViewModel.onClearClick() },
+        onSearchTextChanged = { handleSearchViewModelEvent(CoinSearchUdfEvent.OnSearchTextChanged(it)) },
+        onClearClick = { handleSearchViewModelEvent(CoinSearchUdfEvent.OnClearClicked) },
         onNavigateBack = {
             onBackPressedDispatcher?.onBackPressed()
         },
@@ -82,7 +74,7 @@ fun CoinSearchScreen(
     ) {
 
         DisplayCoinIdResults(coinIds = coinSearchState.value.coinIds, onClick = { coinIdUI ->
-            searchViewModel.onSearchItemSelected(coinIdUI)
+            handleSearchViewModelEvent(CoinSearchUdfEvent.OnSearchItemSelected(coinIdUI))
         })
     }
 }
